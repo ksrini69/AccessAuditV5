@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+        <variable
+            name="aInfo5ViewModel"
+            type="com.example.auditapplication5.presentation.viewmodel.AInfo5ViewModel" />
+    </data>
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/fl_introduction_page">
+        <!-- Linear Layout with action buttons and scrolling view-->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:id="@+id/ll_introductions_page">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/ll_action_buttons_in_introductions_pagge"
+                android:layout_gravity="center"
+                android:gravity="center"
+                android:orientation="horizontal"
+                android:paddingTop="10dp"
+                android:background="@drawable/border_2dp">
+
+                <Space
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1">
+
+                </Space>
+
+                <ImageButton
+                    android:id="@+id/ib_edit_photo_in_introduction_page"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:backgroundTint="@color/white"
+                    android:contentDescription="@string/string_image_button_showing_the_edit_photos_icon"
+                    android:src="@drawable/ic_edit_calendar_50"
+                    android:tooltipText="@string/string_image_button_showing_the_edit_photos_icon"/>
+
+                <Space
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1">
+
+                </Space>
+
+                <ImageButton
+                    android:id="@+id/ib_cameraX_in_introduction_page"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:backgroundTint="@color/white"
+                    android:contentDescription="@string/string_image_button_showing_the_camera_icon"
+                    android:src="@drawable/ic_camera_50"
+                    android:tooltipText="@string/string_image_button_showing_the_camera_icon"/>
+
+                <Space
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1">
+
+                </Space>
+
+                <ImageButton
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:id="@+id/ib_delete_in_introduction_page"
+                    android:backgroundTint="@color/white"
+                    android:contentDescription="@string/string_image_button_showing_the_delete_icon"
+                    android:src="@drawable/ic_delete_50"
+                    android:tooltipText="@string/string_image_button_showing_the_delete_icon"/>
+
+                <Space
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1">
+
+                </Space>
+
+                <ImageButton
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:id="@+id/ib_undo_in_introductions_page"
+                    android:backgroundTint="@color/white"
+                    android:contentDescription="@string/string_image_button_showing_the_undo_icon"
+                    android:src="@drawable/ic_undo_50"
+                    android:tooltipText="@string/string_image_button_showing_the_undo_icon"/>
+
+                <Space
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1">
+
+                </Space>
+
+
+            </LinearLayout>
+
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/tv_photo_paths_in_introductions_page"
+                android:background="@color/black"
+                android:text="@={aInfo5ViewModel.tvPhotoPathsInIntroductionsFragmentMLD}"
+                android:textColor="@color/white"
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="10dp"
+                android:textSize="12sp"
+                android:contentDescription="@string/string_text_view_to_display_photo_paths"
+                android:maxLines="7"
+                android:minLines="3" />
+
+
+
+            <androidx.core.widget.NestedScrollView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                tools:context=".IntroductionsScrollingFragment">
+
+                <EditText
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/et_introduction_remarks"
+                    android:hint="@string/string_enter_introductory_remarks_here"
+                    android:layout_margin="5dp"
+                    android:text="@={aInfo5ViewModel.etIntroductionsMLD}"
+                    android:autofillHints=""
+                    android:inputType="textMultiLine|textAutoComplete|textAutoCorrect"
+                    android:textColorHint="@color/light_grey"
+                    android:textSize="18sp"
+                    android:tooltipText="@string/string_enter_introductory_remarks_here"/>
+
+            </androidx.core.widget.NestedScrollView>
+        </LinearLayout>
+
+        <!-- Progess bar shows when database items are being uploaded-->
+        <ProgressBar
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/pb_uploading_form_db_in_introductions"
+            android:visibility="gone"
+            android:contentDescription="@string/string_this_is_a_progress_bar"
+            android:tooltipText="@string/string_this_is_a_progress_bar"/>
+    </FrameLayout>
+
+</layout>

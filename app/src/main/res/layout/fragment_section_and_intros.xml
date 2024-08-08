@@ -1,0 +1,272 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+    <data>
+        <variable
+            name="aInfo5ViewModel"
+            type="com.example.auditapplication5.presentation.viewmodel.AInfo5ViewModel" />
+    </data>
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/fl_section_and_intros">
+        <LinearLayout
+            android:id="@+id/ll_section_intros"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <!-- Button to Choose Company Intro -->
+
+            <Space
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1">
+
+            </Space>
+
+            <LinearLayout
+                android:id="@+id/ll_layout_container_2"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <RelativeLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="0.15">
+
+                </RelativeLayout>
+
+                <RelativeLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="0.7">
+
+                    <LinearLayout
+                        android:id="@+id/ll_buttons_container"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical">
+
+                        <Button
+                            android:id="@+id/button_company_intro"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="@string/string_company_intro"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent"
+                            android:contentDescription="@string/string_button_for_entering_the_company_introduction"
+                            android:tooltipText="@string/string_button_for_entering_the_company_introduction"/>
+
+                    </LinearLayout>
+
+                </RelativeLayout>
+
+                <RelativeLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="0.15">
+
+                </RelativeLayout>
+
+            </LinearLayout>
+
+            <!-- Button to Choose A Section -->
+
+            <Space
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1">
+
+            </Space>
+
+            <LinearLayout
+                android:id="@+id/ll_layout_container_3"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <RelativeLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="0.15">
+
+                </RelativeLayout>
+
+                <RelativeLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="0.7">
+
+                    <LinearLayout
+                        android:id="@+id/ll_buttons_container_1"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical">
+
+
+                        <Button
+                            android:id="@+id/button_choose_section"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="@string/string_choose_a_section"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toBottomOf="@+id/button_company_intro"
+                            android:contentDescription="@string/string_button_to_choose_a_section"
+                            android:tooltipText="@string/string_button_to_choose_a_section"/>
+
+                    </LinearLayout>
+
+                </RelativeLayout>
+
+                <RelativeLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="0.15">
+
+                </RelativeLayout>
+
+            </LinearLayout>
+
+
+            <!-- Linear Layout for choosing section intro and observations screen-->
+
+            <Space
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1">
+
+            </Space>
+
+            <LinearLayout
+                android:id="@+id/ll_section_intro_and_observations_screen"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:orientation="horizontal">
+
+                <Button
+                    android:id="@+id/button_section_intro"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="10dp"
+                    android:text="@string/string_section_intro"
+                    android:contentDescription="@string/string_button_to_enter_the_section_introduction"
+                    android:tooltipText="@string/string_button_to_enter_the_section_introduction"/>
+
+                <Button
+                    android:id="@+id/button_obs_reco_stds"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/string_obs_reco_stds"
+                    android:contentDescription="@string/string_button_to_move_to_the_observations_recommendations_and_standards_screen"
+                    android:tooltipText="@string/string_button_to_move_to_the_observations_recommendations_and_standards_screen"/>
+
+
+            </LinearLayout>
+
+            <!-- Linear Layout to choose Edit, Delete, New Section, Reports  -->
+
+            <Space
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1">
+
+            </Space>
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/cl_section_buttons">
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/ll_section_buttons"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent">
+                    <Space
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1">
+
+                    </Space>
+                    <Button
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:id="@+id/button_edit_in_section_and_intros_fragment"
+                        android:text="@string/string_edit"
+                        android:contentDescription="@string/string_button_to_edit_the_company_name_audit_date_and_section_name"
+                        android:tooltipText="@string/string_button_to_edit_the_company_name_audit_date_and_section_name"/>
+                    <Space
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1">
+
+                    </Space>
+                    <ImageButton
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/ib_delete"
+                        android:backgroundTint="@color/purple_200"
+                        android:src="@drawable/ic_delete_50"
+                        android:contentDescription="@string/string_image_button_showing_the_delete_icon_click_to_delete_the_company_and_any_section"
+                        android:tooltipText="@string/string_image_button_showing_the_delete_icon_click_to_delete_the_company_and_any_section"/>
+                    <Space
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1">
+
+                    </Space>
+                    <Button
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:id="@+id/button_new_section"
+                        android:text="@string/string_new_section"
+                        android:contentDescription="@string/string_button_for_adding_a_new_section"
+                        android:tooltipText="@string/string_button_for_adding_a_new_section"/>
+                    <Space
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1">
+
+                    </Space>
+                </LinearLayout>
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+
+
+            <Space
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1">
+
+            </Space>
+
+
+        </LinearLayout>
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/fab_choosing_reports"
+            android:clickable="true"
+            android:layout_gravity="center|bottom"
+            android:layout_marginBottom="20dp"
+            android:src="@drawable/ic_baseline_library_books_24"
+            app:maxImageSize="50dp"
+            android:contentDescription="@string/string_floating_action_button_for_choosing_reports"
+            android:tooltipText="@string/string_choosing_reports"/>
+    </FrameLayout>
+
+</layout>

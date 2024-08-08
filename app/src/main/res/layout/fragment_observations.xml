@@ -1,0 +1,426 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+        <variable
+            name="aInfo5ViewModel"
+            type="com.example.auditapplication5.presentation.viewmodel.AInfo5ViewModel" />
+    </data>
+
+    <FrameLayout
+        android:id="@+id/fl_observations_recommendations_standards"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:context=".ObservationsFragment">
+
+        <!-- Linear Layout with action buttons and edit texts and textviews -->
+        <LinearLayout
+            android:id="@+id/ll_observations_actionbuttons_and_views"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:paddingBottom="10dp">
+
+            <TextView
+                android:id="@+id/tv_page_name_and_number"
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:background="@drawable/border_1dp"
+                android:contentDescription="@string/string_textview_that_displays_the_page_name_and_number"
+                android:gravity="center_vertical"
+                android:text="@{aInfo5ViewModel.etPageNameMLD}"
+                android:tooltipText="@string/string_textview_that_displays_the_page_name_and_number"/>
+
+
+            <LinearLayout
+                android:id="@+id/ll_action_buttons_1"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:layout_marginTop="5dp"
+                android:background="@drawable/border_1dp"
+                android:orientation="horizontal">
+
+                <Space
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1">
+
+                </Space>
+
+                <ImageButton
+                    android:id="@+id/ib_back"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:background="@color/purple_200"
+                    android:contentDescription="@string/string_image_button_showing_the_page_back_icon"
+                    android:src="@drawable/ic_back_50"
+                    android:tooltipText="@string/string_image_button_showing_the_page_back_icon"/>
+
+                <Space
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1">
+
+                </Space>
+
+                <ImageButton
+                    android:id="@+id/ib_forward"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:background="@color/purple_200"
+                    android:contentDescription="@string/string_image_button_showing_the_page_forward_icon"
+                    android:src="@drawable/ic_forward_50"
+                    android:tooltipText="@string/string_image_button_showing_the_page_forward_icon"/>
+
+                <Space
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1">
+
+                </Space>
+
+                <Button
+                    android:id="@+id/button_goto"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@color/purple_200"
+                    android:minWidth="48dp"
+                    android:padding="1dp"
+                    android:contentDescription="@string/string_button_for_moving_to_a_specific_page"
+                    android:text="@string/string_goto"
+                    android:tooltipText="@string/string_button_for_moving_to_a_specific_page"/>
+
+                <Space
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1">
+
+                </Space>
+
+                <ImageButton
+                    android:id="@+id/ib_camera_in_observations_page"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:background="@color/purple_200"
+                    android:contentDescription="@string/string_image_button_showing_the_camera_icon"
+                    android:src="@drawable/ic_camera_50"
+                    android:tooltipText="@string/string_image_button_showing_the_camera_icon"/>
+
+                <Space
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1">
+
+                </Space>
+
+                <ImageButton
+                    android:id="@+id/ib_add_a_page"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:background="@color/purple_200"
+                    android:contentDescription="@string/string_image_button_showing_add_a_page_icon"
+                    android:src="@drawable/ic_note_add_50"
+                    android:tooltipText="@string/string_image_button_showing_add_a_page_icon"/>
+
+                <Space
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1">
+
+                </Space>
+
+                <ImageButton
+                    android:id="@+id/ib_edit_photo_in_observations_page"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:background="@color/purple_200"
+                    android:contentDescription="@string/string_image_button_showing_the_edit_photos_icon"
+                    android:src="@drawable/ic_edit_calendar_50"
+                    android:tooltipText="@string/string_image_button_showing_the_edit_photos_icon"/>
+
+                <Space
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1">
+
+                </Space>
+
+                <ImageButton
+                    android:id="@+id/ib_delete_in_observations_page"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:background="@color/purple_200"
+                    android:contentDescription="@string/string_image_button_showing_the_delete_icon"
+                    android:src="@drawable/ic_delete_50"
+                    android:tooltipText="@string/string_image_button_showing_the_delete_icon"/>
+
+                <Space
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1">
+
+                </Space>
+
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:id="@+id/ll_action_buttons_2"
+                android:orientation="horizontal"
+                android:layout_marginTop="5dp">
+
+                <Space
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1">
+
+                </Space>
+
+                <Button
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:id="@+id/button_questions_view"
+                    android:background="@color/purple_200"
+                    android:text="@string/string_questions_view"
+                    android:minWidth="48dp"
+                    android:contentDescription="@string/string_button_to_go_to_the_questions_view"
+                    android:tooltipText="@string/string_button_to_go_to_the_questions_view"/>
+
+                <Space
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1">
+
+                </Space>
+                <Button
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:id="@+id/button_recommendations_view"
+                    android:background="@color/purple_200"
+                    android:text="@string/string_recommendations_view"
+                    android:minWidth="48dp"
+                    android:contentDescription="@string/string_button_to_go_to_the_recommendations_view"
+                    android:tooltipText="@string/string_button_to_go_to_the_recommendations_view"/>
+
+                <Space
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1">
+
+                </Space>
+                <Button
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:id="@+id/button_standards_view"
+                    android:background="@color/purple_200"
+                    android:text="@string/string_standards_view"
+                    android:minWidth="48dp"
+                    android:contentDescription="@string/string_button_to_go_to_the_standards_view"
+                    android:tooltipText="@string/string_button_to_go_to_the_standards_view"/>
+
+                <Space
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1">
+
+                </Space>
+                <Button
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:id="@+id/button_observations_view"
+                    android:background="@color/purple_200"
+                    android:text="@string/string_observations_view"
+                    android:minWidth="48dp"
+                    android:contentDescription="@string/string_button_to_go_to_the_observations_view"
+                    android:tooltipText="@string/string_button_to_go_to_the_observations_view"/>
+
+                <Space
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1">
+
+                </Space>
+
+            </LinearLayout>
+
+            <EditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/et_modify_page_name_by_user"
+                android:textSize="18sp"
+                android:hint="@string/string_modify_page_name_here"
+                android:tooltipText="@string/string_modify_page_name_here"
+                android:textColorHint="@color/light_grey"
+                android:inputType="text"
+                android:background="@drawable/border_1dp"
+                android:layout_marginBottom="5dp"
+                android:layout_marginTop="5dp"
+                android:text="@={aInfo5ViewModel.etPageNameMLD}"/>
+
+            <!--Label for the Observations and Recommendations Block -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:id="@+id/tv_observations_recommendations_label"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:background="@color/purple_700"
+                android:textColor="@color/yellow"
+                android:gravity="center"
+                android:text="@string/string_observations_and_recommendations"
+                android:tooltipText="@string/string_observations_and_recommendations"
+                android:layout_marginBottom="5dp"/>
+
+            <!--Scrollview that holds the Obs, Reco, photopaths and stds items -->
+            <ScrollView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/sv_observations_recommendations">
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/ll_observations_recommendations"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="36dp"
+                        android:id="@+id/tv_observations_pictures_label"
+                        android:textSize="16sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/yellow"
+                        android:background="@color/purple_500"
+                        android:gravity="center_vertical"
+                        android:text="@string/string_observations_and_photo_paths"
+                        android:tooltipText="@string/string_observations_and_photo_paths"
+                        android:layout_marginBottom="5dp"/>
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/tv_photo_paths_in_observations_page"
+                        android:textSize="12sp"
+                        android:text="@{aInfo5ViewModel.tvPhotoPathsInObservationsFragmentMLD}"
+                        android:textColor="@color/white"
+                        android:background="@color/black"
+                        android:scrollbars="vertical"
+                        android:scrollbarSize="12dp"
+                        android:maxLines="5"
+                        android:contentDescription="@string/string_textview_that_displays_the_photograph_paths_after_the_camera_is_used"
+                        android:tooltipText="@string/string_textview_that_displays_the_photograph_paths_after_the_camera_is_used"/>
+                    <EditText
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/et_observations_only"
+                        android:maxLines="10"
+                        android:textColor="@color/black"
+                        android:hint="@string/string_observations_only"
+                        android:textColorHint="@color/light_grey"
+                        android:textSize="18sp"
+                        android:layout_marginBottom="5dp"
+                        android:minHeight="50dp"
+                        android:text="@={aInfo5ViewModel.etObservationsFragmentMLD}"
+                        android:inputType="text"
+                        android:tooltipText="@string/string_edit_text_for_observations_only"/>
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="36dp"
+                        android:id="@+id/tv_recommendations_standards_label"
+                        android:textSize="16sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/yellow"
+                        android:background="@color/purple_500"
+                        android:gravity="center_vertical"
+                        android:text="@string/string_recommendations_and_standards"
+                        android:layout_marginBottom="5dp"
+                        android:contentDescription="@string/string_textview_showing_the_label_recommendations_and_standards"
+                        android:tooltipText="@string/string_textview_showing_the_label_recommendations_and_standards"/>
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/tv_standards_in_observations_page"
+                        android:textSize="12sp"
+                        android:text="@{aInfo5ViewModel.tvStandardsMLD}"
+                        android:textColor="@color/white"
+                        android:background="@color/black"
+                        android:scrollbars="vertical"
+                        android:scrollbarSize="12dp"
+                        android:maxLines="5"
+                        android:contentDescription="@string/string_textview_that_displays_the_standards_selected"
+                        android:tooltipText="@string/string_textview_that_displays_the_standards_selected"/>
+
+                    <EditText
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/et_recommendations_only"
+                        android:maxLines="10"
+                        android:textColor="@color/black"
+                        android:hint="@string/string_recommendations_only"
+                        android:tooltipText="@string/string_recommendations_only"
+                        android:textColorHint="@color/light_grey"
+                        android:textSize="18sp"
+                        android:layout_marginBottom="5dp"
+                        android:minHeight="50dp"
+                        android:text="@={aInfo5ViewModel.etRecommendationsMLD}"
+                        android:inputType="text"/>
+                </LinearLayout>
+            </ScrollView>
+
+            <!--Label for the Questions, Obs, Reco, Stds Views -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:id="@+id/tv_questions_etc_label"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:background="@color/purple_700"
+                android:textColor="@color/yellow"
+                android:gravity="center"
+                android:text="@string/string_questions_below"
+                android:tooltipText="@string/string_textview_that_displays_the_title_of_the_view_below"
+                android:contentDescription="@string/string_textview_that_displays_the_title_of_the_view_below"
+                android:layout_marginBottom="5dp"/>
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/rv_questions_framework"/>
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/rv_checkboxes_framework"/>
+
+        </LinearLayout>
+
+
+        <!-- Floating action button for adding new blocks -->
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/fab_add_a_new_block"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center|bottom"
+            android:layout_margin="5dp"
+            android:clickable="true"
+            android:contentDescription="@string/string_floating_action_button_showing_the_add_icon_click_to_add_a_new_block"
+            android:src="@drawable/ic_block_add_to_queue_50"
+            app:maxImageSize="50dp"
+            android:tooltipText="@string/string_floating_action_button_showing_the_add_icon_click_to_add_a_new_block"/>
+
+        <!-- Progess bar shows when database items are being uploaded-->
+        <ProgressBar
+            android:id="@+id/pb_uploading_from_database"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="gone"
+            android:contentDescription="@string/string_this_is_a_progress_bar"
+            android:tooltipText="@string/string_this_is_a_progress_bar"/>
+
+    </FrameLayout>
+</layout>

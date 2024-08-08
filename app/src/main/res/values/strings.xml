@@ -1,0 +1,195 @@
+<resources>
+    <string name="app_name">AuditApplication5</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="string_new_audit">New Audit</string>
+    <string name="string_edit_delete_audits">Edit/Delete Audits</string>
+    <string name="string_deletion_of_the_database">Deletion of the Database</string>
+    <string name="string_enter_the_password_daspl">Enter the Password: $DASPL#</string>
+    <string name="string_deletion_password">$DASPL#</string>
+    <string name="string_submit">Submit</string>
+    <string name="string_enter_the_company_name">Enter the Company Name</string>
+    <string name="string_enter_only_text_and_underscore_here">Enter only text and _ </string>
+    <string name="string_continue">Continue</string>
+    <string name="string_button_for_taking_photos">Button For Taking Photos</string>
+    <string name="large_text">
+        "Material is the metaphor.\n\n"
+    </string>
+    <string name="string_company_intro">Company Intro</string>
+    <string name="string_choose_a_section">Choose A Section</string>
+    <string name="string_section_intro">Section Intro</string>
+    <string name="string_obs_reco_stds">Obs/Reco/Stds Screen</string>
+    <string name="string_edit">Edit</string>
+    <string name="string_delete">Delete</string>
+    <string name="string_new_section">New Section</string>
+    <string name="string_reports">Reports</string>
+    <string name="string_image_button_showing_the_edit_photos_icon">Image Button showing the Edit Photos Icon</string>
+    <string name="string_image_button_showing_the_camera_icon">Image Button showing the Camera Icon</string>
+    <string name="string_image_button_showing_the_delete_icon">Image Button showing the Delete Icon</string>
+    <string name="string_image_button_showing_the_undo_icon">Image Button showing the Undo Icon</string>
+    <string name="string_text_view_to_display_photo_paths">Text View to display photo paths</string>
+    <string name="string_enter_introductory_remarks_here">Enter Introductory Remarks Here</string>
+    <string name="string_button_for_the_new_audit_option">Button for the New Audit option</string>
+    <string name="string_button_for_the_edit_and_delete_audits_option">Button for the Edit and Delete Audits option</string>
+    <string name="string_button_for_the_submit_option">Button for the Submit option</string>
+    <string name="string_place_to_enter_password_for_deleting_the_database">Place to enter password for deleting the database</string>
+    <string name="string_textview_label_indicating_that_the_password_be_entered_below">Textview label indicating that the password be entered below.</string>
+    <string name="string_textview_with_the_label_deletion_of_the_database">Textview with the label Deletion of the Database</string>
+    <string name="string_enter_the_password">Enter the password</string>
+    <string name="string_floating_action_button_showing_a_t_click_to_upload_template_files">Floating Action Button showing a T. Click to upload template files.</string>
+    <string name="string_floating_action_button_showing_a_delete_icon_choose_this_to_start_the_process_for_deleting_the_entire_database">Floating Action Button showing a Delete Icon. Click to Delete the database.</string>
+    <string name="string_textview_with_the_label_enter_the_company_name">Textview with the label Enter the Company Name</string>
+    <string name="string_button_for_entering_the_company_introduction">Button for entering the Company Introduction.</string>
+    <string name="string_button_to_choose_a_section">Button to Choose a Section</string>
+    <string name="string_button_to_enter_the_section_introduction">Button to enter the Section Introduction</string>
+    <string name="string_button_to_move_to_the_observations_recommendations_and_standards_screen">Button to move to the observations, recommendations and standards screen.</string>
+    <string name="string_button_to_edit_the_company_name_audit_date_and_section_name">Button to edit the company name, audit date and section name</string>
+    <string name="string_image_button_showing_the_delete_icon_click_to_delete_the_company_and_any_section">Image button showing the Delete Icon. Click to delete the company and any section.</string>
+    <string name="string_button_for_adding_a_new_section">Button for adding a new section</string>
+    <string name="string_button_for_choosing_which_types_of_reports_to_save_to_the_disk">Button for choosing which types of reports to save to the disk</string>
+    <string name="string_floating_action_button_showing_the_add_icon_click_to_add_a_new_block">Floating Action Button showing the Add Icon. Click to Add a New Block</string>
+    <string name="string_textview_that_displays_the_page_name_and_number">Textview that displays the page name and number</string>
+    <string name="string_image_button_showing_the_page_back_icon">Image Button showing the page back icon</string>
+    <string name="string_image_button_showing_the_page_forward_icon">Image Button showing the page forward icon</string>
+    <string name="string_goto">Goto</string>
+    <string name="string_button_for_moving_to_a_specific_page">Button for moving to a specific page</string>
+    <string name="string_image_button_showing_add_a_page_icon">Image Button showing Add a Page Icon</string>
+    <string name="string_questions_view">Questions</string>
+    <string name="string_button_to_go_to_the_questions_view">Button to go to the Questions View</string>
+    <string name="string_recommendations_view">Reco</string>
+    <string name="string_button_to_go_to_the_recommendations_view">Button to go to the Recommendations View</string>
+    <string name="string_standards_view">Stds</string>
+    <string name="string_button_to_go_to_the_standards_view">Button to go to the Standards view</string>
+    <string name="string_observations_view">Obs</string>
+    <string name="string_button_to_go_to_the_observations_view">Button to go to the Observations View</string>
+    <string name="string_modify_page_name_here">Modify Page Name here</string>
+    <string name="string_observations_and_recommendations">Observations and Recommendations</string>
+    <string name="string_observations_and_photo_paths">Observations and Photo Paths</string>
+    <string name="string_textview_that_displays_the_photograph_paths_after_the_camera_is_used">Textview that displays the photograph paths after the camera is used</string>
+    <string name="string_observations_only">Observations Only</string>
+    <string name="string_recommendations_and_standards">Recommendations and Standards</string>
+    <string name="string_recommendations_only">Recommendations Only</string>
+    <string name="string_textview_that_displays_the_standards_selected">Textview that displays the standards selected</string>
+    <string name="string_questions_below">Questions Below</string>
+    <string name="string_take_photo">Take Photo</string>
+    <string name="string_button_for_capturing_images_using_the_camera">Button for capturing images using the camera.</string>
+    <string name="string_button_for_capturing_videos">Button for capturing videos.</string>
+    <string name="string_imageview_that_holds_the_background_image">Imageview that holds the background image</string>
+    <string name="string_captions_to_be_entered_here">Captions to be entered here</string>
+    <string name="string_picture_labels_to_be_entered_here">Picture labels to be entered here</string>
+    <string name="string_image_button_for_collapsing_and_expanding_this_palatte">Image Button for collapsing and expanding this palatte</string>
+    <string name="string_image_button_for_entering_closed_captions">Image Button for entering closed captions</string>
+    <string name="string_image_button_for_drawing_rectangles">Image Button for drawing rectangles</string>
+    <string name="string_image_button_for_drawing_ovals">Image Button for drawing ovals</string>
+    <string name="string_image_button_to_mark_distances_between_two_points">Image Button to mark distances between two points</string>
+    <string name="string_image_button_to_enter_text_for_labels_on_the_diagram">Image Button to enter text for labels on the diagram</string>
+    <string name="string_image_button_for_saving_the_entered_text">Image Button for saving the entered text</string>
+    <string name="string_image_button_showing_the_brush_icon_for_selecting_the_brush_size_for_the_drawings">Image Button showing the brush icon for selecting the brush size for the drawings</string>
+    <string name="string_image_button_for_selecting_the_text_font_size_for_labels">Image Button for selecting the text font size for labels</string>
+    <string name="string_image_button_for_rotating_the_label_text_to_the_right">Image Button for rotating the label text to the right.</string>
+    <string name="string_image_button_to_select_the_color_black">Image Button to select the color Black</string>
+    <string name="string_image_button_to_select_the_color_red">Image Button to select the color Red</string>
+    <string name="string_image_button_to_select_the_color_green">Image Button to select the color Green</string>
+    <string name="string_image_button_to_select_the_color_blue">Image Button to select the color Blue</string>
+    <string name="string_image_button_to_select_the_color_yellow">Image Button to select the color Yellow</string>
+    <string name="string_image_button_to_select_the_color_white">Image Button to select the color White</string>
+    <string name="string_textview_that_displays_the_title_of_the_view_below">Textview that displays the title of the view below.</string>
+    <string name="string_edit_text_for_entering_names">Edit Text for entering company names and section names</string>
+    <string name="string_button_for_the_continue_option_click_to_continue_after_entering_the_name">Button for the Continue option. Click to continue after entering the name.</string>
+    <string name="string_take_video">Take Video</string>
+    <string name="string_edit_text_for_observations_only">Edit Text For Observations Only</string>
+    <string name="string_textview_showing_the_label_recommendations_and_standards">Textview showing the label Recommendations and Standards</string>
+    <string name="string_this_is_a_progress_bar">This is a Progress Bar</string>
+    <string name="string_textview_that_holds_the_photograph_title">Textview that holds the Photograph title</string>
+    <string name="string_textview_that_displays_a_name">Textview that displays a name</string>
+    <string name="string_textview_that_displays_the_page_group_heading">Textview that displays the Page Group Heading</string>
+    <string name="string_textview_that_displays_the_page_name">Textview that displays the page name</string>
+    <string name="string_b01">B01</string>
+    <string name="string_textview_that_display_the_question_number">Textview that display the Question Number</string>
+    <string name="string_textview_that_displays_the_question">Textview that displays the Question</string>
+    <string name="string_textview_that_displays_the_message">Textview that displays the message</string>
+    <string name="string_textview_that_displays_whether_the_standard_is_mandatory_or_not">Textview that displays whether the standard is Mandatory or not</string>
+    <string name="string_button_that_allows_you_to_choose_an_answer">Button that allows you to choose an answer</string>
+    <string name="string_textview_that_displays_the_data_field_description">Textview that displays the data field description</string>
+    <string name="string_hp">HP</string>
+    <string name="string_this_is_an_imageview_in_recyclerview_item">This is an Imageview in recyclerview item</string>
+    <string name="string_textview_showing_the_photograph_heading">Textview showing the photograph heading</string>
+    <string name="string_application_name_on_action_bar">Access Audit App for Buildings</string>
+    <string name="string_new_parent_folder">Getting a New Parent Folder</string>
+    <string name="string_message_for_new_parent_folder">Do you want to select a new parent Folder?</string>
+    <string name="string_deleting_templates_db">Deleting the Templates Database</string>
+    <string name="string_message_for_deleting_templates_db">Do you really want to delete all the templates?</string>
+    <string name="string_deleting_audit_records_db">Deleting the Audit Records Database</string>
+    <string name="string_message_for_deleting_audit_records_db">Do you really want to delete all the audit records?</string>
+    <string name="string_floating_action_button_for_choosing_reports">Floating Action Button for Choosing Reports</string>
+    <string name="string_choosing_reports">Choose Reports</string>
+
+
+
+
+    <string-array name="Priority_Choices">
+        <item>HP</item>
+        <item>MP</item>
+        <item>RA</item>
+        <item>PC</item>
+    </string-array>
+
+    <string-array name="Edit_Choices_1">
+        <item>Edit Company Name</item>
+        <item>Edit Audit Date</item>
+    </string-array>
+
+    <string-array name="Edit_Choices_2">
+        <item>Edit Company Name</item>
+        <item>Edit Audit Date</item>
+        <item>Edit Section Name</item>
+    </string-array>
+
+
+    <string-array name="Delete_Choices_1">
+        <item>Delete Company</item>
+    </string-array>
+
+    <string-array name="Delete_Choices_2">
+        <item>Delete Company</item>
+        <item>Delete the Section</item>
+    </string-array>
+
+    <string-array name="Report_Choices">
+        <item>Three Column Report - Word</item>
+        <item>Three Column Report - Excel</item>
+        <item>Six Column Report - Word</item>
+        <item>Six Column Report - Excel</item>
+        <item>Checklist Report - Word</item>
+        <item>Checklist Report - Excel</item>
+    </string-array>
+
+    <string-array name="Default_Section_Names">
+        <item>Gates</item>
+        <item>Pathways</item>
+        <item>Parking</item>
+        <item>Drop off and Building Entry</item>
+        <item>Reception</item>
+        <item>Lifts</item>
+        <item>Staircases</item>
+        <item>Cafeteria</item>
+        <item>Pantry</item>
+        <item>Unisex Toilets</item>
+        <item> Single Sex Toilets</item>
+        <item>Work Areas</item>
+        <item>Operation Area</item>
+        <item>Training Rooms</item>
+        <item>Meeting Rooms</item>
+        <item>Auditoriums</item>
+        <item>Wellness Rooms</item>
+        <item>Health Centre</item>
+        <item>Mothers Room</item>
+        <item>Recreation Centres</item>
+        <item>Laboratories</item>
+        <item>Class Rooms</item>
+        <item>Miscellaneous Rooms</item>
+        <item>Emergency Related</item>
+        <item>Signages</item>
+        <item>Others</item>
+    </string-array>
+</resources>

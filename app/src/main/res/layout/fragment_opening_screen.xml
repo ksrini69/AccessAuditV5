@@ -1,0 +1,199 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+<FrameLayout
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".OpeningScreenFragment">
+
+    <!-- Linear Layout for Opening Screen -->
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="horizontal"
+        android:id="@+id/ll_layout_container"
+        android:baselineAligned="false">
+        
+        <RelativeLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="0.15">
+
+        </RelativeLayout>
+        <RelativeLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="0.7">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:id="@+id/ll_opening_screen"
+                android:orientation="vertical"
+                android:gravity="center"
+                tools:context=".OpeningScreenFragment">
+
+                <Space
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1">
+
+                </Space>
+
+                <Button
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/button_new_audit"
+                    android:textSize="20sp"
+                    android:text="@string/string_new_audit"
+                    android:contentDescription="@string/string_button_for_the_new_audit_option"
+                    android:tooltipText="@string/string_button_for_the_new_audit_option"
+                    />
+
+                <Space
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1">
+
+                </Space>
+
+                <Button
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/button_edit_delete_audits"
+                    android:textSize="20sp"
+                    android:text="@string/string_edit_delete_audits"
+                    android:contentDescription="@string/string_button_for_the_edit_and_delete_audits_option"
+                    android:tooltipText="@string/string_button_for_the_edit_and_delete_audits_option"
+                    />
+                <Space
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1">
+
+                </Space>
+
+            </LinearLayout>
+
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="0.15">
+        </RelativeLayout>
+        
+    </LinearLayout>
+
+    <!-- Linear Layout for Password For Deleting Database etc -->
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="horizontal"
+        android:id="@+id/ll_layout_container_1">
+
+        <RelativeLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="0.15">
+
+        </RelativeLayout>
+        <RelativeLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="0.7">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:id="@+id/ll_password_database_deletion"
+                android:orientation="vertical"
+                android:gravity="center">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_horizontal"
+                    android:textSize="23sp"
+                    android:textStyle="bold"
+                    android:text="@string/string_deletion_of_the_database"
+                    android:contentDescription="@string/string_textview_with_the_label_deletion_of_the_database"
+                    android:tooltipText="@string/string_textview_with_the_label_deletion_of_the_database"
+                    />
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_horizontal"
+                    android:layout_marginTop="5dp"
+                    android:textStyle="bold"
+                    android:textSize="20sp"
+                    android:text="@string/string_enter_the_password_daspl"
+                    android:contentDescription="@string/string_textview_label_indicating_that_the_password_be_entered_below"
+                    android:tooltipText="@string/string_textview_label_indicating_that_the_password_be_entered_below"/>
+
+                <EditText
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/et_password_database_deletion"
+                    android:background="@drawable/border_2dp"
+                    android:layout_marginTop="20dp"
+                    android:textSize="20sp"
+                    android:inputType="textPassword"
+                    android:hint="@string/string_enter_the_password"
+                    android:tooltipText="@string/string_enter_the_password"
+                    android:textColorHint="@color/light_grey"
+                    android:autofillHints="" />
+
+                <Button
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/button_submit_database_deletion"
+                    android:text="@string/string_submit"
+                    android:layout_marginTop="20dp"
+                    android:layout_gravity="end"
+                    android:contentDescription="@string/string_button_for_the_submit_option"
+                    android:tooltipText="@string/string_button_for_the_submit_option"/>
+
+            </LinearLayout>
+
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="0.15">
+
+        </RelativeLayout>
+
+    </LinearLayout>
+
+    <!-- Floating Action Button for adding Template Files -->
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/fab_adding_template_files"
+        android:layout_gravity="end|bottom"
+        android:clickable="true"
+        android:layout_margin="20dp"
+        app:maxImageSize="50dp"
+        android:src="@drawable/ic_title_48"
+        android:contentDescription="@string/string_floating_action_button_showing_a_t_click_to_upload_template_files"
+        android:tooltipText="@string/string_floating_action_button_showing_a_t_click_to_upload_template_files"/>
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/fab_deleting_database_L"
+        android:layout_gravity="start|bottom"
+        android:clickable="true"
+        android:layout_margin="20dp"
+        app:maxImageSize="50dp"
+        android:src="@drawable/ic_delete_all"
+        android:contentDescription="@string/string_floating_action_button_showing_a_delete_icon_choose_this_to_start_the_process_for_deleting_the_entire_database"
+        android:tooltipText="@string/string_floating_action_button_showing_a_delete_icon_choose_this_to_start_the_process_for_deleting_the_entire_database"/>
+
+</FrameLayout>
+</layout>

@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/openingScreenFragment">
+
+    <fragment
+        android:id="@+id/openingScreenFragment"
+        android:name="com.example.auditapplication5.OpeningScreenFragment"
+        android:label="fragment_opening_screen"
+        tools:layout="@layout/fragment_opening_screen" >
+        <action
+            android:id="@+id/action_openingScreenFragment_to_enterNameFragment"
+            app:destination="@id/enterNameFragment" />
+        <action
+            android:id="@+id/action_openingScreenFragment_to_simpleListRecyclerViewFragment"
+            app:destination="@id/simpleListRecyclerViewFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/simpleListRecyclerViewFragment"
+        android:name="com.example.auditapplication5.SimpleListRecyclerViewFragment"
+        android:label="fragment_simple_list_recycler_view"
+        tools:layout="@layout/fragment_simple_list_recycler_view" >
+        <action
+            android:id="@+id/action_simpleListRecyclerViewFragment_to_openingScreenFragment"
+            app:destination="@id/openingScreenFragment" />
+        <action
+            android:id="@+id/action_simpleListRecyclerViewFragment_to_sectionAndIntrosFragment"
+            app:destination="@id/sectionAndIntrosFragment" />
+        <action
+            android:id="@+id/action_simpleListRecyclerViewFragment_to_enterNameFragment"
+            app:destination="@id/enterNameFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/enterNameFragment"
+        android:name="com.example.auditapplication5.EnterNameFragment"
+        android:label="fragment_enter_name"
+        tools:layout="@layout/fragment_enter_name" >
+        <action
+            android:id="@+id/action_enterNameFragment_to_openingScreenFragment"
+            app:destination="@id/openingScreenFragment" />
+        <action
+            android:id="@+id/action_enterNameFragment_to_sectionAndIntrosFragment"
+            app:destination="@id/sectionAndIntrosFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/sectionAndIntrosFragment"
+        android:name="com.example.auditapplication5.SectionAndIntrosFragment"
+        android:label="fragment_section_and_intros"
+        tools:layout="@layout/fragment_section_and_intros" >
+        <action
+            android:id="@+id/action_sectionAndIntrosFragment_to_openingScreenFragment"
+            app:destination="@id/openingScreenFragment" />
+        <action
+            android:id="@+id/action_sectionAndIntrosFragment_to_introductionsScrollingFragment"
+            app:destination="@id/introductionsScrollingFragment" />
+        <action
+            android:id="@+id/action_sectionAndIntrosFragment_to_observationsFragment"
+            app:destination="@id/observationsFragment" />
+        <action
+            android:id="@+id/action_sectionAndIntrosFragment_to_simpleListRecyclerViewFragment"
+            app:destination="@id/simpleListRecyclerViewFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/introductionsScrollingFragment"
+        android:name="com.example.auditapplication5.IntroductionsScrollingFragment"
+        android:label="fragment_introductions_scrolling"
+        tools:layout="@layout/fragment_introductions_scrolling" >
+        <action
+            android:id="@+id/action_introductionsScrollingFragment_to_sectionAndIntrosFragment"
+            app:destination="@id/sectionAndIntrosFragment" />
+        <action
+            android:id="@+id/action_introductionsScrollingFragment_to_photoDisplayRecyclerviewFragment"
+            app:destination="@id/photoDisplayRecyclerviewFragment" />
+        <action
+            android:id="@+id/action_introductionsScrollingFragment_to_cameraXFragment"
+            app:destination="@id/cameraXFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/observationsFragment"
+        android:name="com.example.auditapplication5.ObservationsFragment"
+        android:label="fragment_observations"
+        tools:layout="@layout/fragment_observations" >
+        <action
+            android:id="@+id/action_observationsFragment_to_sectionAndIntrosFragment"
+            app:destination="@id/sectionAndIntrosFragment" />
+        <action
+            android:id="@+id/action_observationsFragment_to_cameraXFragment"
+            app:destination="@id/cameraXFragment" />
+        <action
+            android:id="@+id/action_observationsFragment_to_gotoRecyclerviewFragment"
+            app:destination="@id/gotoRecyclerviewFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/photoDisplayRecyclerviewFragment"
+        android:name="com.example.auditapplication5.PhotoDisplayRecyclerviewFragment"
+        android:label="fragment_photo_display_recyclerview"
+        tools:layout="@layout/fragment_photo_display_recyclerview" >
+        <action
+            android:id="@+id/action_photoDisplayRecyclerviewFragment_to_photoModificationFragment"
+            app:destination="@id/photoModificationFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/parentChildRecyclerviewFragment"
+        android:name="com.example.auditapplication5.ParentChildRecyclerviewFragment"
+        android:label="fragment_parent_child_recyclerview"
+        tools:layout="@layout/fragment_parent_child_recyclerview" />
+    <fragment
+        android:id="@+id/gotoRecyclerviewFragment"
+        android:name="com.example.auditapplication5.GotoRecyclerviewFragment"
+        android:label="fragment_goto_recyclerview"
+        tools:layout="@layout/fragment_goto_recyclerview" >
+        <action
+            android:id="@+id/action_gotoRecyclerviewFragment_to_observationsFragment"
+            app:destination="@id/observationsFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/cameraXFragment"
+        android:name="com.example.auditapplication5.CameraXFragment"
+        android:label="fragment_camera_x"
+        tools:layout="@layout/fragment_camera_x" >
+        <action
+            android:id="@+id/action_cameraXFragment_to_introductionsScrollingFragment"
+            app:destination="@id/introductionsScrollingFragment" />
+        <action
+            android:id="@+id/action_cameraXFragment_to_observationsFragment"
+            app:destination="@id/observationsFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/photoModificationFragment"
+        android:name="com.example.auditapplication5.PhotoModificationFragment"
+        android:label="fragment_photo_modification"
+        tools:layout="@layout/fragment_photo_modification" >
+        <action
+            android:id="@+id/action_photoModificationFragment_to_introductionsScrollingFragment"
+            app:destination="@id/introductionsScrollingFragment" />
+        <action
+            android:id="@+id/action_photoModificationFragment_to_observationsFragment"
+            app:destination="@id/observationsFragment" />
+    </fragment>
+</navigation>

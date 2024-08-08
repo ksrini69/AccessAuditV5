@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/ll_question_item"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="2dp"
+    android:background="@drawable/border_2dp"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:id="@+id/ll_question_and_block_number"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="5dp"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/tv_block_number"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="7"
+            android:contentDescription="@string/string_textview_that_display_the_question_number"
+            android:gravity="start|center_vertical"
+            android:text="@string/string_b01"
+            android:textSize="16sp"
+            android:tooltipText="@string/string_textview_that_display_the_question_number" />
+
+        <TextView
+            android:id="@+id/tv_question"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:contentDescription="@string/string_textview_that_displays_the_question"
+            android:gravity="start|center_vertical"
+            android:maxLines="3"
+            android:text="@string/app_name"
+            android:textSize="16sp"
+            android:tooltipText="@string/string_textview_that_displays_the_question" />
+
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/tv_message"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="5dp"
+        android:contentDescription="@string/string_textview_that_displays_the_message"
+        android:gravity="start|center_vertical"
+        android:maxLines="5"
+        android:text="@string/app_name"
+        android:textSize="14sp"
+        android:tooltipText="@string/string_textview_that_displays_the_message" />
+
+    <TextView
+        android:id="@+id/tv_mandatory"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="5dp"
+        android:contentDescription="@string/string_textview_that_displays_whether_the_standard_is_mandatory_or_not"
+        android:gravity="start|center_vertical"
+        android:maxLines="5"
+        android:text="@string/app_name"
+        android:textSize="14sp"
+        android:tooltipText="@string/string_textview_that_displays_whether_the_standard_is_mandatory_or_not" />
+
+    <Button
+        android:id="@+id/button_choose"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="5dp"
+        android:contentDescription="@string/string_button_that_allows_you_to_choose_an_answer"
+        android:text="@string/app_name"
+        android:tooltipText="@string/string_button_that_allows_you_to_choose_an_answer" />
+
+
+    <LinearLayout
+        android:id="@+id/ll_data_field_1"
+        android:layout_width="match_parent"
+        android:layout_height="35dp"
+        android:layout_marginBottom="5dp"
+        android:background="@drawable/border_1dp"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/tv_data_field_1_description"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1.5"
+            android:contentDescription="@string/string_textview_that_displays_the_data_field_description"
+            android:gravity="start|center_vertical"
+            android:maxLines="2"
+            android:text="@string/app_name"
+            android:textSize="14sp" />
+
+        <EditText
+            android:id="@+id/et_data_field_1"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:autofillHints="username"
+            android:background="@drawable/border_1dp"
+            android:hint="@string/app_name"
+            android:inputType="text"
+            android:textColorHint="@color/light_grey"
+            android:textSize="14sp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/ll_data_field_2"
+        android:layout_width="match_parent"
+        android:layout_height="35dp"
+        android:layout_marginBottom="5dp"
+        android:background="@drawable/border_1dp"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/tv_data_field_2_description"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1.5"
+            android:contentDescription="@string/string_textview_that_displays_the_data_field_description"
+            android:gravity="start|center_vertical"
+            android:maxLines="2"
+            android:text="@string/app_name"
+            android:textSize="14sp" />
+
+        <EditText
+            android:id="@+id/et_data_field_2"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:autofillHints="username"
+            android:background="@drawable/border_1dp"
+            android:hint="@string/app_name"
+            android:inputType="text"
+            android:textColorHint="@color/light_grey"
+            android:textSize="14sp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/ll_data_field_3"
+        android:layout_width="match_parent"
+        android:layout_height="35dp"
+        android:layout_marginBottom="5dp"
+        android:background="@drawable/border_1dp"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/tv_data_field_3_description"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1.5"
+            android:contentDescription="@string/string_textview_that_displays_the_data_field_description"
+            android:gravity="start|center_vertical"
+            android:maxLines="2"
+            android:text="@string/app_name"
+            android:textSize="14sp" />
+
+        <EditText
+            android:id="@+id/et_data_field_3"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:autofillHints="username"
+            android:background="@drawable/border_1dp"
+            android:hint="@string/app_name"
+            android:inputType="text"
+            android:textColorHint="@color/light_grey"
+            android:textSize="14sp" />
+    </LinearLayout>
+</LinearLayout>

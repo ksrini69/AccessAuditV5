@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/ll_rv_parent_child_parent_item"
+    android:orientation="vertical">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:id="@+id/cl_rv_parent_child_parent_item"
+        android:layout_marginBottom="3dp">
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/tv_rv_parent_child_parent_item"
+            android:gravity="start|center_vertical"
+            android:textColor="@color/yellow"
+            android:background="@color/purple_500"
+            android:textStyle="bold"
+            android:textSize="27sp"
+            android:text="@string/app_name"
+            android:layout_margin="5dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            android:contentDescription="@string/string_textview_that_displays_the_page_group_heading"
+            android:tooltipText="@string/string_textview_that_displays_the_page_group_heading"/>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/rv_parent_child_child_recyclerview"
+        android:layout_marginStart="5dp"/>
+
+</LinearLayout>

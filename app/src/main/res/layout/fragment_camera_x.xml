@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+<androidx.constraintlayout.widget.ConstraintLayout
+    android:id="@+id/cl_cameraX"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".CameraXFragment">
+
+    <androidx.camera.view.PreviewView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/viewfinder"/>
+
+    <!-- Button to take photos -->
+    <Button
+        android:layout_width="110dp"
+        android:layout_height="110dp"
+        android:id="@+id/button_image_capture"
+        android:layout_marginBottom="50dp"
+        android:layout_marginEnd="50dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/gl_vertical_centerline"
+        android:text="@string/string_take_photo"
+        android:elevation="2dp"
+        android:tooltipText="@string/string_take_photo"
+        android:contentDescription="@string/string_button_for_taking_photos"/>
+
+    <!-- Button to take videos -->
+
+    <Button
+        android:layout_width="110dp"
+        android:layout_height="110dp"
+        android:id="@+id/button_video_capture"
+        android:layout_marginBottom="50dp"
+        android:layout_marginStart="50dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/gl_vertical_centerline"
+        android:text="@string/string_take_video"
+        android:elevation="2dp"
+        android:tooltipText="@string/string_take_video"
+        android:contentDescription="@string/string_button_for_capturing_videos"/>
+
+
+    <!-- Guideline -->
+    <androidx.constraintlayout.widget.Guideline
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/gl_vertical_centerline"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.5"/>
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

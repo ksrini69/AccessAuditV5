@@ -1,0 +1,526 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+        <variable
+            name="aInfo5ViewModel"
+            type="com.example.auditapplication5.presentation.viewmodel.AInfo5ViewModel" />
+        <variable
+            name="drawingView"
+            type="com.example.auditapplication5.DrawingView" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/constraintLayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:context=".PhotoModificationFragment">
+
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/fl_drawing_view_container"
+            android:background="@drawable/background_drawing_view_layout"
+            android:padding="1dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:id="@+id/iv_background"
+                android:scaleType="centerCrop"
+                tools:ignore="ImageContrastCheck"
+                android:contentDescription="@string/string_imageview_that_holds_the_background_image"
+                android:tooltipText="@string/string_imageview_that_holds_the_background_image"/>
+
+            <com.example.auditapplication5.DrawingView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:id="@+id/drawing_view"/>
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/cl_for_tv_for_photo_title">
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/tv_for_photo_title"
+                    android:background="@color/black"
+                    android:textColor="@color/white"
+                    android:textStyle="bold"
+                    android:gravity="center"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    android:contentDescription="@string/string_textview_that_holds_the_photograph_title"
+                    android:tooltipText="@string/string_textview_that_holds_the_photograph_title"/>
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/cl_for_edit_text_for_captions"
+                android:layout_gravity="bottom">
+                <com.google.android.material.textfield.TextInputLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/tet_for_edit_text_for_captions"
+                    app:hintEnabled="false"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/tiet_for_captions"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:background="@color/white"
+                        android:hint="@string/string_captions_to_be_entered_here"
+                        android:importantForAccessibility="yes"
+                        android:padding="1dp"
+                        android:textColorHint="@color/light_grey"
+                        android:textSize="18sp"
+                        android:tooltipText="@string/string_captions_to_be_entered_here"
+                        tools:ignore="TouchTargetSizeCheck,TextContrastCheck,DuplicateClickableBoundsCheck" />
+                </com.google.android.material.textfield.TextInputLayout>
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/cl_for_edit_text_for_picture_labelling"
+                android:layout_gravity="bottom">
+                <com.google.android.material.textfield.TextInputLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/tet_for_edit_text_for_picture_labelling"
+                    app:hintEnabled="false"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent">
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:id="@+id/tiet_for_picture_labelling"
+                        android:background="@color/white"
+                        android:importantForAccessibility="yes"
+                        android:hint="@string/string_picture_labels_to_be_entered_here"
+                        android:tooltipText="@string/string_picture_labels_to_be_entered_here"
+                        android:textColorHint="@color/light_grey"
+                        android:textSize="18sp"
+                        android:padding="1dp"
+                        tools:ignore="TouchTargetSizeCheck,TextContrastCheck"/>
+                </com.google.android.material.textfield.TextInputLayout>
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+        </FrameLayout>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:id="@+id/ll_paint_colors"
+            android:orientation="horizontal"
+            android:layout_marginBottom="5dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toTopOf="@id/ll_action_buttons_1_in_photo_modification">
+            <ImageButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/ib_to_collapse_and_expand_paint_colours"
+                android:src="@drawable/ic_back_50"
+                android:minHeight="48dp"
+                android:minWidth="48dp"
+                android:contentDescription="@string/string_image_button_for_collapsing_and_expanding_this_palatte"
+                android:tooltipText="@string/string_image_button_for_collapsing_and_expanding_this_palatte"
+                android:background="@color/purple_200"/>
+
+            <Space
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="2">
+
+            </Space>
+
+            <ImageButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/ib_color_black"
+                android:src="@drawable/palette_normal"
+                android:minHeight="48dp"
+                android:minWidth="48dp"
+                android:tag="@color/black"
+                android:contentDescription="@string/string_image_button_to_select_the_color_black"
+                android:tooltipText="@string/string_image_button_to_select_the_color_black"
+                android:background="@color/black"
+                tools:ignore="DuplicateSpeakableTextCheck,RedundantDescriptionCheck"/>
+
+            <Space
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1">
+
+            </Space>
+
+            <ImageButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/ib_color_red"
+                android:src="@drawable/palette_normal"
+                android:minHeight="48dp"
+                android:minWidth="48dp"
+                android:tag="@color/red"
+                android:contentDescription="@string/string_image_button_to_select_the_color_red"
+                android:tooltipText="@string/string_image_button_to_select_the_color_red"
+                android:background="@color/red"
+                tools:ignore="DuplicateSpeakableTextCheck,RedundantDescriptionCheck"/>
+
+            <Space
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1">
+
+            </Space>
+
+            <ImageButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/ib_color_green"
+                android:src="@drawable/palette_normal"
+                android:minHeight="48dp"
+                android:minWidth="48dp"
+                android:tag="@color/green"
+                android:contentDescription="@string/string_image_button_to_select_the_color_green"
+                android:tooltipText="@string/string_image_button_to_select_the_color_green"
+                android:background="@color/green"
+                tools:ignore="DuplicateSpeakableTextCheck,RedundantDescriptionCheck"/>
+
+            <Space
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1">
+
+            </Space>
+
+            <ImageButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/ib_color_blue"
+                android:src="@drawable/palette_normal"
+                android:minHeight="48dp"
+                android:minWidth="48dp"
+                android:tag="@color/blue"
+                android:contentDescription="@string/string_image_button_to_select_the_color_blue"
+                android:tooltipText="@string/string_image_button_to_select_the_color_blue"
+                android:background="@color/blue"
+                tools:ignore="DuplicateSpeakableTextCheck,RedundantDescriptionCheck"/>
+
+            <Space
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1">
+
+            </Space>
+
+            <ImageButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/ib_color_yellow"
+                android:src="@drawable/palette_normal"
+                android:minHeight="48dp"
+                android:minWidth="48dp"
+                android:tag="@color/yellow"
+                android:contentDescription="@string/string_image_button_to_select_the_color_yellow"
+                android:tooltipText="@string/string_image_button_to_select_the_color_yellow"
+                android:background="@color/yellow"
+                tools:ignore="DuplicateSpeakableTextCheck,RedundantDescriptionCheck"/>
+
+            <Space
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1">
+
+            </Space>
+
+            <ImageButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/ib_color_white"
+                android:src="@drawable/palette_normal"
+                android:minHeight="48dp"
+                android:minWidth="48dp"
+                android:tag="@color/white"
+                android:contentDescription="@string/string_image_button_to_select_the_color_white"
+                android:tooltipText="@string/string_image_button_to_select_the_color_white"
+                android:background="@color/white"
+                tools:ignore="DuplicateSpeakableTextCheck,RedundantDescriptionCheck"/>
+
+            <Space
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1">
+
+            </Space>
+
+        </LinearLayout>
+
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:id="@+id/ll_action_buttons_1_in_photo_modification"
+            android:orientation="horizontal"
+            android:layout_marginBottom="5dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toTopOf="@+id/ll_action_buttons_2_in_photo_modification">
+            <ImageButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/ib_to_collapse_and_expand_ll_1"
+                android:src="@drawable/ic_back_50"
+                android:minHeight="48dp"
+                android:minWidth="48dp"
+                android:contentDescription="@string/string_image_button_for_collapsing_and_expanding_this_palatte"
+                android:tooltipText="@string/string_image_button_for_collapsing_and_expanding_this_palatte"
+                android:background="@color/purple_200"/>
+
+            <Space
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1">
+
+            </Space>
+
+
+            <ImageButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/ib_undo_in_photo_modification"
+                android:src="@drawable/ic_undo_50"
+                android:minHeight="48dp"
+                android:minWidth="48dp"
+                android:contentDescription="@string/string_image_button_showing_the_undo_icon"
+                android:tooltipText="@string/string_image_button_showing_the_undo_icon"
+                android:background="@color/purple_200"/>
+
+            <Space
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1">
+
+            </Space>
+
+
+            <ImageButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/ib_save"
+                android:src="@drawable/ic_save_48"
+                android:minHeight="48dp"
+                android:minWidth="48dp"
+                android:contentDescription="@string/string_image_button_for_saving_the_entered_text"
+                android:tooltipText="@string/string_image_button_for_saving_the_entered_text"
+                android:background="@color/purple_200"/>
+
+            <Space
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1">
+
+            </Space>
+
+
+            <ImageButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/ib_brush"
+                android:src="@drawable/ic_brush_48"
+                android:minHeight="48dp"
+                android:minWidth="48dp"
+                android:contentDescription="@string/string_image_button_showing_the_brush_icon_for_selecting_the_brush_size_for_the_drawings"
+                android:tooltipText="@string/string_image_button_showing_the_brush_icon_for_selecting_the_brush_size_for_the_drawings"
+                android:background="@color/purple_200"/>
+
+            <Space
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1">
+
+            </Space>
+
+
+            <ImageButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/ib_text_font_for_labels"
+                android:src="@drawable/ic_menu_48"
+                android:minHeight="48dp"
+                android:minWidth="48dp"
+                android:contentDescription="@string/string_image_button_for_selecting_the_text_font_size_for_labels"
+                android:tooltipText="@string/string_image_button_for_selecting_the_text_font_size_for_labels"
+                android:background="@color/purple_200"/>
+
+            <Space
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1">
+
+            </Space>
+
+
+            <ImageButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/ib_rotate_text_for_labels"
+                android:src="@drawable/ic_rotate_right_48"
+                android:minHeight="48dp"
+                android:minWidth="48dp"
+                android:contentDescription="@string/string_image_button_for_rotating_the_label_text_to_the_right"
+                android:tooltipText="@string/string_image_button_for_rotating_the_label_text_to_the_right"
+                android:background="@color/purple_200"/>
+
+            <Space
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1">
+
+            </Space>
+
+
+        </LinearLayout>
+
+
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:id="@+id/ll_action_buttons_2_in_photo_modification"
+            android:orientation="horizontal"
+            android:layout_marginBottom="5dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent">
+
+            <ImageButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/ib_to_collapse_and_expand_ll_2"
+                android:src="@drawable/ic_back_50"
+                android:minHeight="48dp"
+                android:minWidth="48dp"
+                android:contentDescription="@string/string_image_button_for_collapsing_and_expanding_this_palatte"
+                android:tooltipText="@string/string_image_button_for_collapsing_and_expanding_this_palatte"
+                android:background="@color/purple_200"/>
+
+            <Space
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1">
+
+            </Space>
+
+            <ImageButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/ib_closed_captions"
+                android:src="@drawable/ic_closed_captions_48"
+                android:minHeight="48dp"
+                android:minWidth="48dp"
+                android:contentDescription="@string/string_image_button_for_entering_closed_captions"
+                android:tooltipText="@string/string_image_button_for_entering_closed_captions"
+                android:background="@color/purple_200"/>
+
+            <Space
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1">
+
+            </Space>
+
+            <ImageButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/ib_rectangle"
+                android:src="@drawable/ic_crop_3_2_48"
+                android:minHeight="48dp"
+                android:minWidth="48dp"
+                android:contentDescription="@string/string_image_button_for_drawing_rectangles"
+                android:tooltipText="@string/string_image_button_for_drawing_rectangles"
+                android:background="@color/purple_200"/>
+
+            <Space
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1">
+
+            </Space>
+
+            <ImageButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/ib_ovals"
+                android:src="@drawable/ic_panorama_fish_eye_48"
+                android:minHeight="48dp"
+                android:minWidth="48dp"
+                android:contentDescription="@string/string_image_button_for_drawing_ovals"
+                android:tooltipText="@string/string_image_button_for_drawing_ovals"
+                android:background="@color/purple_200"/>
+
+            <Space
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1">
+
+            </Space>
+
+            <ImageButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/ib_straight_line_with_arrows"
+                android:src="@drawable/ic_open_in_full_48"
+                android:minHeight="48dp"
+                android:minWidth="48dp"
+                android:contentDescription="@string/string_image_button_to_mark_distances_between_two_points"
+                android:tooltipText="@string/string_image_button_to_mark_distances_between_two_points"
+                android:background="@color/purple_200"/>
+
+            <Space
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1">
+
+            </Space>
+
+            <ImageButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/ib_image_labels"
+                android:src="@drawable/ic_title_48"
+                android:minHeight="48dp"
+                android:minWidth="48dp"
+                android:contentDescription="@string/string_image_button_to_enter_text_for_labels_on_the_diagram"
+                android:tooltipText="@string/string_image_button_to_enter_text_for_labels_on_the_diagram"
+                android:background="@color/purple_200"/>
+
+            <Space
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1">
+
+            </Space>
+
+        </LinearLayout>
+
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>
