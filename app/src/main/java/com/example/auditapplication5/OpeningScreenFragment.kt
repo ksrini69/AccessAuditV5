@@ -283,6 +283,8 @@ class OpeningScreenFragment : Fragment() {
         //aInfo5ViewModel.setTheReportsToBeGeneratedList(defaultReportsList)
     }
 
+
+
     private fun showDialog(title: String, message: String) {
         val builder: AlertDialog.Builder = AlertDialog.Builder(this.requireContext())
         val fileFlag = aInfo5ViewModel.getTheFileFlag()
