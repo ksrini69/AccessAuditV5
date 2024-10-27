@@ -8,7 +8,7 @@
             name="aInfo5ViewModel"
             type="com.example.auditapplication5.presentation.viewmodel.AInfo5ViewModel" />
         <variable
-            name="drawingView"
+            name="drawingview"
             type="com.example.auditapplication5.DrawingView" />
     </data>
 
@@ -69,17 +69,18 @@
                 android:layout_height="wrap_content"
                 android:id="@+id/cl_for_edit_text_for_captions"
                 android:layout_gravity="bottom">
+
                 <com.google.android.material.textfield.TextInputLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:id="@+id/tet_for_edit_text_for_captions"
+                    android:id="@+id/til_for_edit_text_for_captions"
                     app:hintEnabled="false"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintBottom_toBottomOf="parent">
 
                     <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/tiet_for_captions"
+                        android:id="@+id/tet_for_captions"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:background="@color/white"
@@ -88,11 +89,15 @@
                         android:padding="1dp"
                         android:textColorHint="@color/light_grey"
                         android:textSize="18sp"
-                        android:tooltipText="@string/string_captions_to_be_entered_here"
+                        android:text="@={aInfo5ViewModel.etTextCaptionsMLD}"
                         tools:ignore="TouchTargetSizeCheck,TextContrastCheck,DuplicateClickableBoundsCheck" />
                 </com.google.android.material.textfield.TextInputLayout>
             </androidx.constraintlayout.widget.ConstraintLayout>
 
+            <!-- Edit Text for Picture Labels
+            android:tooltipText="@string/string_captions_to_be_entered_here"
+            android:tooltipText="@string/string_picture_labels_to_be_entered_here"
+            -->
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -106,6 +111,7 @@
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintBottom_toBottomOf="parent">
+
                     <com.google.android.material.textfield.TextInputEditText
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
@@ -113,7 +119,7 @@
                         android:background="@color/white"
                         android:importantForAccessibility="yes"
                         android:hint="@string/string_picture_labels_to_be_entered_here"
-                        android:tooltipText="@string/string_picture_labels_to_be_entered_here"
+                        android:text="@={drawingview.textInput}"
                         android:textColorHint="@color/light_grey"
                         android:textSize="18sp"
                         android:padding="1dp"

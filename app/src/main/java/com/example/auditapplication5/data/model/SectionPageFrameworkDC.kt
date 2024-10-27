@@ -5,7 +5,7 @@ data class SectionPageFrameworkDC(
     var pageCode: String = "",
     var pageNumber: Int = 1,
     var questionsFrameworkList: MutableList<QuestionsFrameworkItemDC> = mutableListOf(),
-    var observationsCheckboxesFrameworkList: MutableList<CheckboxesFrameworkItemDC> = mutableListOf(),
-    var recommendationsCheckboxesFrameworkList: MutableList<CheckboxesFrameworkItemDC> = mutableListOf(),
-    var standardsCheckboxesFrameworkList: MutableList<CheckboxesFrameworkItemDC> = mutableListOf()
+    var observationsFrameworkList: MutableList<CheckboxesFrameworkItemDC> = mutableListOf(),
+    var recommendationsFrameworkList: MutableList<CheckboxesFrameworkItemDC> = mutableListOf(),
+    var standardsFrameworkList: MutableList<CheckboxesFrameworkItemDC> = mutableListOf()
 )

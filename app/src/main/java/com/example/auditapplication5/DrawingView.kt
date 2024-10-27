@@ -9,6 +9,7 @@ import android.view.MotionEvent
 import android.view.View
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import com.example.auditapplication5.presentation.viewmodel.AInfo5ViewModel
 import kotlin.math.pow
 import kotlin.math.sqrt
 
@@ -33,6 +34,8 @@ class DrawingView(context: Context, attrs: AttributeSet): View(context,attrs) {
     var endY = 0.0f
 
     var chooseShape = 0
+
+
 
     private var textDrawnFlag = false
     fun setFlagIfTextDrawn(input: Boolean){
@@ -128,9 +131,6 @@ class DrawingView(context: Context, attrs: AttributeSet): View(context,attrs) {
                 mDrawPaint?.style = Paint.Style.STROKE
             }
         }
-
-
-
     }
 
     override fun onTouchEvent(event: MotionEvent?): Boolean {
@@ -363,7 +363,6 @@ class DrawingView(context: Context, attrs: AttributeSet): View(context,attrs) {
         mTextList.add(customText)
         setFlagIfTextDrawn(false)
         setTextPathDirection(1)
-        //Log.d("photos", "textSave: ${mTextList[0].textColor} ")
     }
 
     //Classes

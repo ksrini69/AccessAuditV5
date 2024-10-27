@@ -4,7 +4,7 @@ data class SectionPageDataDC(
     var pageTitle: String = "",
     var pageNumber: Int = 1,
     var observations: String = "",
-    var picturePaths: String = "",
+    var photoPaths: String = "",
     var recommendations: String = "",
     var standards: String = "",
     var questionsFrameworkDataItemList: MutableList<QuestionsFrameworkDataItemDC> = mutableListOf(),

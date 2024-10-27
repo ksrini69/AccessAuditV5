@@ -25,14 +25,21 @@ class SimpleListRVAdapter(
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         var name = ""
         var code = ""
+        var pagesPresent = false
         if (codeNameAndDisplayFlag == true){
-            name = codesAndNamesML[position].displayName
             code = codesAndNamesML[position].uniqueCodeName
+            pagesPresent = codesAndNamesML[position].pagesPresent
+            if (pagesPresent == true){
+                name = codesAndNamesML[position].displayName + " - pages present"
+            } else {
+                name = codesAndNamesML[position].displayName
+            }
         } else {
             name = namesList[position]
             code = ""
+            pagesPresent = false
         }
-        holder.bind(name, code, clickListener)
+        holder.bind(name, code, pagesPresent, clickListener)
     }
 
     override fun getItemCount(): Int {
@@ -46,7 +53,7 @@ class SimpleListRVAdapter(
     }
 
     inner class ViewHolder(val binding: RvSimpleListItemBinding) : RecyclerView.ViewHolder(binding.root){
-        fun bind(name : String, code: String, clickListener: (name: String, code: String) -> Unit){
+        fun bind(name : String, code: String, pagesPresent: Boolean, clickListener: (name: String, code: String) -> Unit){
             binding.tvSimpleListItem.text = name
             binding.root.setOnClickListener {
                 clickListener(name, code)

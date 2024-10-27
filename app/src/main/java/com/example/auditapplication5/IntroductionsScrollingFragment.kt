@@ -11,8 +11,6 @@ import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.findNavController
-import com.example.auditapplication5.data.model.AInfo5
-import com.example.auditapplication5.data.model.CompanyIntroDataDC
 import com.example.auditapplication5.databinding.FragmentIntroductionsScrollingBinding
 import com.example.auditapplication5.presentation.viewmodel.AInfo5ViewModel
 
@@ -145,8 +143,13 @@ class IntroductionsScrollingFragment : Fragment() {
         //Onclick Listeners below
 
         binding.ibCameraXInIntroductionPage.setOnClickListener {
-
-
+            //Create the location, count and photograph name (without extension)
+            val location = aInfo5ViewModel.makeLocationForPhotos(aInfo5ViewModel.getTheWhichIntroductionsOrObservationsToBeUploadedVariable())
+            aInfo5ViewModel.setLocationForPhotos(location)
+            val count = aInfo5ViewModel.getPhotoCountByLocation(location) + 1
+            aInfo5ViewModel.setThePhotoCount(count)
+            val presentPhotoNameWithoutExtension = aInfo5ViewModel.makePresentPhotoName(location, count)
+            aInfo5ViewModel.setPresentPhotoName(presentPhotoNameWithoutExtension)
             //Setting the appropriate previous screens
             aInfo5ViewModel.setThePreviousScreen2Variable(aInfo5ViewModel.getThePreviousScreenVariable())
             aInfo5ViewModel.setThePreviousScreenVariable(aInfo5ViewModel.getTheScreenVariable())
@@ -213,6 +216,7 @@ class IntroductionsScrollingFragment : Fragment() {
                 aInfo5ViewModel.setLocationForPhotos("All")
                 aInfo5ViewModel.setThePreviousScreen2Variable(aInfo5ViewModel.getThePreviousScreenVariable())
                 aInfo5ViewModel.setThePreviousScreenVariable(aInfo5ViewModel.getTheScreenVariable())
+                aInfo5ViewModel.setTheScreenVariable(MainActivity.PHOTO_MODIFICATION_FRAGMENT)
                 findNavController().navigate(R.id.action_introductionsScrollingFragment_to_photoDisplayRecyclerviewFragment)
                 dialog.dismiss()
             }
@@ -248,23 +252,14 @@ class IntroductionsScrollingFragment : Fragment() {
 
     private fun saveIntroductionsToDB(companyOrSection: String = ""){
         if (companyOrSection == MainActivity.COMPANY_INTRODUCTION){
-            val companyIntroID =
-                aInfo5ViewModel.getPresentCompanyCode() + MainActivity.COMPANY_INTRO_ID
-            val companyIntroData = CompanyIntroDataDC()
-
-            companyIntroData.introduction = aInfo5ViewModel.etIntroductionsMLD.value.toString()
-            companyIntroData.picturePathsInIntroductions = aInfo5ViewModel.tvPhotoPathsInIntroductionsFragmentMLD.value.toString()
-
-            aInfo5ViewModel.setTheCompanyIntroData(companyIntroData)
-            val companyIntroDataString = aInfo5ViewModel.companyIntroDataToString(companyIntroData)
-            val aInfo5Intro = AInfo5(companyIntroID, companyIntroDataString)
-            aInfo5ViewModel.insertAInfo5(aInfo5Intro)
-            aInfo5ViewModel.addUniqueItemToPresentCompanyAllIds(companyIntroID)
+            aInfo5ViewModel.updateTheIntroInTheCompanyIntroData(aInfo5ViewModel.etIntroductionsMLD.value.toString())
+            aInfo5ViewModel.updateThePhotoPathsInCompanyIntroData(aInfo5ViewModel.tvPhotoPathsInIntroductionsFragmentMLD.value.toString())
+            aInfo5ViewModel.saveTheCompanyIntroDataIntoDB()
         } else if (companyOrSection == MainActivity.SECTION_INTRODUCTION){
             val sectionPagesFrameworkAndDataID =
                 aInfo5ViewModel.getPresentCompanyCode() + aInfo5ViewModel.getPresentSectionCode() + MainActivity.SECTION_PAGES_FRAMEWORK_AND_DATA_ID
-            aInfo5ViewModel.updateIntroForThePresentSectionAllData(aInfo5ViewModel.etIntroductionsMLD.value.toString())
-            aInfo5ViewModel.updatePicturePathsForThePresentSectionAllData(aInfo5ViewModel.tvPhotoPathsInIntroductionsFragmentMLD.value.toString())
+            aInfo5ViewModel.updateIntroInThePresentSectionAllData(aInfo5ViewModel.etIntroductionsMLD.value.toString())
+            aInfo5ViewModel.updatePicturePathsInIntroForThePresentSectionAllData(aInfo5ViewModel.tvPhotoPathsInIntroductionsFragmentMLD.value.toString())
             aInfo5ViewModel.saveThePresentSectionAllPagesFrameworkAndAllDataToDB(aInfo5ViewModel.getThePresentSectionAllPagesFramework(),aInfo5ViewModel.getThePresentSectionAllData(),sectionPagesFrameworkAndDataID)
         }
     }

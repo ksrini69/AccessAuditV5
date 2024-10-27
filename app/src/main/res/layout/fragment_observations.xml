@@ -27,10 +27,10 @@
                 android:id="@+id/tv_page_name_and_number"
                 android:layout_width="match_parent"
                 android:layout_height="40dp"
-                android:background="@drawable/border_1dp"
+                android:background="@drawable/border1dp_with_up_arrow"
                 android:contentDescription="@string/string_textview_that_displays_the_page_name_and_number"
                 android:gravity="center_vertical"
-                android:text="@{aInfo5ViewModel.etPageNameMLD}"
+                android:text="@{String.valueOf(aInfo5ViewModel.sectionNameFormatForDisplay(aInfo5ViewModel.sectionNameMLD)) + String.valueOf(aInfo5ViewModel.pageCountFormatForDisplay(aInfo5ViewModel.pageCountMLD))+ String.valueOf(aInfo5ViewModel.etPageNameMLD)}"
                 android:tooltipText="@string/string_textview_that_displays_the_page_name_and_number"/>
 
 
@@ -268,7 +268,7 @@
                 android:id="@+id/tv_observations_recommendations_label"
                 android:textSize="18sp"
                 android:textStyle="bold"
-                android:background="@color/purple_700"
+                android:background="@drawable/border1dp_color_purple700_with_up_arrow"
                 android:textColor="@color/yellow"
                 android:gravity="center"
                 android:text="@string/string_observations_and_recommendations"
@@ -293,7 +293,7 @@
                         android:textSize="16sp"
                         android:textStyle="bold"
                         android:textColor="@color/yellow"
-                        android:background="@color/purple_500"
+                        android:background="@drawable/border1dp_color_purple500_with_up_arrow"
                         android:gravity="center_vertical"
                         android:text="@string/string_observations_and_photo_paths"
                         android:tooltipText="@string/string_observations_and_photo_paths"
@@ -316,15 +316,17 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:id="@+id/et_observations_only"
-                        android:maxLines="10"
+                        android:maxLines="7"
                         android:textColor="@color/black"
                         android:hint="@string/string_observations_only"
                         android:textColorHint="@color/light_grey"
                         android:textSize="18sp"
                         android:layout_marginBottom="5dp"
                         android:minHeight="50dp"
-                        android:text="@={aInfo5ViewModel.etObservationsFragmentMLD}"
-                        android:inputType="text"
+                        android:scrollbars="vertical"
+                        android:scrollbarSize="12dp"
+                        android:text="@={aInfo5ViewModel.etObservationsMLD}"
+                        android:inputType="textMultiLine|textAutoComplete|textAutoCorrect|textCapSentences"
                         android:tooltipText="@string/string_edit_text_for_observations_only"/>
 
                     <TextView
@@ -334,7 +336,7 @@
                         android:textSize="16sp"
                         android:textStyle="bold"
                         android:textColor="@color/yellow"
-                        android:background="@color/purple_500"
+                        android:background="@drawable/border1dp_color_purple500_with_up_arrow"
                         android:gravity="center_vertical"
                         android:text="@string/string_recommendations_and_standards"
                         android:layout_marginBottom="5dp"
@@ -359,7 +361,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:id="@+id/et_recommendations_only"
-                        android:maxLines="10"
+                        android:maxLines="7"
                         android:textColor="@color/black"
                         android:hint="@string/string_recommendations_only"
                         android:tooltipText="@string/string_recommendations_only"
@@ -367,8 +369,10 @@
                         android:textSize="18sp"
                         android:layout_marginBottom="5dp"
                         android:minHeight="50dp"
+                        android:scrollbars="vertical"
+                        android:scrollbarSize="12dp"
                         android:text="@={aInfo5ViewModel.etRecommendationsMLD}"
-                        android:inputType="text"/>
+                        android:inputType="textMultiLine|textAutoComplete|textAutoCorrect|textCapSentences"/>
                 </LinearLayout>
             </ScrollView>
 
@@ -379,7 +383,7 @@
                 android:id="@+id/tv_questions_etc_label"
                 android:textSize="18sp"
                 android:textStyle="bold"
-                android:background="@color/purple_700"
+                android:background="@drawable/border1dp_color_purple700_with_up_arrow"
                 android:textColor="@color/yellow"
                 android:gravity="center"
                 android:text="@string/string_questions_below"
@@ -407,6 +411,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center|bottom"
             android:layout_margin="5dp"
+            android:backgroundTint="@color/translucent75_purple200"
             android:clickable="true"
             android:contentDescription="@string/string_floating_action_button_showing_the_add_icon_click_to_add_a_new_block"
             android:src="@drawable/ic_block_add_to_queue_50"

@@ -13,6 +13,7 @@ import androidx.activity.OnBackPressedCallback
 import androidx.core.net.toUri
 import androidx.databinding.DataBindingUtil
 import androidx.navigation.findNavController
+import com.example.auditapplication5.data.model.*
 import com.example.auditapplication5.databinding.FragmentOpeningScreenBinding
 import com.example.auditapplication5.presentation.viewmodel.AInfo5ViewModel
 import kotlin.system.exitProcess
@@ -70,66 +71,16 @@ class OpeningScreenFragment : Fragment() {
         aInfo5ViewModel.setThePreviousScreen2Variable(MainActivity.NOT_RELEVANT)
 
         //Observe and Display Status Message
-        aInfo5ViewModel.message.observe(viewLifecycleOwner) {
-            it.getContentIfNotHandled().let {
-                Toast.makeText(context, it, Toast.LENGTH_SHORT).show()
-            }
-        }
+//        aInfo5ViewModel.message.observe(viewLifecycleOwner) {
+//            it.getContentIfNotHandled().let {
+//                Toast.makeText(context, it, Toast.LENGTH_SHORT).show()
+//            }
+//        }
 
         //Initialise some variables from the ViewModel
         initialiseSomeViewModelVariablesHere()
 
-        //Checking the ViewModel stringTo and ToString functions
-
-//        val questionsFrameworkItem1 = QuestionsFrameworkItemDC()
-//        questionsFrameworkItem1.questionsFrameworkTitle = "Be really wonderful"
-//        questionsFrameworkItem1.pageCode = "Ha Be a nice guy"
-//        questionsFrameworkItem1.serialStatus = "Together"
-//        questionsFrameworkItem1.isExpandable = true
-//
-//        val questionsFrameworkItem2 = QuestionsFrameworkItemDC()
-//        questionsFrameworkItem2.questionsFrameworkTitle = "Wonderful to Be really wonderful"
-//        questionsFrameworkItem2.pageCode = "Nice guy Ha Be a nice guy"
-//        questionsFrameworkItem2.serialStatus = "Be a Lot Together"
-//        questionsFrameworkItem2.isExpandable = false
-//
-//        val questionsFrameworkItem3 = QuestionsFrameworkItemDC()
-//
-//        val questionsFrameworkItem1ToString = aInfo5ViewModel.questionsFrameworkItemToString(questionsFrameworkItem1)
-//        val questionsFrameworkItem2ToString = aInfo5ViewModel.questionsFrameworkItemToString(questionsFrameworkItem2)
-//
-//        val checkboxesFrameworkItem1 = CheckboxesFrameworkItemDC()
-//        checkboxesFrameworkItem1.checkboxesFrameworkTitle = "Oooh"
-//        checkboxesFrameworkItem1.pageCode = "Laugh Out Loud"
-//        checkboxesFrameworkItem1.serialStatus = "Make Me Laugh"
-//        checkboxesFrameworkItem1.isExpandable = true
-//
-//        val checkboxesFrameworkItem2 = CheckboxesFrameworkItemDC()
-//        checkboxesFrameworkItem2.checkboxesFrameworkTitle = "See A Oooh"
-//        checkboxesFrameworkItem2.pageCode = "Loudly Laugh Out Loud"
-//        checkboxesFrameworkItem2.serialStatus = "Laugh and Make Me Laugh"
-//        checkboxesFrameworkItem2.isExpandable = false
-//
-//        val checkboxesFrameworkItem3 = CheckboxesFrameworkItemDC()
-//
-//        val checkboxesFrameworkItem1ToString = aInfo5ViewModel.checkboxesFrameworkItemToString(checkboxesFrameworkItem1)
-//        val checkboxesFrameworkItem2ToString = aInfo5ViewModel.checkboxesFrameworkItemToString(checkboxesFrameworkItem2)
-//
-//        val questionsFrameworkList = mutableListOf<QuestionsFrameworkItemDC>()
-//        questionsFrameworkList.add(questionsFrameworkItem1)
-//        questionsFrameworkList.add(questionsFrameworkItem3)
-//        questionsFrameworkList.add(questionsFrameworkItem2)
-//
-//        val questionsFrameworkListToString = aInfo5ViewModel.questionsFrameworkListToString(questionsFrameworkList)
-//
-//        val checkboxesFrameworkList = mutableListOf<CheckboxesFrameworkItemDC>()
-//        checkboxesFrameworkList.add(checkboxesFrameworkItem3)
-//        checkboxesFrameworkList.add(checkboxesFrameworkItem1)
-//        checkboxesFrameworkList.add(checkboxesFrameworkItem2)
-//
-//        val checkboxesFrameworkListToString = aInfo5ViewModel.checkboxesFrameworkListToString(checkboxesFrameworkList)
-//
-
+        //For Checking
 
 
 
@@ -187,6 +138,8 @@ class OpeningScreenFragment : Fragment() {
                                 aInfo5ViewModel.tasksToDoWithPageGroupIDs(pageGroupItemString, iDsListForPageGroup, index)
                             }
                         }
+                    } else {
+                        aInfo5ViewModel.setTheParentChildParentItemML(mutableListOf(aInfo5ViewModel.defaultRVParentChildParentItem))
                     }
                 }
             }
@@ -272,7 +225,9 @@ class OpeningScreenFragment : Fragment() {
     fun initialiseSomeViewModelVariablesHere(){
         aInfo5ViewModel.clearPresentCompanyAllIds()
         aInfo5ViewModel.sectionAllDataLoadedFlagMLD.value = false
-        aInfo5ViewModel.sectionAllPagesFrameworkLoadedFlagMLD.value = false
+        aInfo5ViewModel.setTheSectionAllPagesFrameworkLoadedFlagMLD(false)
+
+
         //Generate and load the Default Reports List
         val reportsList = resources.getStringArray(R.array.Report_Choices).toMutableList()
         val defaultReportsList = mutableListOf<String>()
@@ -281,6 +236,8 @@ class OpeningScreenFragment : Fragment() {
             defaultReportsList.add(reportsList[2])
         }
         //aInfo5ViewModel.setTheReportsToBeGeneratedList(defaultReportsList)
+
+        aInfo5ViewModel.setTheCompanyPhotosUploadedFlag(false)
     }
 
 

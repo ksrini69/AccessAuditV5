@@ -12,6 +12,17 @@
     android:layout_marginBottom="5dp"
     android:layout_marginTop="5dp">
 
+    <!--
+    android:contentDescription="@string/string_this_is_an_imageview_in_recyclerview_item"
+        android:tooltipText="@string/string_this_is_an_imageview_in_recyclerview_item"
+
+    android:contentDescription="@string/string_textview_showing_the_photograph_heading"
+        android:tooltipText="@string/string_textview_showing_the_photograph_heading"
+
+   android:contentDescription="@string/string_textview_showing_the_photograph_heading"
+        android:tooltipText="@string/string_textview_showing_the_photograph_heading"
+    -->
+
     <ImageView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -19,8 +30,7 @@
         android:scaleType="center"
         android:layout_margin="2dp"
         android:src="@mipmap/ic_launcher"
-        android:contentDescription="@string/string_this_is_an_imageview_in_recyclerview_item"
-        android:tooltipText="@string/string_this_is_an_imageview_in_recyclerview_item"/>
+        />
 
     <TextView
         android:layout_width="match_parent"
@@ -34,8 +44,7 @@
         android:layout_marginTop="5dp"
         android:layout_marginBottom="5dp"
         android:background="@drawable/border_1dp"
-        android:contentDescription="@string/string_textview_showing_the_photograph_heading"
-        android:tooltipText="@string/string_textview_showing_the_photograph_heading"/>
+        />
 
     <TextView
         android:layout_width="match_parent"
@@ -47,7 +56,6 @@
         android:textStyle="bold"
         android:gravity="center"
         android:background="@drawable/border_1dp"
-        android:contentDescription="@string/string_textview_showing_the_photograph_heading"
-        android:tooltipText="@string/string_textview_showing_the_photograph_heading"/>
+        />
 
 </LinearLayout>

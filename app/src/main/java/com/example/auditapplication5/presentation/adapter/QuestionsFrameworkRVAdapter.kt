@@ -1,11 +1,13 @@
 package com.example.auditapplication5.presentation.adapter
 
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.auditapplication5.MainActivity
+import com.example.auditapplication5.R
 import com.example.auditapplication5.data.model.QuestionTemplateItemDC
 import com.example.auditapplication5.data.model.QuestionsFrameworkItemDC
 
@@ -17,12 +19,12 @@ class QuestionsFrameworkRVAdapter(
     private val aInfo5ViewModel: AInfo5ViewModel,
     private val clickListener1: (questionsBlockTitle: String, questionsBlockItem: Int) -> Unit,
     private val clickListener2: (questionsBlockPageId: String) -> Unit
-) : RecyclerView.Adapter<QuestionsFrameworkRVAdapter.ViewHolder>(){
+) : RecyclerView.Adapter<QuestionsFrameworkRVAdapter.ViewHolder>() {
 
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val binding = QuestionsFrameworkItemBinding
-            .inflate(LayoutInflater.from(parent.context),parent, false)
+            .inflate(LayoutInflater.from(parent.context), parent, false)
         return ViewHolder(binding)
     }
 
@@ -45,8 +47,9 @@ class QuestionsFrameworkRVAdapter(
         }
     }
 
-    inner class ViewHolder(val binding: QuestionsFrameworkItemBinding): RecyclerView.ViewHolder(binding.root){
-        fun bind(questionsFrameworkItem: QuestionsFrameworkItemDC, position: Int){
+    inner class ViewHolder(val binding: QuestionsFrameworkItemBinding) :
+        RecyclerView.ViewHolder(binding.root) {
+        fun bind(questionsFrameworkItem: QuestionsFrameworkItemDC, position: Int) {
             binding.tvQuestionsFrameworkItemHeading.text =
                 questionsFrameworkItem.questionsFrameworkTitle
             if (questionsFrameworkItem.serialStatus == MainActivity.PRIMARY_QUESTION_SET) {
@@ -57,14 +60,49 @@ class QuestionsFrameworkRVAdapter(
 
             binding.rvQuestionsTemplateItems.layoutManager =
                 LinearLayoutManager(binding.root.context)
-            //Need to get the QuestionTemplateItem MutableList from the ViewModel
-            var questionTemplateItemML : MutableList<QuestionTemplateItemDC> = mutableListOf()
 
-            binding.rvQuestionsTemplateItems.adapter = QuestionTemplateRVAdapter(questionTemplateItemML,aInfo5ViewModel,position,questionsFrameworkItem.questionsFrameworkTitle,questionsFrameworkItem.serialStatus)
+            val questionTemplateItemML = aInfo5ViewModel.questionsList_LD.value
+            val currentPageIndex = aInfo5ViewModel.getThePresentSectionAllPagesFrameworkIndex()
+
+            val result = questionTemplateItemML?.let {
+                aInfo5ViewModel.isQuestionDataItemListUpdatedInPresentSectionAllData(currentPageIndex,position,
+                    it
+                )
+            }
+            if (result == false){
+                aInfo5ViewModel.updateQuestionDataItemListUsingTemplateInPresentSectionAllData(currentPageIndex,position,
+                    questionTemplateItemML
+                )
+            }
+            binding.rvQuestionsTemplateItems.adapter = questionTemplateItemML?.let {
+                QuestionTemplateRVAdapter(
+                    it,
+                    aInfo5ViewModel,
+                    position,
+                    questionsFrameworkItem.questionsFrameworkTitle,
+                    questionsFrameworkItem.serialStatus
+                )
+            }
 
             val isExpandable = questionsFrameworkItem.isExpandable
-            binding.rvQuestionsTemplateItems.visibility =
-                if (isExpandable) View.VISIBLE else View.GONE
+            if (isExpandable){
+                binding.rvQuestionsTemplateItems.visibility = View.VISIBLE
+                if (questionsFrameworkItem.serialStatus == MainActivity.PRIMARY_QUESTION_SET){
+                    binding.clTextviewAndDeleteOption.setBackgroundResource(R.drawable.border1dp_color_purple500_with_up_arrow)
+                } else if (questionsFrameworkItem.serialStatus == MainActivity.OTHER_QUESTION_SET){
+                    binding.clTextviewAndDeleteOption.setBackgroundResource(R.drawable.border1dp_color_purple500_with_up_arrow_centered)
+                }
+
+            } else {
+                binding.rvQuestionsTemplateItems.visibility = View.GONE
+                if (questionsFrameworkItem.serialStatus == MainActivity.PRIMARY_QUESTION_SET){
+                    binding.clTextviewAndDeleteOption.setBackgroundResource(R.drawable.border1dp_color_purple500_with_down_arrow)
+                }
+                else if (questionsFrameworkItem.serialStatus == MainActivity.OTHER_QUESTION_SET){
+                    binding.clTextviewAndDeleteOption.setBackgroundResource(R.drawable.border1dp_color_purple500_with_down_arrow_centered)
+                }
+
+            }
 
             binding.llQuestionsFrameworkItem.setOnClickListener {
                 clickListener2(questionsFrameworkItem.pageCode)

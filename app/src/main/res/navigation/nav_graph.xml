@@ -91,6 +91,12 @@
         <action
             android:id="@+id/action_observationsFragment_to_gotoRecyclerviewFragment"
             app:destination="@id/gotoRecyclerviewFragment" />
+        <action
+            android:id="@+id/action_observationsFragment_to_photoDisplayRecyclerviewFragment"
+            app:destination="@id/photoDisplayRecyclerviewFragment" />
+        <action
+            android:id="@+id/action_observationsFragment_to_parentChildRecyclerviewFragment"
+            app:destination="@id/parentChildRecyclerviewFragment" />
     </fragment>
     <fragment
         android:id="@+id/photoDisplayRecyclerviewFragment"
@@ -100,12 +106,23 @@
         <action
             android:id="@+id/action_photoDisplayRecyclerviewFragment_to_photoModificationFragment"
             app:destination="@id/photoModificationFragment" />
+        <action
+            android:id="@+id/action_photoDisplayRecyclerviewFragment_to_observationsFragment"
+            app:destination="@id/observationsFragment" />
+        <action
+            android:id="@+id/action_photoDisplayRecyclerviewFragment_to_introductionsScrollingFragment"
+            app:destination="@id/introductionsScrollingFragment" />
+
     </fragment>
     <fragment
         android:id="@+id/parentChildRecyclerviewFragment"
         android:name="com.example.auditapplication5.ParentChildRecyclerviewFragment"
         android:label="fragment_parent_child_recyclerview"
-        tools:layout="@layout/fragment_parent_child_recyclerview" />
+        tools:layout="@layout/fragment_parent_child_recyclerview" >
+        <action
+            android:id="@+id/action_parentChildRecyclerviewFragment_to_observationsFragment"
+            app:destination="@id/observationsFragment" />
+    </fragment>
     <fragment
         android:id="@+id/gotoRecyclerviewFragment"
         android:name="com.example.auditapplication5.GotoRecyclerviewFragment"

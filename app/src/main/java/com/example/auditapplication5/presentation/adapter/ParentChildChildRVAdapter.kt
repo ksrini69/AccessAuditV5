@@ -1,8 +1,10 @@
 package com.example.auditapplication5.presentation.adapter
 
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import com.example.auditapplication5.MainActivity
 import com.example.auditapplication5.databinding.RvParentChildChildItemBinding
 
 class ParentChildChildRVAdapter(
@@ -44,10 +46,9 @@ class ParentChildChildRVAdapter(
         fun bind(pageCode: String, position: Int){
             binding.tvParentChildChildItem.text = extractDisplayNameFromPageCode(pageCode)
 
-            binding.root.setOnClickListener{
+            binding.tvParentChildChildItem.setOnClickListener {
                 clickListener(pageCode)
             }
-
         }
     }
 }

@@ -97,6 +97,8 @@
     <string name="string_edit_text_for_entering_names">Edit Text for entering company names and section names</string>
     <string name="string_button_for_the_continue_option_click_to_continue_after_entering_the_name">Button for the Continue option. Click to continue after entering the name.</string>
     <string name="string_take_video">Take Video</string>
+    <string name="string_start_capture">Start Capture</string>
+    <string name="string_stop_capture">Stop Capture</string>
     <string name="string_edit_text_for_observations_only">Edit Text For Observations Only</string>
     <string name="string_textview_showing_the_label_recommendations_and_standards">Textview showing the label Recommendations and Standards</string>
     <string name="string_this_is_a_progress_bar">This is a Progress Bar</string>
@@ -123,8 +125,10 @@
     <string name="string_message_for_deleting_audit_records_db">Do you really want to delete all the audit records?</string>
     <string name="string_floating_action_button_for_choosing_reports">Floating Action Button for Choosing Reports</string>
     <string name="string_choosing_reports">Choose Reports</string>
-
-
+    <string name="string_Questions_Below">Questions Below</string>
+    <string name="string_Observations_Below">Observations Below</string>
+    <string name="string_Recommendations_Below">Recommendations Below</string>
+    <string name="string_Standards_Below">Standards Below</string>
 
 
     <string-array name="Priority_Choices">

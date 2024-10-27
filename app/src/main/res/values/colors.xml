@@ -20,7 +20,8 @@
     <color name="random">#A349B1</color>
 
     <color name="purple_experimental">#FFCC40FC</color>
-
-
-
+    <color name="translucent_color_50">#80FFFFFF</color>
+    <color name="translucent_color_75">#BFFFFFFF</color>
+    <color name="translucent75_purple200">#BFBB86FC</color>
+    <color name="translucent50_purple200">#80BB86FC</color>
 </resources>

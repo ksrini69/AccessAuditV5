@@ -1,10 +1,14 @@
 package com.example.auditapplication5
 
 import android.content.Intent
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.graphics.Matrix
 import android.net.Uri
 import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.provider.OpenableColumns
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
@@ -15,9 +19,7 @@ import com.example.auditapplication5.databinding.ActivityMainBinding
 import com.example.auditapplication5.presentation.viewmodel.AInfo5ViewModel
 import com.example.auditapplication5.presentation.viewmodel.AInfo5ViewModelFactory
 import dagger.hilt.android.AndroidEntryPoint
-import java.io.BufferedReader
-import java.io.IOException
-import java.io.InputStreamReader
+import java.io.*
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -109,6 +111,64 @@ class MainActivity : AppCompatActivity() {
     override fun onDestroy() {
         super.onDestroy()
     }
+    //Functions Below
+
+    // Image and Photo related functions
+
+
+    //Takes URI of the image and returns bitmap
+    fun uriToBitmap(selectedFileUri: Uri): Bitmap? {
+        try {
+            val parcelFileDescriptor = contentResolver.openFileDescriptor(selectedFileUri, "r")
+            val fileDescriptor: FileDescriptor = parcelFileDescriptor!!.fileDescriptor
+            val image = BitmapFactory.decodeFileDescriptor(fileDescriptor)
+            parcelFileDescriptor.close()
+            return image
+        } catch (e: IOException) {
+            e.printStackTrace()
+        }
+        return null
+    }
+
+    private fun rotateBitmap(original: Bitmap, degrees: Double): Bitmap? {
+        val x = original.width
+        val y = original.height
+        val matrix = Matrix()
+        matrix.preRotate(degrees.toFloat())
+        return Bitmap.createBitmap(original, 0, 0, original.width, original.height, matrix, true)
+    }
+
+    fun fileNameFromURI(uri: Uri?): String {
+
+        val returnCursor = uri?.let { contentResolver.query(it, null, null, null, null) }
+        val nameIndex = returnCursor?.getColumnIndex(OpenableColumns.DISPLAY_NAME)
+        if (returnCursor != null) {
+            returnCursor.moveToFirst()
+        }
+        val fileName = nameIndex?.let { returnCursor.getString(it) }
+        if (returnCursor != null) {
+            returnCursor.close()
+        }
+        //Log.d("photoName", "writeToImageFile: loom  $fileName ")
+        return fileName!!
+    }
+
+    private fun alterDocument(uri: Uri, data: ByteArray) {
+        try {
+            contentResolver.openFileDescriptor(uri, "w")?.use { parcelFileDescriptor ->
+                FileOutputStream(parcelFileDescriptor.fileDescriptor).use {
+                    it.write(
+                        data
+                    )
+                    Toast.makeText(this, "File Write OK!", Toast.LENGTH_SHORT).show()
+                }
+            }
+        } catch (e: FileNotFoundException) {
+            e.printStackTrace()
+        } catch (e: IOException) {
+            e.printStackTrace()
+        }
+    }
 
     companion object{
         // For Screen Related Operations
@@ -131,7 +191,8 @@ class MainActivity : AppCompatActivity() {
         const val SECTION_FRAGMENT_DELETE_1 = "Section Fragment Delete 1"
         const val SECTION_FRAGMENT_DELETE_2 = "Section Fragment Delete 2"
 
-        const val INTRODUCTIONS_PAGE_NAME = "Introductions"
+        const val INTRODUCTIONS_PAGE = "Introductions"
+        const val OBSERVATIONS_PAGE = "Observations"
         const val COMPANY = "Company"
         const val INTROS_FRAGMENT = "Intros Fragment"
 
@@ -192,6 +253,8 @@ class MainActivity : AppCompatActivity() {
         const val COMPANY_CODES_NAMES_ID = "Company_Codes_Names"
 
         const val COMPANY_SECTION_LIST_ID = "_Company_Section_List_ID"
+
+        const val COMPANY_REPORT_ID = "_Company_Report_ID"
 
         const val COMPANY_DIRECTORY_URI_ID = "_Directory_URI_ID"
         const val TXT_FILE_3COLUMN_URI_ID = "_ThreeColumn_URI_ID"

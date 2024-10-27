@@ -83,12 +83,12 @@ class EnterNameFragment : Fragment() {
         val actionBar = (activity as MainActivity).supportActionBar
         actionBar?.hide()
 
-        //Observe and Display Status Message
-        aInfo5ViewModel.message.observe(viewLifecycleOwner) {
-            it.getContentIfNotHandled().let {
-                Toast.makeText(context, it, Toast.LENGTH_SHORT).show()
-            }
-        }
+//        //Observe and Display Status Message
+//        aInfo5ViewModel.message.observe(viewLifecycleOwner) {
+//            it.getContentIfNotHandled().let {
+//                Toast.makeText(context, it, Toast.LENGTH_SHORT).show()
+//            }
+//        }
 
         //Getting the list of companies from the db and storing in ViewModel
         aInfo5ViewModel.getMLOfCompanyCodesAndNamesLD.observe(viewLifecycleOwner) { list ->
@@ -100,9 +100,8 @@ class EnterNameFragment : Fragment() {
                 for (item in list) {
                     companyCodesAndNamesListString += item.framework
                 }
-                val companyCodesAndNamesML = aInfo5ViewModel.stringToCodeAndDisplayCollection(
-                    companyCodesAndNamesListString,
-                    MainActivity.FLAG_VALUE_COMPANY
+                val companyCodesAndNamesML = aInfo5ViewModel.stringToCodeAndDisplayNameList(
+                    companyCodesAndNamesListString
                 )
                 aInfo5ViewModel.setTheCompanyCodeAndDisplayNameML(companyCodesAndNamesML)
             }
@@ -199,7 +198,7 @@ class EnterNameFragment : Fragment() {
                             presentCompanyCodeAndDisplay
                         )
                         val companyCodeAndDisplayNameMLString =
-                            aInfo5ViewModel.codeAndDisplayCollectionToString(aInfo5ViewModel.getTheCompanyCodeAndDisplayNameML())
+                            aInfo5ViewModel.codeAndDisplayNameListToString(aInfo5ViewModel.getTheCompanyCodeAndDisplayNameML())
                         val aInfo5 = AInfo5(
                             MainActivity.COMPANY_CODES_NAMES_ID,
                             companyCodeAndDisplayNameMLString
@@ -268,7 +267,7 @@ class EnterNameFragment : Fragment() {
                                 presentCompanyCodeAndDisplay
                             )
                             val companyCodeAndDisplayNameMLString =
-                                aInfo5ViewModel.codeAndDisplayCollectionToString(aInfo5ViewModel.getTheCompanyCodeAndDisplayNameML())
+                                aInfo5ViewModel.codeAndDisplayNameListToString(aInfo5ViewModel.getTheCompanyCodeAndDisplayNameML())
                             val aInfo5 = AInfo5(
                                 MainActivity.COMPANY_CODES_NAMES_ID,
                                 companyCodeAndDisplayNameMLString
@@ -315,21 +314,21 @@ class EnterNameFragment : Fragment() {
                 }
                 else if (aInfo5ViewModel.getThePreviousScreenVariable() == MainActivity.SECTION_FRAGMENT) {
                     val sectionName = binding.etEnterName.text.toString().trim()
-                    if (aInfo5ViewModel.getTheSectionCodeAndDisplayNameML().isEmpty()) {
+                    if (aInfo5ViewModel.getTheCompanySectionCodeAndDisplayNameML().isEmpty()) {
                         val presentSectionCodeAndDisplay =
                             aInfo5ViewModel.generateUniqueCodeFromCDCollection(
-                                aInfo5ViewModel.getTheSectionCodeAndDisplayNameML(),
+                                aInfo5ViewModel.getTheCompanySectionCodeAndDisplayNameML(),
                                 sectionName,
                                 MainActivity.FLAG_VALUE_SECTION
                             )
                         aInfo5ViewModel.setThePresentSectionCodeAndDisplayName(
                             presentSectionCodeAndDisplay
                         )
-                        aInfo5ViewModel.addToSectionCodeAndDisplayNameML(
+                        aInfo5ViewModel.addToTheCompanySectionCodeAndDisplayNameML(
                             presentSectionCodeAndDisplay
                         )
                         val sectionCodeAndDisplayNameMLString =
-                            aInfo5ViewModel.codeAndDisplayCollectionToString(aInfo5ViewModel.getTheSectionCodeAndDisplayNameML())
+                            aInfo5ViewModel.codeAndDisplayNameListToString(aInfo5ViewModel.getTheCompanySectionCodeAndDisplayNameML())
                         val companySectionListID =
                             aInfo5ViewModel.getPresentCompanyCode() + MainActivity.COMPANY_SECTION_LIST_ID
                         val aInfo5 = AInfo5(companySectionListID, sectionCodeAndDisplayNameMLString)
@@ -341,24 +340,24 @@ class EnterNameFragment : Fragment() {
                             .navigate(R.id.action_enterNameFragment_to_sectionAndIntrosFragment)
                     } else {
                         if (aInfo5ViewModel.uniquenessCheckInCodesAndNames(
-                                aInfo5ViewModel.getTheSectionCodeAndDisplayNameML(),
+                                aInfo5ViewModel.getTheCompanySectionCodeAndDisplayNameML(),
                                 sectionName
                             )
                         ) {
                             val presentSectionCodeAndDisplay =
                                 aInfo5ViewModel.generateUniqueCodeFromCDCollection(
-                                    aInfo5ViewModel.getTheSectionCodeAndDisplayNameML(),
+                                    aInfo5ViewModel.getTheCompanySectionCodeAndDisplayNameML(),
                                     sectionName,
                                     MainActivity.FLAG_VALUE_SECTION
                                 )
                             aInfo5ViewModel.setThePresentSectionCodeAndDisplayName(
                                 presentSectionCodeAndDisplay
                             )
-                            aInfo5ViewModel.addToSectionCodeAndDisplayNameML(
+                            aInfo5ViewModel.addToTheCompanySectionCodeAndDisplayNameML(
                                 presentSectionCodeAndDisplay
                             )
                             val sectionCodeAndDisplayNameMLString =
-                                aInfo5ViewModel.codeAndDisplayCollectionToString(aInfo5ViewModel.getTheSectionCodeAndDisplayNameML())
+                                aInfo5ViewModel.codeAndDisplayNameListToString(aInfo5ViewModel.getTheCompanySectionCodeAndDisplayNameML())
                             val companySectionListID =
                                 aInfo5ViewModel.getPresentCompanyCode() + MainActivity.COMPANY_SECTION_LIST_ID
                             val aInfo5 =
@@ -403,7 +402,7 @@ class EnterNameFragment : Fragment() {
                             )
                             //Save the above in the DB
                             val companyCodeAndDisplayNameMLString =
-                                aInfo5ViewModel.codeAndDisplayCollectionToString(aInfo5ViewModel.getTheCompanyCodeAndDisplayNameML())
+                                aInfo5ViewModel.codeAndDisplayNameListToString(aInfo5ViewModel.getTheCompanyCodeAndDisplayNameML())
                             val aInfo5 = AInfo5(
                                 MainActivity.COMPANY_CODES_NAMES_ID,
                                 companyCodeAndDisplayNameMLString
@@ -432,7 +431,7 @@ class EnterNameFragment : Fragment() {
                         val newSectionName = binding.etEnterName.text.toString().trim()
                         //Checking to see if this section name is unique
                         if (aInfo5ViewModel.uniquenessCheckInCodesAndNames(
-                                aInfo5ViewModel.getTheSectionCodeAndDisplayNameML(),
+                                aInfo5ViewModel.getTheCompanySectionCodeAndDisplayNameML(),
                                 newSectionName
                             )
                         ) {
@@ -451,13 +450,13 @@ class EnterNameFragment : Fragment() {
                             aInfo5ViewModel.addUniqueItemToPresentCompanyAllIds(presentSectionNameID)
                             aInfo5ViewModel.setFlagForSectionNameToBeUpdated(true)
                             //update the Section related ML
-                            aInfo5ViewModel.modifyDisplayNameOfSpecificSectionInML(
+                            aInfo5ViewModel.modifyDisplayNameOfSpecificSectionInSectionCDML(
                                 newSectionName,
                                 presentSectionCodeAndDisplay.uniqueCodeName
                             )
                             //Save the above in the DB
                             val sectionCodeAndDisplayNameMLString =
-                                aInfo5ViewModel.codeAndDisplayCollectionToString(aInfo5ViewModel.getTheSectionCodeAndDisplayNameML())
+                                aInfo5ViewModel.codeAndDisplayNameListToString(aInfo5ViewModel.getTheCompanySectionCodeAndDisplayNameML())
                             val companySectionsCDListID =
                                 aInfo5ViewModel.getPresentCompanyCode() + MainActivity.COMPANY_SECTION_LIST_ID
                             val aInfo5 = AInfo5(

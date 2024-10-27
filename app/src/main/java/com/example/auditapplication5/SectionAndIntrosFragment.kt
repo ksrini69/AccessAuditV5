@@ -8,7 +8,6 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.databinding.DataBindingUtil
 import androidx.navigation.findNavController
@@ -52,11 +51,11 @@ class SectionAndIntrosFragment : Fragment() {
         binding.lifecycleOwner = viewLifecycleOwner
 
         //Observe and Display Status Message
-        aInfo5ViewModel.message.observe(viewLifecycleOwner) {
-            it.getContentIfNotHandled().let {
-                Toast.makeText(context, it, Toast.LENGTH_SHORT).show()
-            }
-        }
+//        aInfo5ViewModel.message.observe(viewLifecycleOwner) {
+//            it.getContentIfNotHandled().let {
+//                Toast.makeText(context, it, Toast.LENGTH_SHORT).show()
+//            }
+//        }
 
         activity?.onBackPressedDispatcher?.addCallback(
             viewLifecycleOwner,
@@ -88,13 +87,23 @@ class SectionAndIntrosFragment : Fragment() {
         val actionBar = (activity as MainActivity).supportActionBar
         actionBar?.show()
 
-        //Check the create present section all data using section all pages framework
-//        val sectionAllPagesFramework = SectionAllPagesFrameworkDC()
-//        sectionAllPagesFramework.sectionPageFrameworkList.add(aInfo5ViewModel.defaultSectionPageFramework)
-//        sectionAllPagesFramework.sectionPageFrameworkList.add(aInfo5ViewModel.defaultSectionPageFramework)
-//        val sectionAllData = aInfo5ViewModel.createPresentSectionAllDataUsingSectionAllPagesFramework(sectionAllPagesFramework)
-//        Log.d(MainActivity.TESTING_TAG, "onViewCreated: $sectionAllData ")
+        //Checking stuff here
 
+
+        //Getting the URI for the company directory and loading it in the ViewModel
+        aInfo5ViewModel.setTheCompanyDirectoryUriId(aInfo5ViewModel.getPresentCompanyCode())
+        val companyDirectoryURIIdML = mutableListOf<String>(aInfo5ViewModel.getTheCompanyDirectoryUriId())
+        aInfo5ViewModel.getAInfo5ByIds(companyDirectoryURIIdML).observe(viewLifecycleOwner){list ->
+            var companyDirectoryURIString = ""
+            if (list.isEmpty()){
+                companyDirectoryURIString = ""
+            } else {
+                for (item in list){
+                    companyDirectoryURIString += item.framework
+                }
+            }
+            aInfo5ViewModel.setTheCompanyDirectoryURIString(companyDirectoryURIString)
+        }
 
         //Getting the present company All Ids List and Load it into the ViewModel
         if (aInfo5ViewModel.getThePresentCompanyAllIds().isEmpty()){
@@ -154,12 +163,99 @@ class SectionAndIntrosFragment : Fragment() {
             }
         }
 
+        //Getting the company section List from db and if not available get it from the templates db
+        //and if that is not available load in the default section list from strings.
+        if (aInfo5ViewModel.getTheCompanySectionCodeAndDisplayNameML().isEmpty()){
+            val companySectionListID =
+                aInfo5ViewModel.getPresentCompanyCode() + MainActivity.COMPANY_SECTION_LIST_ID
+            aInfo5ViewModel.addUniqueItemToPresentCompanyAllIds(companySectionListID)
+            aInfo5ViewModel.getAInfo5ByIds(mutableListOf(companySectionListID)).observe(viewLifecycleOwner) { list ->
+                if (list.isEmpty()) {
+                    var defaultSectionListString = ""
+                    val defaultSectionList = aInfo5ViewModel.getDefaultSectionList
+                    defaultSectionList.observe(viewLifecycleOwner) { templateSectionList ->
+                        if (templateSectionList.isEmpty()) {
+                            val defaultSectionListML =
+                                resources.getStringArray(R.array.Default_Section_Names).toMutableList()
+                            defaultSectionListString =
+                                aInfo5ViewModel.mlToStringUsingDelimiter1(defaultSectionListML)
+                        } else {
+                            defaultSectionListString = ""
+                            for (item in templateSectionList) {
+                                defaultSectionListString += item.template_string
+                            }
+                        }
+                        val sectionCodesAndNamesML = aInfo5ViewModel.mlStringToCodeAndDisplayNameListWithUniqueCodes(
+                            defaultSectionListString,
+                            MainActivity.FLAG_VALUE_SECTION
+                        )
+                        val sectionCodesAndNamesMLString =
+                            aInfo5ViewModel.codeAndDisplayNameListToString(sectionCodesAndNamesML)
+                        val companySectionsCDListID =
+                            aInfo5ViewModel.getPresentCompanyCode() + MainActivity.COMPANY_SECTION_LIST_ID
+                        val aInfo5 = AInfo5(
+                            companySectionsCDListID,
+                            sectionCodesAndNamesMLString
+                        )
+                        aInfo5ViewModel.insertAInfo5(aInfo5)
+                        aInfo5ViewModel.setTheCompanySectionCodeAndDisplayNameML(sectionCodesAndNamesML)
+                    }
+                }
+                else {
+                    var companySectionListString = ""
+                    for (item in list) {
+                        companySectionListString += item.framework
+                    }
+                    val sectionCodesAndNamesML = aInfo5ViewModel.stringToCodeAndDisplayNameList(
+                        companySectionListString
+                    )
+                    val companySectionsCDListID =
+                        aInfo5ViewModel.getPresentCompanyCode() + MainActivity.COMPANY_SECTION_LIST_ID
+                    val aInfo5 = AInfo5(
+                        companySectionsCDListID,
+                        companySectionListString
+                    )
+                    aInfo5ViewModel.insertAInfo5(aInfo5)
+                    aInfo5ViewModel.setTheCompanySectionCodeAndDisplayNameML(sectionCodesAndNamesML)
+                }
+            }
+        }
+
+        //Upload the company Photographs
+        if (!aInfo5ViewModel.getTheCompanyPhotosUploadedFlag()) {
+            aInfo5ViewModel.setTheCompanyPhotosUploadedFlag(true)
+            val photoID = aInfo5ViewModel.getPresentCompanyCode() + MainActivity.PHOTOS_LIST_ID
+            val photoIDMutableList = mutableListOf(photoID)
+            aInfo5ViewModel.getAInfo5ByIds(photoIDMutableList).observe(viewLifecycleOwner) { list ->
+                if (list.isEmpty()) {
+                    aInfo5ViewModel.setPhotosListInCompany(aInfo5ViewModel.stringToPhotoDetailsList(""))
+
+                } else {
+                    var photosListString = ""
+                    for (item in list) {
+                        photosListString += item.framework
+                    }
+                    aInfo5ViewModel.setPhotosListInCompany(
+                        aInfo5ViewModel.stringToPhotoDetailsList(
+                            photosListString
+                        )
+                    )
+                }
+            }
+
+        }
+
 
         //Set the view for screen being SectionFragmentSectionChoice
         if (aInfo5ViewModel.getTheScreenVariable() == MainActivity.SECTION_FRAGMENT_SECTION_CHOICE) {
             binding.buttonChooseSection.text = aInfo5ViewModel.getPresentSectionName()
             binding.buttonNewSection.visibility = View.GONE
             binding.llSectionIntroAndObservationsScreen.visibility = View.VISIBLE
+            //Put true to pagesPresent in CompanySectionCodeAndDisplayML
+            aInfo5ViewModel.changePagesPresentToTrueInPresentSectionCodeAndDisplayNameList(aInfo5ViewModel.getPresentSectionCode())
+            val companySectionsCDListID =
+                aInfo5ViewModel.getPresentCompanyCode() + MainActivity.COMPANY_SECTION_LIST_ID
+            aInfo5ViewModel.saveTheCompanySectionCodeAndDisplayMLIntoDB(companySectionsCDListID)
             //Updating the section name in the Choose Section button
             if (aInfo5ViewModel.getFlagForSectionNameToBeUpdated() == true) {
                 aInfo5ViewModel.setFlagForSectionNameToBeUpdated(false)
@@ -173,12 +269,13 @@ class SectionAndIntrosFragment : Fragment() {
                             presentSectionName += item.framework
                         }
                         binding.buttonChooseSection.setText(presentSectionName)
+                        aInfo5ViewModel.sectionNameMLD.value = presentSectionName
+                        aInfo5ViewModel.setSectionNameMLD(presentSectionName)
                     }
                 }
             }
-
             //Getting the section framework and section data and loading it
-            aInfo5ViewModel.sectionAllPagesFrameworkLoadedFlagMLD.observe(viewLifecycleOwner){flagValue ->
+            aInfo5ViewModel.sectionAllPagesFrameworkLoadedFlagLD.observe(viewLifecycleOwner){flagValue ->
                 if (flagValue == false){
                     val sectionPagesFrameworkAndDataID =
                         aInfo5ViewModel.getPresentCompanyCode() + aInfo5ViewModel.getPresentSectionCode() + MainActivity.SECTION_PAGES_FRAMEWORK_AND_DATA_ID
@@ -200,83 +297,23 @@ class SectionAndIntrosFragment : Fragment() {
                         aInfo5ViewModel.loadThePresentSectionAllPagesFrameworkAndAllDataUsingStrings(sectionAllPagesFrameworkString, sectionAllDataString)
                     }
                 }
-                aInfo5ViewModel.sectionAllPagesFrameworkLoadedFlagMLD.removeObservers(viewLifecycleOwner)
+                aInfo5ViewModel.sectionAllPagesFrameworkLoadedFlagLD.removeObservers(viewLifecycleOwner)
             }
-        } else if (aInfo5ViewModel.getTheScreenVariable() == MainActivity.SECTION_FRAGMENT) {
+        } 
+        else if (aInfo5ViewModel.getTheScreenVariable() == MainActivity.SECTION_FRAGMENT) {
             binding.buttonChooseSection.text = resources.getString(R.string.string_choose_a_section)
             binding.buttonNewSection.visibility = View.VISIBLE
             binding.llSectionIntroAndObservationsScreen.visibility = View.GONE
-
         }
-
-
-        //Getting the company section List from db and if not available get it from the templates db
-        //and if that is not available load in the default section list from strings.
-        if (aInfo5ViewModel.getTheSectionCodeAndDisplayNameML().isEmpty()){
-            val companySectionListID =
-                aInfo5ViewModel.getPresentCompanyCode() + MainActivity.COMPANY_SECTION_LIST_ID
-            aInfo5ViewModel.addUniqueItemToPresentCompanyAllIds(companySectionListID)
-            aInfo5ViewModel.getAInfo5ByIds(mutableListOf(companySectionListID)).observe(viewLifecycleOwner) { list ->
-                if (list.isEmpty()) {
-                    var defaultSectionListString = ""
-                    val defaultSectionList = aInfo5ViewModel.getDefaultSectionList
-                    defaultSectionList.observe(viewLifecycleOwner) { templateSectionList ->
-                        if (templateSectionList.isEmpty()) {
-                            val defaultSectionListML =
-                                resources.getStringArray(R.array.Default_Section_Names).toMutableList()
-                            defaultSectionListString =
-                                aInfo5ViewModel.mlToStringUsingDelimiter1(defaultSectionListML)
-                        } else {
-                            defaultSectionListString = ""
-                            for (item in templateSectionList) {
-                                defaultSectionListString += item.template_string
-                            }
-                        }
-                        val sectionCodesAndNamesML = aInfo5ViewModel.stringToCodeAndDisplayCollection(
-                            defaultSectionListString,
-                            MainActivity.FLAG_VALUE_SECTION
-                        )
-                        val sectionCodesAndNamesMLString =
-                            aInfo5ViewModel.codeAndDisplayCollectionToString(sectionCodesAndNamesML)
-                        val companySectionsCDListID =
-                            aInfo5ViewModel.getPresentCompanyCode() + MainActivity.COMPANY_SECTION_LIST_ID
-                        val aInfo5 = AInfo5(
-                            companySectionsCDListID,
-                            sectionCodesAndNamesMLString
-                        )
-                        aInfo5ViewModel.insertAInfo5(aInfo5)
-                        aInfo5ViewModel.setTheSectionCodeAndDisplayNameML(sectionCodesAndNamesML)
-                    }
-                }
-                else {
-                    var companySectionListString = ""
-                    for (item in list) {
-                        companySectionListString += item.framework
-                    }
-                    val sectionCodesAndNamesML = aInfo5ViewModel.stringToCodeAndDisplayCollection(
-                        companySectionListString,
-                        MainActivity.FLAG_VALUE_SECTION
-                    )
-                    val sectionCodesAndNamesMLString =
-                        aInfo5ViewModel.codeAndDisplayCollectionToString(sectionCodesAndNamesML)
-                    val companySectionsCDListID =
-                        aInfo5ViewModel.getPresentCompanyCode() + MainActivity.COMPANY_SECTION_LIST_ID
-                    val aInfo5 = AInfo5(
-                        companySectionsCDListID,
-                        sectionCodesAndNamesMLString
-                    )
-                    aInfo5ViewModel.insertAInfo5(aInfo5)
-                    aInfo5ViewModel.setTheSectionCodeAndDisplayNameML(sectionCodesAndNamesML)
-                }
-            }
-        }
-
 
 
         //On Click Listeners Below
         binding.buttonChooseSection.setOnClickListener {
-            aInfo5ViewModel.setThePreviousScreenVariable(MainActivity.SECTION_FRAGMENT_SECTION_CHOICE)
-
+            if (aInfo5ViewModel.getTheScreenVariable() == MainActivity.SECTION_FRAGMENT_SECTION_CHOICE){
+                aInfo5ViewModel.setThePreviousScreenVariable(MainActivity.SECTION_FRAGMENT_SECTION_CHOICE)
+            } else if (aInfo5ViewModel.getTheScreenVariable() == MainActivity.SECTION_FRAGMENT){
+                aInfo5ViewModel.setThePreviousScreenVariable(MainActivity.SECTION_FRAGMENT)
+            }
             it.findNavController()
                 .navigate(R.id.action_sectionAndIntrosFragment_to_simpleListRecyclerViewFragment)
         }
@@ -298,13 +335,14 @@ class SectionAndIntrosFragment : Fragment() {
         }
 
         binding.ibDelete.setOnClickListener {
+
             if (aInfo5ViewModel.getTheScreenVariable() == MainActivity.SECTION_FRAGMENT) {
                 aInfo5ViewModel.setTheDeleteML(
                     resources.getStringArray(R.array.Delete_Choices_1).toMutableList()
                 )
                 aInfo5ViewModel.setThePreviousScreenVariable(MainActivity.SECTION_FRAGMENT_DELETE_1)
             } else if (aInfo5ViewModel.getTheScreenVariable() == MainActivity.SECTION_FRAGMENT_SECTION_CHOICE) {
-                aInfo5ViewModel.setTheEditML(
+                aInfo5ViewModel.setTheDeleteML(
                     resources.getStringArray(R.array.Delete_Choices_2).toMutableList()
                 )
                 aInfo5ViewModel.setThePreviousScreenVariable(MainActivity.SECTION_FRAGMENT_DELETE_2)
@@ -329,6 +367,13 @@ class SectionAndIntrosFragment : Fragment() {
             aInfo5ViewModel.setTheWhichIntroductionsOrObservationsToBeUploadedVariable(MainActivity.SECTION_INTRODUCTION)
             it.findNavController()
                 .navigate(R.id.action_sectionAndIntrosFragment_to_introductionsScrollingFragment)
+        }
+
+        binding.buttonObsRecoStds.setOnClickListener {
+            aInfo5ViewModel.setTheScreenVariable(MainActivity.OBSERVATIONS_FRAGMENT)
+            aInfo5ViewModel.setThePreviousScreenVariable(MainActivity.SECTION_FRAGMENT_SECTION_CHOICE)
+            aInfo5ViewModel.setTheWhichIntroductionsOrObservationsToBeUploadedVariable(MainActivity.SECTION_OBSERVATIONS)
+            findNavController().navigate(R.id.action_sectionAndIntrosFragment_to_observationsFragment)
         }
 
         binding.fabChoosingReports.setOnClickListener {
@@ -470,4 +515,6 @@ class SectionAndIntrosFragment : Fragment() {
             }
         builder.create().show()
     }
+
+
 }

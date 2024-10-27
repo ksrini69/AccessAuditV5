@@ -1,6 +1,6 @@
 package com.example.auditapplication5.data.model
 
-data class PhotosDetailsDC(
+data class PhotoDetailsDC(
     var location: String = "",
     var fullPhotoName: String = "",
     var photoUriString: String = "",

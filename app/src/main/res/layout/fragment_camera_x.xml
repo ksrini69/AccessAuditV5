@@ -11,7 +11,7 @@
     <androidx.camera.view.PreviewView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:id="@+id/viewfinder"/>
+        android:id="@+id/viewFinder"/>
 
     <!-- Button to take photos -->
     <Button
