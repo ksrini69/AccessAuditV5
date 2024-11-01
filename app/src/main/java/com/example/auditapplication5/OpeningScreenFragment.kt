@@ -227,15 +227,15 @@ class OpeningScreenFragment : Fragment() {
         aInfo5ViewModel.sectionAllDataLoadedFlagMLD.value = false
         aInfo5ViewModel.setTheSectionAllPagesFrameworkLoadedFlagMLD(false)
 
-
         //Generate and load the Default Reports List
         val reportsList = resources.getStringArray(R.array.Report_Choices).toMutableList()
+        aInfo5ViewModel.setTheAllReportsList(reportsList)
         val defaultReportsList = mutableListOf<String>()
         if (reportsList.size >= 2){
             defaultReportsList.add(reportsList[0])
             defaultReportsList.add(reportsList[2])
         }
-        //aInfo5ViewModel.setTheReportsToBeGeneratedList(defaultReportsList)
+        aInfo5ViewModel.setTheReportsToBeGeneratedList(defaultReportsList)
 
         aInfo5ViewModel.setTheCompanyPhotosUploadedFlag(false)
     }

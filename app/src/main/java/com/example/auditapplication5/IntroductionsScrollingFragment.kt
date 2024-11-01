@@ -3,6 +3,7 @@ package com.example.auditapplication5
 import android.app.AlertDialog
 import android.os.Bundle
 import android.text.method.ScrollingMovementMethod
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -255,12 +256,16 @@ class IntroductionsScrollingFragment : Fragment() {
             aInfo5ViewModel.updateTheIntroInTheCompanyIntroData(aInfo5ViewModel.etIntroductionsMLD.value.toString())
             aInfo5ViewModel.updateThePhotoPathsInCompanyIntroData(aInfo5ViewModel.tvPhotoPathsInIntroductionsFragmentMLD.value.toString())
             aInfo5ViewModel.saveTheCompanyIntroDataIntoDB()
+            val companyIntroAndPhotoPathsData = "${aInfo5ViewModel.etIntroductionsMLD.value.toString()} \n\n ${aInfo5ViewModel.tvPhotoPathsInIntroductionsFragmentMLD.value.toString()}"
+            aInfo5ViewModel.updateTheCompanyNameAuditDateAndIntroInCompanyReportAndSave(aInfo5ViewModel.getPresentCompanyCode(), aInfo5ViewModel.getPresentCompanyName(), aInfo5ViewModel.getTheCompanyAuditDate(), companyIntroAndPhotoPathsData)
         } else if (companyOrSection == MainActivity.SECTION_INTRODUCTION){
             val sectionPagesFrameworkAndDataID =
                 aInfo5ViewModel.getPresentCompanyCode() + aInfo5ViewModel.getPresentSectionCode() + MainActivity.SECTION_PAGES_FRAMEWORK_AND_DATA_ID
             aInfo5ViewModel.updateIntroInThePresentSectionAllData(aInfo5ViewModel.etIntroductionsMLD.value.toString())
             aInfo5ViewModel.updatePicturePathsInIntroForThePresentSectionAllData(aInfo5ViewModel.tvPhotoPathsInIntroductionsFragmentMLD.value.toString())
             aInfo5ViewModel.saveThePresentSectionAllPagesFrameworkAndAllDataToDB(aInfo5ViewModel.getThePresentSectionAllPagesFramework(),aInfo5ViewModel.getThePresentSectionAllData(),sectionPagesFrameworkAndDataID)
+            val sectionIntroAndPhotoPathsData = "${aInfo5ViewModel.etIntroductionsMLD.value.toString()} \n\n ${aInfo5ViewModel.tvPhotoPathsInIntroductionsFragmentMLD.value.toString()}"
+            aInfo5ViewModel.updateSectionNameAndIntroInCompanyReportAndSave(aInfo5ViewModel.getPresentSectionCode(), aInfo5ViewModel.getPresentSectionName(), sectionIntroAndPhotoPathsData)
         }
     }
 }

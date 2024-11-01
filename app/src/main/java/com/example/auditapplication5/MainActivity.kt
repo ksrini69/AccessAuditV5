@@ -258,9 +258,13 @@ class MainActivity : AppCompatActivity() {
 
         const val COMPANY_DIRECTORY_URI_ID = "_Directory_URI_ID"
         const val TXT_FILE_3COLUMN_URI_ID = "_ThreeColumn_URI_ID"
-        const val TXT_FILE_3COLUMN_EXTENSION = "_ThreeColumn.txt"
+        const val TXT_FILE_3COLUMN_EXCEL_EXTENSION = "_ThreeColumn.txt"
+        const val DOC_FILE_3COLUMN_WORD_EXTENSION = "_ThreeColumn.doc"
         const val TXT_FILE_6COLUMN_URI_ID = "_SixColumn_URI_ID"
-        const val TXT_FILE_6COLUMN_EXTENSION = "_SixColumn.txt"
+        const val TXT_FILE_6COLUMN_EXCEL_EXTENSION = "_SixColumn.txt"
+        const val DOC_FILE_6COLUMN_WORD_EXTENSION = "_SixColumn.doc"
+        const val TXT_FILE_CHECKLIST_EXCEL_EXTENSION = "_CheckList.txt"
+        const val DOC_FILE_CHECKLIST_WORD_EXTENSION = "_CheckList.doc"
 
         const val TEMPLATE_DOCUMENT_URI_ID = "Template_Document_URI_ID"
         const val TEMPLATE_DOCUMENT_ID = "Template_Document_ID"

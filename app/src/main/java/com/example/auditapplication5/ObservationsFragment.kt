@@ -72,6 +72,9 @@ class ObservationsFragment : Fragment() {
                             aInfo5ViewModel.getThePresentSectionAllData(),
                             sectionPagesFrameworkAndDataID
                         )
+                        //Save the information into the CompanyReport suitably
+                        aInfo5ViewModel.updateSectionDetailsInCompanyReportAndSave(aInfo5ViewModel.getPresentSectionCode(),aInfo5ViewModel.getPresentSectionName(),aInfo5ViewModel.getThePresentSectionAllData())
+
                         aInfo5ViewModel.setTheScreenVariable(MainActivity.SECTION_FRAGMENT_SECTION_CHOICE)
                         aInfo5ViewModel.setThePreviousScreenVariable(MainActivity.NOT_RELEVANT)
                         findNavController().navigate(R.id.action_observationsFragment_to_sectionAndIntrosFragment)

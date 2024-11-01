@@ -557,6 +557,7 @@ class SimpleListRecyclerViewFragment : Fragment() {
                     aInfo5ViewModel.getPresentCompanyCode() + MainActivity.COMPANY_AUDIT_DATE_ID
                 val aInfo5 = AInfo5(dateID, currentDate)
                 aInfo5ViewModel.insertAInfo5(aInfo5)
+                aInfo5ViewModel.setTheCompanyAuditDate(currentDate)
                 aInfo5ViewModel.addUniqueItemToPresentCompanyAllIds(dateID)
             },
             myear,

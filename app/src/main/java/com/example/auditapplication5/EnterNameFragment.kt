@@ -83,13 +83,6 @@ class EnterNameFragment : Fragment() {
         val actionBar = (activity as MainActivity).supportActionBar
         actionBar?.hide()
 
-//        //Observe and Display Status Message
-//        aInfo5ViewModel.message.observe(viewLifecycleOwner) {
-//            it.getContentIfNotHandled().let {
-//                Toast.makeText(context, it, Toast.LENGTH_SHORT).show()
-//            }
-//        }
-
         //Getting the list of companies from the db and storing in ViewModel
         aInfo5ViewModel.getMLOfCompanyCodesAndNamesLD.observe(viewLifecycleOwner) { list ->
             var companyCodesAndNamesListString = ""
@@ -212,6 +205,7 @@ class EnterNameFragment : Fragment() {
                             aInfo5ViewModel.getPresentCompanyCode() + MainActivity.COMPANY_AUDIT_DATE_ID
                         val aInfo5Date = AInfo5(dateID, currentDate.toString())
                         aInfo5ViewModel.insertAInfo5(aInfo5Date)
+                        aInfo5ViewModel.setTheCompanyAuditDate(currentDate.toString())
                         aInfo5ViewModel.setTheAuditDateToBeUpdatedFlag(true)
                         aInfo5ViewModel.addUniqueItemToPresentCompanyAllIds(dateID)
 
@@ -413,6 +407,8 @@ class EnterNameFragment : Fragment() {
 //                                aInfo5ViewModel.getCompanyDirectoryURIString_A().toUri(),
 //                                newCompanyName
 //                            )
+                            //Updating the company name in the company report
+                            aInfo5ViewModel.updateTheCompanyNameAuditDateAndIntroInCompanyReportAndSave(aInfo5ViewModel.getPresentCompanyCode(),newCompanyName)
                             //Move to the SectionAndIntrosFragment
                             if (aInfo5ViewModel.getThePreviousScreen2Variable() == MainActivity.SECTION_FRAGMENT_EDIT_1) {
                                 aInfo5ViewModel.setTheScreenVariable(MainActivity.SECTION_FRAGMENT)
@@ -427,7 +423,8 @@ class EnterNameFragment : Fragment() {
                         } else {
                             Toast.makeText(this.requireContext(), "This company name exists. Please enter a unique name.", Toast.LENGTH_SHORT).show()
                         }
-                    } else if (aInfo5ViewModel.getFlagForSectionNameToBeUpdated() == true) {
+                    }
+                    else if (aInfo5ViewModel.getFlagForSectionNameToBeUpdated() == true) {
                         val newSectionName = binding.etEnterName.text.toString().trim()
                         //Checking to see if this section name is unique
                         if (aInfo5ViewModel.uniquenessCheckInCodesAndNames(
@@ -469,6 +466,8 @@ class EnterNameFragment : Fragment() {
 //                            aInfo5ViewModel.renamingFilesAfterSectionNameChange(
 //                                newSectionName
 //                            )
+                            //Update the section name in the Company Report
+                            aInfo5ViewModel.updateSectionDetailsInCompanyReportAndSave(aInfo5ViewModel.getPresentSectionCode(),newSectionName,aInfo5ViewModel.getThePresentSectionAllData())
                             //Move to the Section Fragment
                             aInfo5ViewModel.setTheScreenVariable(MainActivity.SECTION_FRAGMENT_SECTION_CHOICE)
                             aInfo5ViewModel.setThePreviousScreenVariable(MainActivity.NOT_RELEVANT)

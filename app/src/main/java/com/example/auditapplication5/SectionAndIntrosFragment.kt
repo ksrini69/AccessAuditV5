@@ -8,11 +8,14 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
+import androidx.core.net.toUri
 import androidx.databinding.DataBindingUtil
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.findNavController
 import com.example.auditapplication5.data.model.AInfo5
+import com.example.auditapplication5.data.model.CompanyReportDC
 import com.example.auditapplication5.databinding.FragmentSectionAndIntrosBinding
 import com.example.auditapplication5.presentation.viewmodel.AInfo5ViewModel
 import java.util.*
@@ -50,13 +53,6 @@ class SectionAndIntrosFragment : Fragment() {
         binding.aInfo5ViewModel = aInfo5ViewModel
         binding.lifecycleOwner = viewLifecycleOwner
 
-        //Observe and Display Status Message
-//        aInfo5ViewModel.message.observe(viewLifecycleOwner) {
-//            it.getContentIfNotHandled().let {
-//                Toast.makeText(context, it, Toast.LENGTH_SHORT).show()
-//            }
-//        }
-
         activity?.onBackPressedDispatcher?.addCallback(
             viewLifecycleOwner,
             object : OnBackPressedCallback(true) {
@@ -88,7 +84,8 @@ class SectionAndIntrosFragment : Fragment() {
         actionBar?.show()
 
         //Checking stuff here
-
+        //Log.d(MainActivity.TESTING_TAG, "onViewCreated: ${aInfo5ViewModel.getTheCompanyAuditDate()} ")
+       //Log.d(MainActivity.TESTING_TAG, "onViewCreated: ${aInfo5ViewModel.isItemPresentInPageTemplateList("PC_General_Entry_01_PC")} ")
 
         //Getting the URI for the company directory and loading it in the ViewModel
         aInfo5ViewModel.setTheCompanyDirectoryUriId(aInfo5ViewModel.getPresentCompanyCode())
@@ -143,7 +140,7 @@ class SectionAndIntrosFragment : Fragment() {
         }
 
         // Getting the audit date and updating action bar.
-        if (aInfo5ViewModel.getTheAuditDateToBeUpdatedFlag() == true) {
+        if (aInfo5ViewModel.getTheAuditDateToBeUpdatedFlag()) {
             aInfo5ViewModel.setTheAuditDateToBeUpdatedFlag(false)
             val dateID =
                 aInfo5ViewModel.getPresentCompanyCode() + MainActivity.COMPANY_AUDIT_DATE_ID
@@ -158,8 +155,8 @@ class SectionAndIntrosFragment : Fragment() {
                             date += item.framework.toString()
                         }
                         actionBar?.subtitle = "Audit Date: " + date
+                        aInfo5ViewModel.setTheCompanyAuditDate(date)
                     }
-
             }
         }
 
@@ -245,6 +242,23 @@ class SectionAndIntrosFragment : Fragment() {
 
         }
 
+        //Get The Company Report and Upload it into ViewModel
+        if (aInfo5ViewModel.getTheCompanyReportUploadedFlag() == false){
+            val companyReportID = aInfo5ViewModel.getPresentCompanyCode() + MainActivity.COMPANY_REPORT_ID
+            aInfo5ViewModel.addUniqueItemToPresentCompanyAllIds(companyReportID)
+            aInfo5ViewModel.getAInfo5ByIds(mutableListOf(companyReportID)).observe(viewLifecycleOwner){list ->
+                var companyReportString = ""
+                if (list.isEmpty()){
+                    companyReportString = ""
+                } else {
+                    companyReportString = ""
+                    for (item in list){
+                        companyReportString += item.framework
+                    }
+                }
+                aInfo5ViewModel.uploadTheCompanyReportIntoViewModel(companyReportString)
+            }
+        }
 
         //Set the view for screen being SectionFragmentSectionChoice
         if (aInfo5ViewModel.getTheScreenVariable() == MainActivity.SECTION_FRAGMENT_SECTION_CHOICE) {
@@ -378,7 +392,7 @@ class SectionAndIntrosFragment : Fragment() {
 
         binding.fabChoosingReports.setOnClickListener {
             val reportChoicesML = resources.getStringArray(R.array.Report_Choices).toMutableList()
-            val linkedHashMap = aInfo5ViewModel.makeLinkedHashMapFromML(reportChoicesML)
+            val linkedHashMap = aInfo5ViewModel.makeLinkedHashMapFromML(reportChoicesML, MainActivity.SECTION_FRAGMENT)
             chooseReportsDialog(linkedHashMap)
         }
 
@@ -455,6 +469,7 @@ class SectionAndIntrosFragment : Fragment() {
                     aInfo5ViewModel.getPresentCompanyCode() + MainActivity.COMPANY_AUDIT_DATE_ID
                 val aInfo5 = AInfo5(dateID, currentDate)
                 aInfo5ViewModel.insertAInfo5(aInfo5)
+                aInfo5ViewModel.setTheCompanyAuditDate(currentDate)
 
             },
             myear,
@@ -501,7 +516,34 @@ class SectionAndIntrosFragment : Fragment() {
         builder.setTitle(title)
             .setMessage(message)
             .setPositiveButton("Yes") { dialog, _ ->
-                aInfo5ViewModel.generateReports(aInfo5ViewModel.getTheReportsToBeGeneratedList())
+                //Company Directory URI ID
+                val dirUriString = aInfo5ViewModel.getTheCompanyDirectoryURIString()
+                if (dirUriString != "") {
+                    aInfo5ViewModel.generateReports(aInfo5ViewModel.getTheReportsToBeGeneratedList())
+                } else {
+                    //Make sure that a new folder is created here and then generate reports
+                    val dirExists = aInfo5ViewModel.directoryExists(
+                        aInfo5ViewModel.getPresentCompanyName(),
+                        aInfo5ViewModel.getTheParentFolderURIString().toUri()
+                    )
+                    if (dirExists == false || dirExists == null) {
+                        try {
+                            aInfo5ViewModel.makeAChildDirectory(
+                                aInfo5ViewModel.getPresentCompanyName(),
+                                aInfo5ViewModel.getPresentCompanyCode(),
+                                aInfo5ViewModel.getTheParentFolderURIString().toUri()
+                            )
+                        } catch (e: FileSystemException) {
+                            Toast.makeText(
+                                this.requireContext(),
+                                "Directory Creation Failed. Please note $e",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
+                    }
+                    aInfo5ViewModel.generateReports(aInfo5ViewModel.getTheReportsToBeGeneratedList())
+                }
+
                 findNavController().navigate(R.id.action_sectionAndIntrosFragment_to_openingScreenFragment)
                 dialog.dismiss()
             }

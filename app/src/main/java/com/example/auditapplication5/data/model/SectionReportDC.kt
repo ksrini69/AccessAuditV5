@@ -4,12 +4,12 @@ data class SectionReportDC(
     var sectionCode: String = "",
     var sectionName: String = "",
     var sectionIntroduction: String = "",
-    var threeColumnReportWord: String = "",
-    var threeColumnReportExcel: String = "",
-    var sixColumnReportWord: String = "",
-    var sixColumnReportExcel: String = "",
-    var checkListReportWord: String = "",
-    var checkListReportExcel: String = "",
+    var threeColumnTableWord: String = "",
+    var threeColumnTableExcel: String = "",
+    var sixColumnTableWord: String = "",
+    var sixColumnTableExcel: String = "",
+    var checkListTableWord: String = "",
+    var checkListTableExcel: String = "",
     var executiveSummaryTwoColumn: String = "",
     var executiveSummaryFourColumn: String = ""
 )
