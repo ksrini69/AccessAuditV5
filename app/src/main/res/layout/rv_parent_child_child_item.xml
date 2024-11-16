@@ -16,7 +16,8 @@
         android:background="@color/white"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        android:layout_marginBottom="3dp"
+        android:layout_marginTop="5dp"
+        android:layout_marginBottom="10dp"
         android:contentDescription="@string/string_textview_that_displays_the_page_name"
         android:tooltipText="@string/string_textview_that_displays_the_page_name"/>
 

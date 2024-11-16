@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="48dp"
+    android:layout_height="68dp"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/cl_rv_simple_list_item"
     android:layout_margin="1dp">
@@ -13,8 +13,13 @@
         android:gravity="start|center_vertical"
         android:textSize="20sp"
         android:text="@string/app_name"
+        android:fontFamily="sans-serif"
         android:textColor="@color/black"
         android:textStyle="bold"
+        android:layout_marginBottom="5dp"
+        android:layout_marginTop="10dp"
+        android:paddingStart="5dp"
+        android:paddingEnd="5dp"
         android:background="@drawable/border_1dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"

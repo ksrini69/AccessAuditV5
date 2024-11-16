@@ -82,16 +82,14 @@ class ParentChildRecyclerviewFragment : Fragment() {
         var sectionPageFramework = SectionPageFrameworkDC()
         var sectionPageData = SectionPageDataDC()
 
-        sectionPageFramework.pageCode = selectedPageCode
-        sectionPageFramework.pageNumber = presentSectionAllPagesFrameworkIndex + 1
-
-        sectionPageData.pageNumber = presentSectionAllPagesFrameworkIndex + 1
-
-        if (selectedPageCode == "" || selectedPageCode == "PC_General_Entry_01_PC" ){
+        if (selectedPageCode == "PC_General_Entry_01_PC" ){
             sectionPageFramework = aInfo5ViewModel.getTheDefaultSectionPageFramework()
             sectionPageData = aInfo5ViewModel.getTheDefaultSectionPageData()
+        } else if (selectedPageCode == "No Pages Present" || selectedPageCode == ""){
+            sectionPageFramework.pageCode = ""
         }
         else {
+            sectionPageFramework.pageCode = selectedPageCode
             sectionPageFramework.pageTitle = aInfo5ViewModel.extractDisplayNameFromPageCode(selectedPageCode)
             sectionPageData.pageTitle = sectionPageFramework.pageTitle
 
@@ -142,17 +140,16 @@ class ParentChildRecyclerviewFragment : Fragment() {
             sectionPageData.standardsFrameworkDataItemList.add(standardsFrameworkDataItem)
         }
 
-        aInfo5ViewModel.addPageFrameworkToPresentSectionAllPagesFramework(sectionPageFramework,presentSectionAllPagesFrameworkIndex + 1 )
-
-        //aInfo5ViewModel.setSectionPagesFrameworkIndexMLD(presentSectionAllPagesFrameworkIndex + 1)
-        aInfo5ViewModel.setThePresentSectionAllPagesFrameworkIndex(presentSectionAllPagesFrameworkIndex + 1)
-
-        aInfo5ViewModel.setTheSectionAllPagesFrameworkLoadedFlagMLD(true)
-
-        aInfo5ViewModel.addSectionPageDataToPresentSectionAllData(sectionPageData, presentSectionAllPagesFrameworkIndex + 1)
-
-        aInfo5ViewModel.resetThePageNumbersOfPresentSectionAllPagesFramework()
-        aInfo5ViewModel.resetThePageNumbersOfPresentSectionAllData()
+        if (sectionPageFramework.pageCode != ""){
+            sectionPageFramework.pageNumber = presentSectionAllPagesFrameworkIndex + 1
+            sectionPageData.pageNumber = presentSectionAllPagesFrameworkIndex + 1
+            aInfo5ViewModel.addPageFrameworkToPresentSectionAllPagesFramework(sectionPageFramework,presentSectionAllPagesFrameworkIndex + 1 )
+            aInfo5ViewModel.setThePresentSectionAllPagesFrameworkIndex(presentSectionAllPagesFrameworkIndex + 1)
+            aInfo5ViewModel.addSectionPageDataToPresentSectionAllData(sectionPageData, presentSectionAllPagesFrameworkIndex + 1)
+            aInfo5ViewModel.setTheSectionAllPagesFrameworkLoadedFlagMLD(true)
+            aInfo5ViewModel.resetThePageNumbersOfPresentSectionAllPagesFramework()
+            aInfo5ViewModel.resetThePageNumbersOfPresentSectionAllData()
+        }
 
         val sectionPagesFrameworkAndDataID =
             aInfo5ViewModel.getPresentCompanyCode() + aInfo5ViewModel.getPresentSectionCode() + MainActivity.SECTION_PAGES_FRAMEWORK_AND_DATA_ID

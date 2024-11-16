@@ -55,6 +55,10 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:text="@string/string_company_intro"
+                            android:textSize="18sp"
+                            android:textStyle="bold"
+                            android:backgroundTint="@color/black"
+                            android:textColor="@color/white"
                             app:layout_constraintBottom_toBottomOf="parent"
                             app:layout_constraintEnd_toEndOf="parent"
                             app:layout_constraintStart_toStartOf="parent"
@@ -114,6 +118,10 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:text="@string/string_choose_a_section"
+                            android:textSize="18sp"
+                            android:textStyle="bold"
+                            android:textColor="@color/white"
+                            android:backgroundTint="@color/black"
                             app:layout_constraintBottom_toBottomOf="parent"
                             app:layout_constraintEnd_toEndOf="parent"
                             app:layout_constraintStart_toStartOf="parent"
@@ -157,6 +165,10 @@
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="10dp"
                     android:text="@string/string_section_intro"
+                    android:backgroundTint="@color/black"
+                    android:textStyle="bold"
+                    android:textSize="16sp"
+                    android:textColor="@color/white"
                     android:contentDescription="@string/string_button_to_enter_the_section_introduction"
                     android:tooltipText="@string/string_button_to_enter_the_section_introduction"/>
 
@@ -165,6 +177,10 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/string_obs_reco_stds"
+                    android:backgroundTint="@color/black"
+                    android:textColor="@color/white"
+                    android:textStyle="bold"
+                    android:textSize="16sp"
                     android:contentDescription="@string/string_button_to_move_to_the_observations_recommendations_and_standards_screen"
                     android:tooltipText="@string/string_button_to_move_to_the_observations_recommendations_and_standards_screen"/>
 
@@ -205,6 +221,10 @@
                         android:layout_height="match_parent"
                         android:id="@+id/button_edit_in_section_and_intros_fragment"
                         android:text="@string/string_edit"
+                        android:backgroundTint="@color/black"
+                        android:textSize="16sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/white"
                         android:contentDescription="@string/string_button_to_edit_the_company_name_audit_date_and_section_name"
                         android:tooltipText="@string/string_button_to_edit_the_company_name_audit_date_and_section_name"/>
                     <Space
@@ -217,8 +237,8 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:id="@+id/ib_delete"
-                        android:backgroundTint="@color/purple_200"
-                        android:src="@drawable/ic_delete_50"
+                        android:backgroundTint="@color/black"
+                        android:src="@drawable/ic_delete_50_white"
                         android:contentDescription="@string/string_image_button_showing_the_delete_icon_click_to_delete_the_company_and_any_section"
                         android:tooltipText="@string/string_image_button_showing_the_delete_icon_click_to_delete_the_company_and_any_section"/>
                     <Space
@@ -232,6 +252,10 @@
                         android:layout_height="match_parent"
                         android:id="@+id/button_new_section"
                         android:text="@string/string_new_section"
+                        android:backgroundTint="@color/black"
+                        android:textColor="@color/white"
+                        android:textStyle="bold"
+                        android:textSize="16sp"
                         android:contentDescription="@string/string_button_for_adding_a_new_section"
                         android:tooltipText="@string/string_button_for_adding_a_new_section"/>
                     <Space
@@ -263,6 +287,7 @@
             android:clickable="true"
             android:layout_gravity="center|bottom"
             android:layout_marginBottom="20dp"
+            android:backgroundTint="@color/white"
             android:src="@drawable/ic_baseline_library_books_24"
             app:maxImageSize="50dp"
             android:contentDescription="@string/string_floating_action_button_for_choosing_reports"

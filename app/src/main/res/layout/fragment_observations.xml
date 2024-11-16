@@ -30,6 +30,8 @@
                 android:background="@drawable/border1dp_with_up_arrow"
                 android:contentDescription="@string/string_textview_that_displays_the_page_name_and_number"
                 android:gravity="center_vertical"
+                android:textStyle="bold"
+                android:textColor="@color/black"
                 android:text="@{String.valueOf(aInfo5ViewModel.sectionNameFormatForDisplay(aInfo5ViewModel.sectionNameMLD)) + String.valueOf(aInfo5ViewModel.pageCountFormatForDisplay(aInfo5ViewModel.pageCountMLD))+ String.valueOf(aInfo5ViewModel.etPageNameMLD)}"
                 android:tooltipText="@string/string_textview_that_displays_the_page_name_and_number"/>
 
@@ -40,7 +42,9 @@
                 android:layout_height="48dp"
                 android:layout_marginTop="5dp"
                 android:background="@drawable/border_1dp"
-                android:orientation="horizontal">
+                android:orientation="horizontal"
+                android:paddingTop="2dp"
+                android:paddingBottom="2dp">
 
                 <Space
                     android:layout_width="0dp"
@@ -53,7 +57,7 @@
                     android:id="@+id/ib_back"
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
-                    android:background="@color/purple_200"
+                    android:background="@color/white"
                     android:contentDescription="@string/string_image_button_showing_the_page_back_icon"
                     android:src="@drawable/ic_back_50"
                     android:tooltipText="@string/string_image_button_showing_the_page_back_icon"/>
@@ -69,7 +73,7 @@
                     android:id="@+id/ib_forward"
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
-                    android:background="@color/purple_200"
+                    android:background="@color/white"
                     android:contentDescription="@string/string_image_button_showing_the_page_forward_icon"
                     android:src="@drawable/ic_forward_50"
                     android:tooltipText="@string/string_image_button_showing_the_page_forward_icon"/>
@@ -85,11 +89,12 @@
                     android:id="@+id/button_goto"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:background="@color/purple_200"
+                    android:backgroundTint="@color/black"
                     android:minWidth="48dp"
                     android:padding="1dp"
                     android:contentDescription="@string/string_button_for_moving_to_a_specific_page"
                     android:text="@string/string_goto"
+                    android:textStyle="bold"
                     android:tooltipText="@string/string_button_for_moving_to_a_specific_page"/>
 
                 <Space
@@ -103,7 +108,7 @@
                     android:id="@+id/ib_camera_in_observations_page"
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
-                    android:background="@color/purple_200"
+                    android:background="@color/white"
                     android:contentDescription="@string/string_image_button_showing_the_camera_icon"
                     android:src="@drawable/ic_camera_50"
                     android:tooltipText="@string/string_image_button_showing_the_camera_icon"/>
@@ -119,7 +124,7 @@
                     android:id="@+id/ib_add_a_page"
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
-                    android:background="@color/purple_200"
+                    android:background="@color/white"
                     android:contentDescription="@string/string_image_button_showing_add_a_page_icon"
                     android:src="@drawable/ic_note_add_50"
                     android:tooltipText="@string/string_image_button_showing_add_a_page_icon"/>
@@ -135,7 +140,7 @@
                     android:id="@+id/ib_edit_photo_in_observations_page"
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
-                    android:background="@color/purple_200"
+                    android:background="@color/white"
                     android:contentDescription="@string/string_image_button_showing_the_edit_photos_icon"
                     android:src="@drawable/ic_edit_calendar_50"
                     android:tooltipText="@string/string_image_button_showing_the_edit_photos_icon"/>
@@ -151,9 +156,9 @@
                     android:id="@+id/ib_delete_in_observations_page"
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
-                    android:background="@color/purple_200"
+                    android:background="@color/white"
                     android:contentDescription="@string/string_image_button_showing_the_delete_icon"
-                    android:src="@drawable/ic_delete_50"
+                    android:src="@drawable/ic_delete_50_black"
                     android:tooltipText="@string/string_image_button_showing_the_delete_icon"/>
 
                 <Space
@@ -171,7 +176,10 @@
                 android:layout_height="48dp"
                 android:id="@+id/ll_action_buttons_2"
                 android:orientation="horizontal"
-                android:layout_marginTop="5dp">
+                android:background="@drawable/border_1dp"
+                android:layout_marginTop="5dp"
+                android:paddingTop="2dp"
+                android:paddingBottom="2dp">
 
                 <Space
                     android:layout_width="0dp"
@@ -184,8 +192,10 @@
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
                     android:id="@+id/button_questions_view"
-                    android:background="@color/purple_200"
+                    android:backgroundTint="@color/black"
                     android:text="@string/string_questions_view"
+                    android:textStyle="bold"
+                    android:textColor="@color/white"
                     android:minWidth="48dp"
                     android:contentDescription="@string/string_button_to_go_to_the_questions_view"
                     android:tooltipText="@string/string_button_to_go_to_the_questions_view"/>
@@ -200,8 +210,10 @@
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
                     android:id="@+id/button_recommendations_view"
-                    android:background="@color/purple_200"
+                    android:backgroundTint="@color/black"
                     android:text="@string/string_recommendations_view"
+                    android:textColor="@color/white"
+                    android:textStyle="bold"
                     android:minWidth="48dp"
                     android:contentDescription="@string/string_button_to_go_to_the_recommendations_view"
                     android:tooltipText="@string/string_button_to_go_to_the_recommendations_view"/>
@@ -216,8 +228,10 @@
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
                     android:id="@+id/button_standards_view"
-                    android:background="@color/purple_200"
+                    android:backgroundTint="@color/black"
                     android:text="@string/string_standards_view"
+                    android:textStyle="bold"
+                    android:textColor="@color/white"
                     android:minWidth="48dp"
                     android:contentDescription="@string/string_button_to_go_to_the_standards_view"
                     android:tooltipText="@string/string_button_to_go_to_the_standards_view"/>
@@ -232,8 +246,10 @@
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
                     android:id="@+id/button_observations_view"
-                    android:background="@color/purple_200"
+                    android:backgroundTint="@color/black"
                     android:text="@string/string_observations_view"
+                    android:textColor="@color/white"
+                    android:textStyle="bold"
                     android:minWidth="48dp"
                     android:contentDescription="@string/string_button_to_go_to_the_observations_view"
                     android:tooltipText="@string/string_button_to_go_to_the_observations_view"/>
@@ -247,11 +263,12 @@
 
             </LinearLayout>
 
+            <!--Edit Text for Changing the Page Name -->
             <EditText
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="48dp"
                 android:id="@+id/et_modify_page_name_by_user"
-                android:textSize="18sp"
+                android:textSize="20sp"
                 android:hint="@string/string_modify_page_name_here"
                 android:tooltipText="@string/string_modify_page_name_here"
                 android:textColorHint="@color/light_grey"
@@ -266,11 +283,13 @@
                 android:layout_width="match_parent"
                 android:layout_height="40dp"
                 android:id="@+id/tv_observations_recommendations_label"
-                android:textSize="18sp"
+                android:textSize="20sp"
                 android:textStyle="bold"
                 android:background="@drawable/border1dp_color_purple700_with_up_arrow"
                 android:textColor="@color/yellow"
-                android:gravity="center"
+                android:paddingStart="10dp"
+                android:paddingEnd="2dp"
+                android:gravity="start|center_vertical"
                 android:text="@string/string_observations_and_recommendations"
                 android:tooltipText="@string/string_observations_and_recommendations"
                 android:layout_marginBottom="5dp"/>
@@ -292,8 +311,10 @@
                         android:id="@+id/tv_observations_pictures_label"
                         android:textSize="16sp"
                         android:textStyle="bold"
+                        android:paddingStart="5dp"
+                        android:paddingEnd="5dp"
                         android:textColor="@color/yellow"
-                        android:background="@drawable/border1dp_color_purple500_with_up_arrow"
+                        android:background="@drawable/border1dp_color_black_with_up_arrow"
                         android:gravity="center_vertical"
                         android:text="@string/string_observations_and_photo_paths"
                         android:tooltipText="@string/string_observations_and_photo_paths"
@@ -335,8 +356,10 @@
                         android:id="@+id/tv_recommendations_standards_label"
                         android:textSize="16sp"
                         android:textStyle="bold"
+                        android:paddingStart="5dp"
+                        android:paddingEnd="5dp"
                         android:textColor="@color/yellow"
-                        android:background="@drawable/border1dp_color_purple500_with_up_arrow"
+                        android:background="@drawable/border1dp_color_black_with_up_arrow"
                         android:gravity="center_vertical"
                         android:text="@string/string_recommendations_and_standards"
                         android:layout_marginBottom="5dp"
@@ -381,7 +404,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="40dp"
                 android:id="@+id/tv_questions_etc_label"
-                android:textSize="18sp"
+                android:textSize="22sp"
                 android:textStyle="bold"
                 android:background="@drawable/border1dp_color_purple700_with_up_arrow"
                 android:textColor="@color/yellow"
@@ -411,7 +434,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center|bottom"
             android:layout_margin="5dp"
-            android:backgroundTint="@color/translucent75_purple200"
+            android:backgroundTint="@color/translucent_white"
             android:clickable="true"
             android:contentDescription="@string/string_floating_action_button_showing_the_add_icon_click_to_add_a_new_block"
             android:src="@drawable/ic_block_add_to_queue_50"

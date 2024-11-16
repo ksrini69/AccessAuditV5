@@ -74,7 +74,7 @@
                     android:id="@+id/ib_delete_in_introduction_page"
                     android:backgroundTint="@color/white"
                     android:contentDescription="@string/string_image_button_showing_the_delete_icon"
-                    android:src="@drawable/ic_delete_50"
+                    android:src="@drawable/ic_delete_50_black"
                     android:tooltipText="@string/string_image_button_showing_the_delete_icon"/>
 
                 <Space
@@ -133,7 +133,7 @@
                     android:layout_margin="5dp"
                     android:text="@={aInfo5ViewModel.etIntroductionsMLD}"
                     android:autofillHints=""
-                    android:inputType="textMultiLine|textAutoComplete|textAutoCorrect"
+                    android:inputType="textMultiLine|textAutoComplete|textAutoCorrect|textCapSentences"
                     android:textColorHint="@color/light_grey"
                     android:textSize="18sp"
                     android:tooltipText="@string/string_enter_introductory_remarks_here"/>

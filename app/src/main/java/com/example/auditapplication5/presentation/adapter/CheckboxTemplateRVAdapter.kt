@@ -95,7 +95,7 @@ class CheckboxTemplateRVAdapter(
                 binding.cbCheckboxItem.visibility = View.GONE
             } else {
                 binding.cbCheckboxItem.visibility = View.VISIBLE
-                binding.cbCheckboxItem.setText(checkboxTemplateItem.checkboxLabel)
+                binding.cbCheckboxItem.setText(checkboxTemplateItem.checkboxLabel.replace("#", ","))
             }
 
 //            val buttonChoicesML =

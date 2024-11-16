@@ -81,7 +81,7 @@ class IntroductionsScrollingFragment : Fragment() {
                         if (actionBar?.title?.contains(presentCompanyName) == false) {
                             actionBar.title = "Company Name: " + presentCompanyName
                         }
-                        actionBar?.subtitle = "Introduction Screen"
+                        actionBar?.subtitle = "Company Introduction"
                     }
                 }
             aInfo5ViewModel.addUniqueItemToPresentCompanyAllIds(presentCompanyNameID)
@@ -121,7 +121,7 @@ class IntroductionsScrollingFragment : Fragment() {
                     if (actionBar?.title?.contains(presentSectionName) == false) {
                         actionBar.title = "Section Name: " + presentSectionName
                     }
-                    actionBar?.subtitle = "Introduction Screen"
+                    actionBar?.subtitle = "Section Introduction"
                 }
             }
             aInfo5ViewModel.addUniqueItemToPresentCompanyAllIds(presentSectionNameID)
@@ -192,9 +192,8 @@ class IntroductionsScrollingFragment : Fragment() {
     }
 
 
-
-    override fun onDestroy() {
-        super.onDestroy()
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
         saveIntroductionsToDB(aInfo5ViewModel.getTheWhichIntroductionsOrObservationsToBeUploadedVariable())
     }
 

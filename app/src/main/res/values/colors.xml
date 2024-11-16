@@ -18,10 +18,13 @@
     <color name="yellow">#FFFF00</color>
     <color name="lollipop">#35A79C</color>
     <color name="random">#A349B1</color>
+    <color name="lemon_yellow">#FFFDD9FF</color>
+    <color name="lemon_yellow_1">#FFFFFF9F</color>
 
     <color name="purple_experimental">#FFCC40FC</color>
     <color name="translucent_color_50">#80FFFFFF</color>
     <color name="translucent_color_75">#BFFFFFFF</color>
     <color name="translucent75_purple200">#BFBB86FC</color>
     <color name="translucent50_purple200">#80BB86FC</color>
+    <color name="translucent_white">#80FFFFFF</color>
 </resources>

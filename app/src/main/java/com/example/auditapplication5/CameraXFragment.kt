@@ -1,6 +1,7 @@
 package com.example.auditapplication5
 
 import android.content.ContentValues
+import android.content.pm.ActivityInfo
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
@@ -58,6 +59,7 @@ class CameraXFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+
         // Inflate the layout for this fragment
         binding =
             DataBindingUtil.inflate(layoutInflater, R.layout.fragment_camera_x, container, false)

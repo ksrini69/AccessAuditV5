@@ -18,7 +18,7 @@
     <string name="string_company_intro">Company Intro</string>
     <string name="string_choose_a_section">Choose A Section</string>
     <string name="string_section_intro">Section Intro</string>
-    <string name="string_obs_reco_stds">Obs/Reco/Stds Screen</string>
+    <string name="string_obs_reco_stds">Obs Screen</string>
     <string name="string_edit">Edit</string>
     <string name="string_delete">Delete</string>
     <string name="string_new_section">New Section</string>
@@ -116,7 +116,7 @@
     <string name="string_hp">HP</string>
     <string name="string_this_is_an_imageview_in_recyclerview_item">This is an Imageview in recyclerview item</string>
     <string name="string_textview_showing_the_photograph_heading">Textview showing the photograph heading</string>
-    <string name="string_application_name_on_action_bar">Access Audit App for Buildings</string>
+    <string name="string_application_name_on_action_bar">Access Audit App for Buildings - V5</string>
     <string name="string_new_parent_folder">Getting a New Parent Folder</string>
     <string name="string_message_for_new_parent_folder">Do you want to select a new parent Folder?</string>
     <string name="string_deleting_templates_db">Deleting the Templates Database</string>

@@ -42,7 +42,7 @@ class QuestionTemplateRVAdapter(
 
     inner class ViewHolder(val binding: QuestionTemplateItemBinding): RecyclerView.ViewHolder(binding.root){
         fun bind(questionTemplateItem: QuestionTemplateItemDC, templateQuestionPosition: Int){
-            val result = questionTemplateItemML?.let {
+            val result = questionTemplateItemML.let {
                 aInfo5ViewModel.isQuestionDataItemListUpdatedInPresentSectionAllData(currentPageIndex,questionsFrameworkIndex,
                     it
                 )
@@ -53,7 +53,7 @@ class QuestionTemplateRVAdapter(
                 )
             }
 
-            binding.tvBlockNumber.text = questionTemplateItem.blockNumber
+            binding.tvBlockNumber.text = questionTemplateItem.blockNumber.replace("B0", "Q") + ")"
             binding.tvQuestion.text = questionTemplateItem.question
 
             if (questionTemplateItem.message.contains("<>") || questionTemplateItem.message == "") {

@@ -62,6 +62,7 @@ class MainActivity : AppCompatActivity() {
                         aInfo5ViewModel.setTheTemplateString(readTextFromUri(treeURI))
                         //Load the separate templates into the database
                         aInfo5ViewModel.loadDefaultTemplatesIntoTemplateDatabase(aInfo5ViewModel.getTheTemplateString()!!)
+
                     }
                 }
             }
@@ -173,6 +174,7 @@ class MainActivity : AppCompatActivity() {
     companion object{
         // For Screen Related Operations
         const val OPENING_SCREEN_FRAGMENT = "Opening Screen Fragment"
+        const val OPENING_SCREEN_FRAGMENT_DB_DELETION = "Opening Screen Fragment DB Deletion"
         const val ENTER_NAME_FRAGMENT = "Enter Name Fragment"
         const val SIMPLE_LIST_RV_FRAGMENT = "Simple List RV Fragment"
 
@@ -325,6 +327,8 @@ class MainActivity : AppCompatActivity() {
 
     private fun initialiseValues() {
         //aInfo5ViewModel.clearPresentCompanyAllIds()
+        //aInfo5ViewModel.setTheParentChildParentItemML(mutableListOf())
+        //aInfo5ViewModel.clearTheParentChildParentItemML()
 
     }
 

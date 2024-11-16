@@ -1,8 +1,10 @@
 package com.example.auditapplication5
 
 import android.app.AlertDialog
+import android.content.pm.ActivityInfo
 import android.os.Bundle
 import android.text.method.ScrollingMovementMethod
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -339,6 +341,8 @@ class ObservationsFragment : Fragment() {
         // On Click Listeners for Questions, Observations, Recommendations and Standards
 
         binding.buttonQuestionsView.setOnClickListener {
+            val animation = AnimationUtils.loadAnimation(this.requireContext(), R.anim.fade_out_in)
+            binding.buttonQuestionsView.startAnimation(animation)
             aInfo5ViewModel.setTheScreenVariable(MainActivity.OBSERVATIONS_FRAGMENT)
             var currentPageIndex = 0
             if (aInfo5ViewModel.getThePreviousScreenVariable() == MainActivity.SECTION_FRAGMENT_SECTION_CHOICE){
@@ -353,6 +357,8 @@ class ObservationsFragment : Fragment() {
         }
 
         binding.buttonObservationsView.setOnClickListener {
+            val animation = AnimationUtils.loadAnimation(this.requireContext(), R.anim.fade_out_in)
+            binding.buttonObservationsView.startAnimation(animation)
             aInfo5ViewModel.setTheScreenVariable(MainActivity.OBSERVATIONS_FRAGMENT_OBSERVATIONS)
             var currentPageIndex = 0
             if (aInfo5ViewModel.getThePreviousScreenVariable() == MainActivity.SECTION_FRAGMENT_SECTION_CHOICE){
@@ -367,6 +373,8 @@ class ObservationsFragment : Fragment() {
         }
 
         binding.buttonRecommendationsView.setOnClickListener {
+            val animation = AnimationUtils.loadAnimation(this.requireContext(), R.anim.fade_out_in)
+            binding.buttonRecommendationsView.startAnimation(animation)
             aInfo5ViewModel.setTheScreenVariable(MainActivity.OBSERVATIONS_FRAGMENT_RECOMMENDATIONS)
             var currentPageIndex = 0
             if (aInfo5ViewModel.getThePreviousScreenVariable() == MainActivity.SECTION_FRAGMENT_SECTION_CHOICE){
@@ -381,6 +389,8 @@ class ObservationsFragment : Fragment() {
         }
 
         binding.buttonStandardsView.setOnClickListener {
+            val animation = AnimationUtils.loadAnimation(this.requireContext(), R.anim.fade_out_in)
+            binding.buttonStandardsView.startAnimation(animation)
             aInfo5ViewModel.setTheScreenVariable(MainActivity.OBSERVATIONS_FRAGMENT_STANDARDS)
             var currentPageIndex = 0
             if (aInfo5ViewModel.getThePreviousScreenVariable() == MainActivity.SECTION_FRAGMENT_SECTION_CHOICE){
@@ -527,6 +537,8 @@ class ObservationsFragment : Fragment() {
 
         //Click Listener for Goto
         binding.buttonGoto.setOnClickListener {
+            val animation = AnimationUtils.loadAnimation(this.requireContext(), R.anim.fade_out_in)
+            binding.buttonGoto.startAnimation(animation)
             val currentPageIndex = aInfo5ViewModel.getThePresentSectionAllPagesFrameworkIndex()
             //Save the page title into the page structure
             aInfo5ViewModel.updatePageFrameworkTitleInPresentSectionAllPagesFramework(
@@ -553,6 +565,27 @@ class ObservationsFragment : Fragment() {
 
     }
 
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        //Save the page title into the page framework and data
+        val currentPageIndex = aInfo5ViewModel.getThePresentSectionAllPagesFrameworkIndex()
+        aInfo5ViewModel.updatePageFrameworkTitleInPresentSectionAllPagesFramework(aInfo5ViewModel.etPageNameMLD.value.toString(), currentPageIndex)
+        //Save the observations etc info into Section Page Data
+        aInfo5ViewModel.updateObservationsInObsForThePresentSectionAllData(aInfo5ViewModel.etObservationsMLD.value.toString(),currentPageIndex)
+        aInfo5ViewModel.updatePicturePathsInObsForThePresentSectionAllData(aInfo5ViewModel.tvPhotoPathsInObservationsFragmentMLD.value.toString(), currentPageIndex)
+        aInfo5ViewModel.updateRecommendationsInObsForThePresentSectionAllData(aInfo5ViewModel.etRecommendationsMLD.value.toString(), currentPageIndex)
+        aInfo5ViewModel.updateStandardsInObsForThePresentSectionAllData(aInfo5ViewModel.tvStandardsMLD.value.toString(), currentPageIndex)
+        //Save the SectionPagesFramework and Data before exiting
+        val sectionPagesFrameworkAndDataID =
+            aInfo5ViewModel.getPresentCompanyCode() + aInfo5ViewModel.getPresentSectionCode() + MainActivity.SECTION_PAGES_FRAMEWORK_AND_DATA_ID
+        aInfo5ViewModel.saveThePresentSectionAllPagesFrameworkAndAllDataToDB(
+            aInfo5ViewModel.getThePresentSectionAllPagesFramework(),
+            aInfo5ViewModel.getThePresentSectionAllData(),
+            sectionPagesFrameworkAndDataID
+        )
+        //Save the information into the CompanyReport suitably
+        aInfo5ViewModel.updateSectionDetailsInCompanyReportAndSave(aInfo5ViewModel.getPresentSectionCode(),aInfo5ViewModel.getPresentSectionName(),aInfo5ViewModel.getThePresentSectionAllData())
+    }
 
     //Functions below
 
@@ -567,6 +600,7 @@ class ObservationsFragment : Fragment() {
                 val currentPageIndex = aInfo5ViewModel.getThePresentSectionAllPagesFrameworkIndex()
                 aInfo5ViewModel.deletePageFrameworkInPresentSectionAllPagesFramework(currentPageIndex)
                 aInfo5ViewModel.deleteSectionPageDataInPresentSectionAllData(currentPageIndex)
+                aInfo5ViewModel.deleteSectionReportInCompanyReportAndSave(aInfo5ViewModel.getPresentSectionCode())
                 if (currentPageIndex > 0) {
                     aInfo5ViewModel.setThePageCountMLD(currentPageIndex - 1)
                     aInfo5ViewModel.setThePresentSectionAllPagesFrameworkIndex(currentPageIndex - 1)
@@ -681,14 +715,6 @@ class ObservationsFragment : Fragment() {
                                     questionsFrameworkItem.questionsFrameworkTitle
                                 questionFrameworkDataItem.pageCode = questionsFrameworkItem.pageCode
 
-                                //Add the Questions Block Data Item based on the template
-//                                for (questionsItem in pageTemplateItem.questionsList){
-//                                    val questionDataItem = QuestionDataItemDC()
-//                                    questionDataItem.blockNumber = questionsItem.blockNumber
-//                                    questionDataItem.mandatoryValue = questionsItem.mandatory
-//                                    questionFrameworkDataItem.questionDataItemList.add(questionDataItem)
-//                                }
-
                                 val positionOfQuestionsFrameworkList =
                                     binding.rvQuestionsFramework.adapter?.itemCount
                                 aInfo5ViewModel.addPageFrameworkQuestionsInPresentSectionAllPagesFramework(
@@ -723,10 +749,6 @@ class ObservationsFragment : Fragment() {
                                     observationsFrameworkItem,
                                     currentpageIndex
                                 )
-//                                for (observationsItem in pageTemplateItem.observationsList){
-//                                    val observationDataItem = CheckboxDataItemDC()
-//                                    observationsFrameworkDataItem.checkboxDataItemML.add(observationDataItem)
-//                                }
 
                                 aInfo5ViewModel.addObservationsFrameworkDataItemInThePresentSectionAllData(
                                     observationsFrameworkDataItem,
@@ -751,10 +773,6 @@ class ObservationsFragment : Fragment() {
                                     recommendationsFrameworkItem,
                                     currentpageIndex
                                 )
-//                                for (recommendationsItem in pageTemplateItem.recommendationsList){
-//                                    val recommendationDataItem = CheckboxDataItemDC()
-//                                    recommendationsFrameworkDataItem.checkboxDataItemML.add(recommendationDataItem)
-//                                }
 
                                 aInfo5ViewModel.addRecommendationsFrameworkDataItemInThePresentSectionAllData(
                                     recommendationsFrameworkDataItem,
@@ -779,10 +797,6 @@ class ObservationsFragment : Fragment() {
                                     standardsFrameworkItem,
                                     currentpageIndex
                                 )
-//                                for (standardsItem in pageTemplateItem.standardsList){
-//                                    val standardDataItem = CheckboxDataItemDC()
-//                                    standardsFrameworkDataItem.checkboxDataItemML.add(standardDataItem)
-//                                }
 
                                 aInfo5ViewModel.addStandardsFrameworkDataItemInThePresentSectionAllData(
                                     standardsFrameworkDataItem,
@@ -805,10 +819,6 @@ class ObservationsFragment : Fragment() {
                                 observationsFrameworkDataItem.checkboxesFrameworkTitle =
                                     observationsFrameworkItem.checkboxesFrameworkTitle
                                 observationsFrameworkDataItem.pageCode = observationsFrameworkItem.pageCode
-//                                for (observationsItem in pageTemplateItem.observationsList){
-//                                    val observationDataItem = CheckboxDataItemDC()
-//                                    observationsFrameworkDataItem.checkboxDataItemML.add(observationDataItem)
-//                                }
 
                                 aInfo5ViewModel.addPageFrameworkObservationsInPresentSectionAllPagesFramework(
                                     observationsFrameworkItem,
@@ -841,10 +851,6 @@ class ObservationsFragment : Fragment() {
                                 recommendationsFrameworkDataItem.checkboxesFrameworkTitle =
                                     recommendationsFrameworkItem.checkboxesFrameworkTitle
                                 recommendationsFrameworkDataItem.pageCode = recommendationsFrameworkItem.pageCode
-//                                for (recommendationsItem in pageTemplateItem.recommendationsList){
-//                                    val recommendationDataItem = CheckboxDataItemDC()
-//                                    recommendationsFrameworkDataItem.checkboxDataItemML.add(recommendationDataItem)
-//                                }
 
                                 aInfo5ViewModel.addPageFrameworkRecommendationsInPresentSectionAllPagesFramework(
                                     recommendationsFrameworkItem,
@@ -1368,11 +1374,11 @@ class ObservationsFragment : Fragment() {
             if (getObsExpandedValue()) {
                 binding.tvPhotoPathsInObservationsPage.visibility = View.VISIBLE
                 binding.etObservationsOnly.visibility = View.VISIBLE
-                binding.tvObservationsPicturesLabel.setBackgroundResource(R.drawable.border1dp_color_purple500_with_up_arrow)
+                binding.tvObservationsPicturesLabel.setBackgroundResource(R.drawable.border1dp_color_black_with_up_arrow)
             } else {
                 binding.tvPhotoPathsInObservationsPage.visibility = View.GONE
                 binding.etObservationsOnly.visibility = View.GONE
-                binding.tvObservationsPicturesLabel.setBackgroundResource(R.drawable.border1dp_color_purple500_with_down_arrow)
+                binding.tvObservationsPicturesLabel.setBackgroundResource(R.drawable.border1dp_color_black_with_down_arrow)
             }
         }
 
@@ -1389,11 +1395,11 @@ class ObservationsFragment : Fragment() {
             if (getRecoExpandedValue()) {
                 binding.tvStandardsInObservationsPage.visibility = View.VISIBLE
                 binding.etRecommendationsOnly.visibility = View.VISIBLE
-                binding.tvRecommendationsStandardsLabel.setBackgroundResource(R.drawable.border1dp_color_purple500_with_up_arrow)
+                binding.tvRecommendationsStandardsLabel.setBackgroundResource(R.drawable.border1dp_color_black_with_up_arrow)
             } else {
                 binding.tvStandardsInObservationsPage.visibility = View.GONE
                 binding.etRecommendationsOnly.visibility = View.GONE
-                binding.tvRecommendationsStandardsLabel.setBackgroundResource(R.drawable.border1dp_color_purple500_with_down_arrow)
+                binding.tvRecommendationsStandardsLabel.setBackgroundResource(R.drawable.border1dp_color_black_with_down_arrow)
             }
         }
 

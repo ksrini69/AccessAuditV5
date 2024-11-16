@@ -441,9 +441,9 @@ class AInfo5ViewModel(
 
     fun addPageFrameworkQuestionsInPresentSectionAllPagesFramework(
         input: QuestionsFrameworkItemDC,
-        pageIndex: Int
+        currentPageIndex: Int
     ) {
-        presentSectionAllPagesFramework.sectionPageFrameworkList[pageIndex].questionsFrameworkList.add(
+        presentSectionAllPagesFramework.sectionPageFrameworkList[currentPageIndex].questionsFrameworkList.add(
             input
         )
 
@@ -1004,96 +1004,144 @@ class AInfo5ViewModel(
         return ObserveAndActOnceForTemplatesLoadedFlag
     }
 
+    private var ObserveAndActOnceForTemplatesIDsListFlag: Boolean = false
+    fun setTheObserveAndActOnceForTemplatesIDsListFlag(input: Boolean) {
+        ObserveAndActOnceForTemplatesIDsListFlag = input
+    }
+
+    fun getTheObserveAndActOnceForTemplatesIDsListFlag(): Boolean {
+        return ObserveAndActOnceForTemplatesIDsListFlag
+    }
+
+    private var ObserveAndActOnceForPageGroupsIDsFlag: Boolean = false
+    fun setTheObserveAndActOnceForPageGroupIDsFlag(input: Boolean) {
+        ObserveAndActOnceForPageGroupsIDsFlag = input
+    }
+
+    fun getTheObserveAndActOnceForPageGroupIDsFlag(): Boolean {
+        return ObserveAndActOnceForPageGroupsIDsFlag
+    }
+
+
     fun loadDefaultTemplatesIntoTemplateDatabase(templateString: String) {
-        viewModelScope.launch {
-            withContext(Dispatchers.IO) {
-                val fileString = templateString
-                val fileStringList: List<String>
-                val templateIDList = mutableListOf<String>()
-                var pageCode = ""
-                val pageContentsML = mutableListOf<String>()
-                if (fileString != "") {
-                    fileStringList = fileString.split("\n")
-                    for (line in fileStringList) {
-                        if (line.contains(",")) {
-                            val lineList = line.split(",")
+        viewModelScope.launch(Dispatchers.Default) {
+            val fileString = templateString
+            val fileStringList: List<String>
+            val templateIDList = mutableListOf<String>()
+            val rvParentChildParentItemML = mutableListOf<RVParentChildParentItemDC>()
+            var pageCode = ""
+            val pageContentsML = mutableListOf<String>()
+            if (fileString != "") {
+                fileStringList = fileString.split("\n")
+                for (line in fileStringList) {
+                    if (line.contains(",")) {
+                        val lineList = line.split(",")
+                        if (lineList[0].contains("Page Group ID") || lineList[0].contains("Add Page Menu ID") || lineList[0].contains(
+                                "Page Code ID"
+                            )
+                        ) {
+                            continue
+                        } else if (lineList[0].contains("PG_") || lineList[0].contains("APM_") || lineList[0].contains(
+                                "Default_Section_List"
+                            )
+                        ) {
+                            val rvParentChildParentItem = RVParentChildParentItemDC()
+                            if (!templateIDList.contains(lineList[0])) {
+                                templateIDList.add(lineList[0])
+                            }
+                            if (lineList[0].contains("PG_")) {
+                                rvParentChildParentItem.pageGroupCode = lineList[0]
+                            }
 
-                            if (lineList[0].contains("Page Group ID") || lineList[0].contains("Add Page Menu ID") || lineList[0].contains(
-                                    "Page Code ID"
-                                )
-                            ) {
-                                continue
-                            } else if (lineList[0].contains("PG_") || lineList[0].contains("APM_") || lineList[0].contains(
-                                    "Default_Section_List"
-                                )
-                            ) {
-                                if (!templateIDList.contains(lineList[0])) {
-                                    templateIDList.add(lineList[0])
-                                }
-                                val lineItemList = mutableListOf<String>()
-                                for (index in 1 until lineList.size) {
-                                    if (lineList[index] != "") {
-                                        lineItemList.add(lineList[index])
-                                    }
-                                }
-
-                                val lineItemListString = mlToStringUsingDelimiter1(lineItemList)
-                                val aInfo5Template = AInfo5Templates(
-                                    lineList[0],
-                                    lineItemListString
-                                )
-                                insertAInfo5Templates(aInfo5Template)
-                            } else if (lineList[0].contains("PC_")) {
-                                if (!templateIDList.contains(lineList[0])) {
-                                    templateIDList.add(lineList[0])
-                                }
-                                val blockContentsML = mutableListOf<String>()
-                                for (index in 1 until lineList.size) {
-                                    if (lineList[index] != "") {
-                                        blockContentsML.add(lineList[index])
-                                    }
-                                }
-                                val blockContentsMLString =
-                                    mlToStringUsingDelimiter1(blockContentsML)
-                                if (pageCode == "") {
-                                    pageCode = lineList[0]
-                                    pageContentsML.add(blockContentsMLString)
-                                } else {
-                                    if (pageCode == lineList[0]) {
-                                        pageContentsML.add(blockContentsMLString)
-                                        if (fileStringList.indexOf(line) == fileStringList.lastIndex - 1) {
-                                            val pageBlockListString =
-                                                mlToStringUsingDelimiter2(pageContentsML)
-                                            val aInfo5Template = AInfo5Templates(
-                                                pageCode,
-                                                pageBlockListString
-                                            )
-                                            insertAInfo5Templates(aInfo5Template)
-                                        }
+                            val lineItemList = mutableListOf<String>()
+                            rvParentChildParentItem.childItemList = mutableListOf()
+                            for (index in 1 until lineList.size) {
+                                if (lineList[index] != "") {
+                                    lineItemList.add(lineList[index])
+                                    if (index == 1) {
+                                        rvParentChildParentItem.title = lineList[index]
                                     } else {
+                                        rvParentChildParentItem.childItemList.add(lineList[index])
+                                    }
+                                }
+                            }
+                            if (rvParentChildParentItem.pageGroupCode.contains("PG_")) {
+                                if (rvParentChildParentItem.title != "") {
+                                    if (rvParentChildParentItem.childItemList.isEmpty()) {
+                                        rvParentChildParentItem.childItemList =
+                                            mutableListOf("No Pages Present")
+                                    }
+                                    if (!rvParentChildParentItemML.contains(rvParentChildParentItem)) {
+                                        rvParentChildParentItemML.add(rvParentChildParentItem)
+                                    }
+                                }
+                            }
+                            val lineItemListString = mlToStringUsingDelimiter1(lineItemList)
+                            val aInfo5Template = AInfo5Templates(
+                                lineList[0],
+                                lineItemListString
+                            )
+                            insertAInfo5Templates(aInfo5Template)
+                        } else if (lineList[0].contains("PC_")) {
+                            if (!templateIDList.contains(lineList[0])) {
+                                templateIDList.add(lineList[0])
+                            }
+                            val blockContentsML = mutableListOf<String>()
+                            for (index in 1 until lineList.size) {
+                                if (lineList[index] != "") {
+                                    blockContentsML.add(lineList[index])
+                                }
+                            }
+                            val blockContentsMLString =
+                                mlToStringUsingDelimiter1(blockContentsML)
+                            if (pageCode == "") {
+                                pageCode = lineList[0]
+                                pageContentsML.add(blockContentsMLString)
+                            } else {
+                                if (pageCode == lineList[0]) {
+                                    pageContentsML.add(blockContentsMLString)
+                                    if (fileStringList.indexOf(line) == fileStringList.lastIndex - 1) {
                                         val pageBlockListString =
                                             mlToStringUsingDelimiter2(pageContentsML)
-                                        val aInfo3Template = AInfo5Templates(
+                                        val aInfo5Template = AInfo5Templates(
                                             pageCode,
                                             pageBlockListString
                                         )
-                                        insertAInfo5Templates(aInfo3Template)
-                                        pageContentsML.clear()
-                                        pageCode = lineList[0]
-                                        pageContentsML.add(blockContentsMLString)
+                                        insertAInfo5Templates(aInfo5Template)
                                     }
+                                } else {
+                                    val pageBlockListString =
+                                        mlToStringUsingDelimiter2(pageContentsML)
+                                    val aInfo3Template = AInfo5Templates(
+                                        pageCode,
+                                        pageBlockListString
+                                    )
+                                    insertAInfo5Templates(aInfo3Template)
+                                    pageContentsML.clear()
+                                    pageCode = lineList[0]
+                                    pageContentsML.add(blockContentsMLString)
                                 }
                             }
                         }
                     }
                 }
+            }
 
-                //Load the Template ID List into the Template Database
-                val aInfo3TemplateListID = AInfo5Templates(
-                    MainActivity.TEMPLATE_IDs_LIST_ID,
-                    mlToStringUsingDelimiter1(templateIDList)
-                )
-                insertAInfo5Templates(aInfo3TemplateListID)
+            //Load the Template ID List into the Template Database
+            val aInfo3TemplateListID = AInfo5Templates(
+                MainActivity.TEMPLATE_IDs_LIST_ID,
+                mlToStringUsingDelimiter1(templateIDList)
+            )
+            insertAInfo5Templates(aInfo3TemplateListID)
+
+            //Load the templateLoadedIntoDBFlag into Template DB
+            val templateLoadedIntoDBFlagID = MainActivity.TEMPLATES_LOADED_INTO_DB_ID
+            val aInfo5Template = AInfo5Templates(templateLoadedIntoDBFlagID, true.toString())
+            insertAInfo5Templates(aInfo5Template)
+            withContext(Dispatchers.Main) {
+                setTheTemplatesHaveBeenLoadedIntoDBFlag(true)
+                //Load the ParentChildParentItemML Variable
+                setTheParentChildParentItemML(rvParentChildParentItemML)
             }
         }
     }
@@ -1111,6 +1159,10 @@ class AInfo5ViewModel(
         return templateIDList
     }
 
+    fun clearTheTemplateIDList() {
+        templateIDList = mutableListOf()
+    }
+
     //Page group IDs List
     private var pageGroupIDsList = mutableListOf<String>()
     fun setThePageGroupIDsList(input: MutableList<String>) {
@@ -1119,6 +1171,10 @@ class AInfo5ViewModel(
 
     fun getThePageGroupIDsList(): MutableList<String> {
         return pageGroupIDsList
+    }
+
+    fun clearThePageGroupIDsList() {
+        pageGroupIDsList = mutableListOf()
     }
 
     fun tasksToDoWithTemplateIDsListString(templateIDsListString: String) {
@@ -1146,7 +1202,7 @@ class AInfo5ViewModel(
                 val pageGroupItemList = stringToMLUsingDlimiter1(pageGroupItemString)
                 val rvParentChildParentItem = RVParentChildParentItemDC()
 
-                rvParentChildParentItem.pageCode = idsListForPageGroup[indexOfPageGroupItem]
+                rvParentChildParentItem.pageGroupCode = idsListForPageGroup[indexOfPageGroupItem]
                 when (pageGroupItemList.size) {
                     0 -> {
                         rvParentChildParentItem.title = ""
@@ -1168,7 +1224,7 @@ class AInfo5ViewModel(
                     }
                 }
                 withContext(Dispatchers.Main) {
-                    addToTheParentChildParentItemML(rvParentChildParentItem)
+                    addUniqueItemToTheParentChildParentItemML(rvParentChildParentItem)
                 }
             }
         }
@@ -1197,8 +1253,14 @@ class AInfo5ViewModel(
         return parentChildParentItemML
     }
 
-    fun addToTheParentChildParentItemML(input: RVParentChildParentItemDC) {
-        parentChildParentItemML.add(input)
+    fun addUniqueItemToTheParentChildParentItemML(input: RVParentChildParentItemDC) {
+        if (!parentChildParentItemML.contains(input)) {
+            parentChildParentItemML.add(input)
+        }
+    }
+
+    fun clearTheParentChildParentItemML() {
+        parentChildParentItemML.clear()
     }
 
     var defaultRVParentChildParentItem = RVParentChildParentItemDC(
@@ -1477,10 +1539,12 @@ class AInfo5ViewModel(
     //True represents that the item is present
     fun isItemPresentInPageTemplateList(pageCode: String): Boolean {
         var result = false
-        for (item in pageTemplateList) {
-            if (item.pageCode == pageCode) {
-                result = true
-                break
+        if (pageCode != ""){
+            for (item in pageTemplateList) {
+                if (item.pageCode == pageCode) {
+                    result = true
+                    break
+                }
             }
         }
 
@@ -1497,6 +1561,10 @@ class AInfo5ViewModel(
         }
 
         return result
+    }
+
+    fun clearThePageTemplateList() {
+        pageTemplateList = mutableListOf()
     }
 
     //Mutable Live Data for Template Lists for Child RV to access
@@ -3323,7 +3391,7 @@ class AInfo5ViewModel(
         setTheCompanyReportUploadedFlag(false)
     }
 
-
+    //The below function ensures that the reports are ordered in the Company Report
     fun reorderSectionReportsInCompanyReportAndSave() {
         viewModelScope.launch(Dispatchers.Default) {
             val reorderedSectionReportList = mutableListOf<SectionReportDC>()
@@ -3379,41 +3447,27 @@ class AInfo5ViewModel(
         sectionAllData: SectionAllDataDC
     ) {
         viewModelScope.launch(Dispatchers.Default) {
+            val sectionAllData = getThePresentSectionAllData()
             var sectionReportPresentFlag = false
             var sectionReportIndex = 0
             val sectionReportNew = SectionReportDC()
             sectionReportNew.sectionCode = sectionCode
             sectionReportNew.sectionName = sectionName
             sectionReportNew.sectionIntroduction = sectionAllData.introduction
-            val reportsToBeGeneratedList = getTheReportsToBeGeneratedList()
-            val reportsList = getTheAllReportsList()
-            if (reportsList.size >= 6) {
-                if (reportsToBeGeneratedList.isNotEmpty()) {
-                    for (index in 0 until reportsToBeGeneratedList.size) {
-                        if (reportsList.contains(reportsToBeGeneratedList[index])) {
-                            if (reportsList.indexOf(reportsToBeGeneratedList[index]) == 0) {
-                                sectionReportNew.threeColumnTableWord =
-                                    generateSectionThreeColumnWordTable(sectionAllData.sectionAllPagesData.sectionPageDataList)
-                            } else if (reportsList.indexOf(reportsToBeGeneratedList[index]) == 1) {
-                                sectionReportNew.threeColumnTableExcel =
-                                    generateSectionThreeColumnExcelTable(sectionAllData.sectionAllPagesData.sectionPageDataList)
-                            } else if (reportsList.indexOf(reportsToBeGeneratedList[index]) == 2) {
-                                sectionReportNew.sixColumnTableWord =
-                                    generateSectionSixColumnWordTable(sectionAllData.sectionAllPagesData.sectionPageDataList)
-                            } else if (reportsList.indexOf(reportsToBeGeneratedList[index]) == 3) {
-                                sectionReportNew.sixColumnTableExcel =
-                                    generateSectionSixColumnExcelTable(sectionAllData.sectionAllPagesData.sectionPageDataList)
-                            } else if (reportsList.indexOf(reportsToBeGeneratedList[index]) == 4) {
-                                sectionReportNew.checkListTableWord =
-                                    generateSectionChecklistWordTable(sectionAllData.sectionAllPagesData.sectionPageDataList)
-                            } else if (reportsList.indexOf(reportsToBeGeneratedList[index]) == 5) {
-                                sectionReportNew.checkListTableExcel =
-                                    generateSectionChecklistExcelTable(sectionAllData.sectionAllPagesData.sectionPageDataList)
-                            }
-                        }
-                    }
-                }
-            }
+
+            sectionReportNew.threeColumnTableWord =
+                generateSectionThreeColumnWordTable(sectionAllData.sectionAllPagesData.sectionPageDataList)
+            sectionReportNew.threeColumnTableExcel =
+                generateSectionThreeColumnExcelTable(sectionAllData.sectionAllPagesData.sectionPageDataList)
+            sectionReportNew.sixColumnTableWord =
+                generateSectionSixColumnWordTable(sectionAllData.sectionAllPagesData.sectionPageDataList)
+            sectionReportNew.sixColumnTableExcel =
+                generateSectionSixColumnExcelTable(sectionAllData.sectionAllPagesData.sectionPageDataList)
+            sectionReportNew.checkListTableWord =
+                generateSectionChecklistWordTable(sectionAllData.sectionAllPagesData.sectionPageDataList)
+            sectionReportNew.checkListTableExcel =
+                generateSectionChecklistExcelTable(sectionAllData.sectionAllPagesData.sectionPageDataList)
+
             if (companyReport.sectionReportList.isNotEmpty()) {
                 for (index in 0 until companyReport.sectionReportList.size) {
                     if (companyReport.sectionReportList[index].sectionCode == sectionCode) {
@@ -3437,6 +3491,21 @@ class AInfo5ViewModel(
         }
     }
 
+    fun deleteSectionReportInCompanyReportAndSave(
+        sectionCode: String
+    ){
+        if (companyReport.sectionReportList.isNotEmpty()){
+            for (sectionIndex in 0 until companyReport.sectionReportList.size){
+                val sectionReport = companyReport.sectionReportList[sectionIndex]
+                if (sectionReport.sectionCode == sectionCode){
+                    companyReport.sectionReportList.removeAt(sectionIndex)
+                }
+            }
+        }
+        //Save the companyReport to DB
+        saveTheCompanyReportToDB(getTheCompanyReport())
+    }
+
     fun saveTheCompanyReportToDB(companyReport: CompanyReportDC) {
         viewModelScope.launch(Dispatchers.IO) {
             val companyReportID = getPresentCompanyCode() + MainActivity.COMPANY_REPORT_ID
@@ -3451,8 +3520,9 @@ class AInfo5ViewModel(
         if (sectionPageDataList.isNotEmpty()) {
             for (pageIndex in 0 until sectionPageDataList.size) {
                 if (pageIndex == 0) {
-                    threeColumnWordTable =  "Observations" + "$" + "Recommendations" + "$" + "Standards\n" +
-                        sectionPageDataList[pageIndex].pageTitle.replace("\n", ";") + ";;" +
+                    threeColumnWordTable =
+                        "Observations" + "$" + "Recommendations" + "$" + "Standards\n" +
+                                sectionPageDataList[pageIndex].pageTitle.replace("\n", ";") + ";;" +
                                 sectionPageDataList[pageIndex].observations.replace("\n", ";") +
                                 sectionPageDataList[pageIndex].photoPaths.replace("\n", ";") + "$" +
                                 sectionPageDataList[pageIndex].recommendations.replace(
@@ -3485,8 +3555,9 @@ class AInfo5ViewModel(
         if (sectionPageDataList.isNotEmpty()) {
             for (pageIndex in 0 until sectionPageDataList.size) {
                 if (pageIndex == 0) {
-                    threeColumnExcelTable = "Observations" + "$" + "Recommendations" + "$" + "Standards\n" +
-                        sectionPageDataList[pageIndex].pageTitle.replace("\n", ";") + ";;" +
+                    threeColumnExcelTable =
+                        "Observations" + "$" + "Recommendations" + "$" + "Standards\n" +
+                                sectionPageDataList[pageIndex].pageTitle.replace("\n", ";") + ";;" +
                                 sectionPageDataList[pageIndex].observations.replace("\n", ";") +
                                 sectionPageDataList[pageIndex].photoPaths.replace("\n", ";") + "$" +
                                 sectionPageDataList[pageIndex].recommendations.replace(
@@ -3519,8 +3590,9 @@ class AInfo5ViewModel(
         if (sectionPageDataList.isNotEmpty()) {
             for (pageIndex in 0 until sectionPageDataList.size) {
                 if (pageIndex == 0) {
-                    sixColumnWordTable = "Space" + "$" + "Observations" + "$" + "Images" + "$" + "Compliance" + "$" + "Recommendations" + "$" + "Standards\n" +
-                        sectionPageDataList[pageIndex].pageTitle.replace("\n", ";") + "$" +
+                    sixColumnWordTable =
+                        "Space" + "$" + "Observations" + "$" + "Images" + "$" + "Compliance" + "$" + "Recommendations" + "$" + "Standards\n" +
+                                sectionPageDataList[pageIndex].pageTitle.replace("\n", ";") + "$" +
                                 sectionPageDataList[pageIndex].observations.replace(
                                     "\n",
                                     ";"
@@ -3565,8 +3637,9 @@ class AInfo5ViewModel(
         if (sectionPageDataList.isNotEmpty()) {
             for (pageIndex in 0 until sectionPageDataList.size) {
                 if (pageIndex == 0) {
-                    sixColumnExcelTable = "Space" + "$" + "Observations" + "$" + "Images" + "$" + "Compliance" + "$" + "Recommendations" + "$" + "Standards\n" +
-                        sectionPageDataList[pageIndex].pageTitle.replace("\n", ";") + "$" +
+                    sixColumnExcelTable =
+                        "Space" + "$" + "Observations" + "$" + "Images" + "$" + "Compliance" + "$" + "Recommendations" + "$" + "Standards\n" +
+                                sectionPageDataList[pageIndex].pageTitle.replace("\n", ";") + "$" +
                                 sectionPageDataList[pageIndex].observations.replace(
                                     "\n",
                                     ";"
@@ -3608,33 +3681,45 @@ class AInfo5ViewModel(
 
     fun generateSectionChecklistWordTable(sectionPageDataList: MutableList<SectionPageDataDC>): String {
         var checklistWordTable = ""
-        checklistWordTable = "Checklist" + "$" + "DataField1" + "$" + "DataField2" + "$" + "DataField3" + "$" + "Button Choice\n"
+        checklistWordTable =
+            "Checklist" + "$" + "DataField1" + "$" + "DataField2" + "$" + "DataField3" + "$" + "Button Choice\n"
         if (sectionPageDataList.isNotEmpty()) {
             for (pageIndex in 0 until sectionPageDataList.size) {
-                if (sectionPageDataList[pageIndex].questionsFrameworkDataItemList.isNotEmpty()){
-                    val questionsFrameworkList = sectionPageDataList[pageIndex].questionsFrameworkDataItemList
-                    for (frameworkIndex in 0 until questionsFrameworkList.size){
+                if (sectionPageDataList[pageIndex].questionsFrameworkDataItemList.isNotEmpty()) {
+                    val questionsFrameworkList =
+                        sectionPageDataList[pageIndex].questionsFrameworkDataItemList
+                    for (frameworkIndex in 0 until questionsFrameworkList.size) {
                         val pageCode = questionsFrameworkList[frameworkIndex].pageCode
-                        if (pageCode == "PC_General_Entry_01_PC"){
-                            checklistWordTable = checklistWordTable + questionsFrameworkList[frameworkIndex].questionsFrameworkTitle + "$" + "$" + "$" + "$" + "\n"
-                        } else {
-                            if (isItemPresentInPageTemplateList(pageCode) == true){
-                                val itemQuestionsList = getItemFromPageTemplateList(pageCode).questionsList
-                                val itemDataList = questionsFrameworkList[frameworkIndex].questionDataItemList
-                                checklistWordTable = checklistWordTable + questionsFrameworkList[frameworkIndex].questionsFrameworkTitle + "$" + "$" + "$" + "$" + "\n"
-                                if (itemQuestionsList.isNotEmpty()){
-                                    for (questionsListIndex in 0 until itemQuestionsList.size){
-                                        checklistWordTable = checklistWordTable + itemQuestionsList[questionsListIndex].question + "$"
-                                        if (itemDataList.size >= questionsListIndex){
-                                            checklistWordTable = checklistWordTable + itemDataList[questionsListIndex].data1Value + "$" + itemDataList[questionsListIndex].data2Value + "$" + itemDataList[questionsListIndex].data3Value +  "$" + itemDataList[questionsListIndex].buttonOptionChosen + "\n"
-                                        } else {
-                                            checklistWordTable = checklistWordTable + "$" + "$" + "$" + "\n"
+                        if (pageCode == "PC_General_Entry_01_PC") {
+                            checklistWordTable =
+                                checklistWordTable + questionsFrameworkList[frameworkIndex].questionsFrameworkTitle + "$" + "$" + "$" + "$" + "\n"
+                        }
+                        else {
+                            if (isItemPresentInPageTemplateList(pageCode) == true) {
+                                val itemQuestionsList =
+                                    getItemFromPageTemplateList(pageCode).questionsList
+                                val itemDataList =
+                                    questionsFrameworkList[frameworkIndex].questionDataItemList
+                                checklistWordTable =
+                                    checklistWordTable + questionsFrameworkList[frameworkIndex].questionsFrameworkTitle + "$" + "$" + "$" + "$" + "\n"
+                                if (itemQuestionsList.isNotEmpty()) {
+                                    for (questionsListIndex in 0 until itemQuestionsList.size) {
+                                        checklistWordTable =
+                                            checklistWordTable + itemQuestionsList[questionsListIndex].question + "$"
+                                        if (questionsListIndex <  itemDataList.size) {
+                                            checklistWordTable =
+                                                checklistWordTable + itemDataList[questionsListIndex].data1Value + "$" + itemDataList[questionsListIndex].data2Value + "$" + itemDataList[questionsListIndex].data3Value + "$" + itemDataList[questionsListIndex].buttonOptionChosen + "\n"
+                                        }
+                                        else {
+                                            checklistWordTable =
+                                                checklistWordTable + "$" + "$" + "$" + "\n"
                                         }
                                     }
                                 }
-                                checklistWordTable = checklistWordTable + questionsFrameworkList[frameworkIndex].questionsFrameworkTitle
-                            } else {
-                                checklistWordTable = checklistWordTable + questionsFrameworkList[frameworkIndex].questionsFrameworkTitle + "$" + "$" + "$" + "$" + "\n"
+                            }
+                            else {
+                                checklistWordTable =
+                                    checklistWordTable + questionsFrameworkList[frameworkIndex].questionsFrameworkTitle + "$" + "$" + "$" + "$" + "\n"
                             }
                         }
                     }
@@ -3648,33 +3733,42 @@ class AInfo5ViewModel(
 
     fun generateSectionChecklistExcelTable(sectionPageDataList: MutableList<SectionPageDataDC>): String {
         var checklistExcelTable = ""
-        checklistExcelTable = "Checklist" + "$" + "DataField1" + "$" + "DataField2" + "$" + "DataField3" + "$" + "Button Choice\n"
+        checklistExcelTable =
+            "Checklist" + "$" + "DataField1" + "$" + "DataField2" + "$" + "DataField3" + "$" + "Button Choice\n"
         if (sectionPageDataList.isNotEmpty()) {
             for (pageIndex in 0 until sectionPageDataList.size) {
-                if (sectionPageDataList[pageIndex].questionsFrameworkDataItemList.isNotEmpty()){
-                    val questionsFrameworkList = sectionPageDataList[pageIndex].questionsFrameworkDataItemList
-                    for (frameworkIndex in 0 until questionsFrameworkList.size){
+                if (sectionPageDataList[pageIndex].questionsFrameworkDataItemList.isNotEmpty()) {
+                    val questionsFrameworkList =
+                        sectionPageDataList[pageIndex].questionsFrameworkDataItemList
+                    for (frameworkIndex in 0 until questionsFrameworkList.size) {
                         val pageCode = questionsFrameworkList[frameworkIndex].pageCode
-                        if (pageCode == "PC_General_Entry_01_PC"){
-                            checklistExcelTable = checklistExcelTable + questionsFrameworkList[frameworkIndex].questionsFrameworkTitle + "$" + "$" + "$" + "$" + "\n"
+                        if (pageCode == "PC_General_Entry_01_PC") {
+                            checklistExcelTable =
+                                checklistExcelTable + questionsFrameworkList[frameworkIndex].questionsFrameworkTitle + "$" + "$" + "$" + "$" + "\n"
                         } else {
-                            if (isItemPresentInPageTemplateList(pageCode) == true){
-                                val itemQuestionsList = getItemFromPageTemplateList(pageCode).questionsList
-                                val itemDataList = questionsFrameworkList[frameworkIndex].questionDataItemList
-                                checklistExcelTable = checklistExcelTable + questionsFrameworkList[frameworkIndex].questionsFrameworkTitle + "$" + "$" + "$" + "$" + "\n"
-                                if (itemQuestionsList.isNotEmpty()){
-                                    for (questionsListIndex in 0 until itemQuestionsList.size){
-                                        checklistExcelTable = checklistExcelTable + itemQuestionsList[questionsListIndex].question + "$"
-                                        if (itemDataList.size >= questionsListIndex){
-                                            checklistExcelTable = checklistExcelTable + itemDataList[questionsListIndex].data1Value + "$" + itemDataList[questionsListIndex].data2Value + "$" + itemDataList[questionsListIndex].data3Value +  "$" + itemDataList[questionsListIndex].buttonOptionChosen + "\n"
+                            if (isItemPresentInPageTemplateList(pageCode) == true) {
+                                val itemQuestionsList =
+                                    getItemFromPageTemplateList(pageCode).questionsList
+                                val itemDataList =
+                                    questionsFrameworkList[frameworkIndex].questionDataItemList
+                                checklistExcelTable =
+                                    checklistExcelTable + questionsFrameworkList[frameworkIndex].questionsFrameworkTitle + "$" + "$" + "$" + "$" + "\n"
+                                if (itemQuestionsList.isNotEmpty()) {
+                                    for (questionsListIndex in 0 until itemQuestionsList.size) {
+                                        checklistExcelTable =
+                                            checklistExcelTable + itemQuestionsList[questionsListIndex].question + "$"
+                                        if (questionsListIndex  < itemDataList.size) {
+                                            checklistExcelTable =
+                                                checklistExcelTable + itemDataList[questionsListIndex].data1Value + "$" + itemDataList[questionsListIndex].data2Value + "$" + itemDataList[questionsListIndex].data3Value + "$" + itemDataList[questionsListIndex].buttonOptionChosen + "\n"
                                         } else {
-                                            checklistExcelTable = checklistExcelTable + "$" + "$" + "$" + "\n"
+                                            checklistExcelTable =
+                                                checklistExcelTable + "$" + "$" + "$" + "\n"
                                         }
                                     }
                                 }
-                                checklistExcelTable = checklistExcelTable + questionsFrameworkList[frameworkIndex].questionsFrameworkTitle
                             } else {
-                                checklistExcelTable = checklistExcelTable + questionsFrameworkList[frameworkIndex].questionsFrameworkTitle + "$" + "$" + "$" + "$" + "\n"
+                                checklistExcelTable =
+                                    checklistExcelTable + questionsFrameworkList[frameworkIndex].questionsFrameworkTitle + "$" + "$" + "$" + "$" + "\n"
                             }
                         }
                     }
@@ -4130,20 +4224,26 @@ class AInfo5ViewModel(
         if (companyReport.sectionReportList.isNotEmpty()) {
             for (page in 0 until companyReport.sectionReportList.size) {
                 val sectionPage = companyReport.sectionReportList[page]
-                threeColumnReport = threeColumnReport + "[H3] ${sectionPage.sectionName};${sectionPage.sectionIntroduction};${sectionPage.threeColumnTableWord};;;;"
+                threeColumnReport =
+                    threeColumnReport + "[H3] ${sectionPage.sectionName};${sectionPage.sectionIntroduction};${sectionPage.threeColumnTableWord};;;;"
             }
         }
         val fileNameWithoutExtension = getPresentCompanyName() + "_Word"
-        val fileNameWithExtension = fileNameWithoutExtension + MainActivity.DOC_FILE_3COLUMN_WORD_EXTENSION
+        val fileNameWithExtension =
+            fileNameWithoutExtension + MainActivity.DOC_FILE_3COLUMN_WORD_EXTENSION
         val dirUriString = getTheCompanyDirectoryURIString()
         if (dirUriString != "") {
             val dirUri = dirUriString.toUri()
-            val fileExistsFlag = fileExists(fileNameWithExtension,dirUri)
-            if (fileExistsFlag == true){
-                writeToTextFile(dirUri, fileNameWithExtension,threeColumnReport )
+            val fileExistsFlag = fileExists(fileNameWithExtension, dirUri)
+            if (fileExistsFlag == true) {
+                writeToTextFile(dirUri, fileNameWithExtension, threeColumnReport)
             } else {
-                createTextFileWithExtension(fileNameWithoutExtension,dirUri,MainActivity.DOC_FILE_3COLUMN_WORD_EXTENSION)
-                writeToTextFile(dirUri, fileNameWithExtension,threeColumnReport )
+                createTextFileWithExtension(
+                    fileNameWithoutExtension,
+                    dirUri,
+                    MainActivity.DOC_FILE_3COLUMN_WORD_EXTENSION
+                )
+                writeToTextFile(dirUri, fileNameWithExtension, threeColumnReport)
             }
         }
 
@@ -4163,20 +4263,26 @@ class AInfo5ViewModel(
         if (companyReport.sectionReportList.isNotEmpty()) {
             for (page in 0 until companyReport.sectionReportList.size) {
                 val sectionPage = companyReport.sectionReportList[page]
-                threeColumnReport = threeColumnReport + "[H3] ${sectionPage.sectionName};${sectionPage.sectionIntroduction};${sectionPage.threeColumnTableExcel};;;;"
+                threeColumnReport =
+                    threeColumnReport + "[H3] ${sectionPage.sectionName};${sectionPage.sectionIntroduction};${sectionPage.threeColumnTableExcel};;;;"
             }
         }
         val fileNameWithoutExtension = getPresentCompanyName() + "_Excel"
-        val fileNameWithExtension = fileNameWithoutExtension + MainActivity.TXT_FILE_3COLUMN_EXCEL_EXTENSION
+        val fileNameWithExtension =
+            fileNameWithoutExtension + MainActivity.TXT_FILE_3COLUMN_EXCEL_EXTENSION
         val dirUriString = getTheCompanyDirectoryURIString()
         if (dirUriString != "") {
             val dirUri = dirUriString.toUri()
-            val fileExistsFlag = fileExists(fileNameWithExtension,dirUri)
-            if (fileExistsFlag == true){
-                writeToTextFile(dirUri, fileNameWithExtension,threeColumnReport )
+            val fileExistsFlag = fileExists(fileNameWithExtension, dirUri)
+            if (fileExistsFlag == true) {
+                writeToTextFile(dirUri, fileNameWithExtension, threeColumnReport)
             } else {
-                createTextFileWithExtension(fileNameWithoutExtension,dirUri,MainActivity.TXT_FILE_3COLUMN_EXCEL_EXTENSION)
-                writeToTextFile(dirUri, fileNameWithExtension,threeColumnReport )
+                createTextFileWithExtension(
+                    fileNameWithoutExtension,
+                    dirUri,
+                    MainActivity.TXT_FILE_3COLUMN_EXCEL_EXTENSION
+                )
+                writeToTextFile(dirUri, fileNameWithExtension, threeColumnReport)
             }
         }
     }
@@ -4187,28 +4293,34 @@ class AInfo5ViewModel(
         sixColumnReport =
             "[H1] Acess Audit Report for ${companyReport.companyName} ;Date of Audit: " +
                     "${companyReport.companyAuditDate};; ^12;[H2] Table of Contents;^12;[H2] Introduction;;${
-                companyReport.companyIntroduction.replace(
-                    "\n",
-                    ";"
-                )
-            };;^12;[H2] Observations and Recommendations;;"
+                        companyReport.companyIntroduction.replace(
+                            "\n",
+                            ";"
+                        )
+                    };;^12;[H2] Observations and Recommendations;;"
         if (companyReport.sectionReportList.isNotEmpty()) {
             for (page in 0 until companyReport.sectionReportList.size) {
                 val sectionPage = companyReport.sectionReportList[page]
-                sixColumnReport = sixColumnReport + "[H3] ${sectionPage.sectionName};${sectionPage.sectionIntroduction};${sectionPage.sixColumnTableWord};;;;"
+                sixColumnReport =
+                    sixColumnReport + "[H3] ${sectionPage.sectionName};${sectionPage.sectionIntroduction};${sectionPage.sixColumnTableWord};;;;"
             }
         }
         val fileNameWithoutExtension = getPresentCompanyName() + "_Word"
-        val fileNameWithExtension = fileNameWithoutExtension + MainActivity.DOC_FILE_6COLUMN_WORD_EXTENSION
+        val fileNameWithExtension =
+            fileNameWithoutExtension + MainActivity.DOC_FILE_6COLUMN_WORD_EXTENSION
         val dirUriString = getTheCompanyDirectoryURIString()
         if (dirUriString != "") {
             val dirUri = dirUriString.toUri()
-            val fileExistsFlag = fileExists(fileNameWithExtension,dirUri)
-            if (fileExistsFlag == true){
-                writeToTextFile(dirUri, fileNameWithExtension,sixColumnReport )
+            val fileExistsFlag = fileExists(fileNameWithExtension, dirUri)
+            if (fileExistsFlag == true) {
+                writeToTextFile(dirUri, fileNameWithExtension, sixColumnReport)
             } else {
-                createTextFileWithExtension(fileNameWithoutExtension,dirUri,MainActivity.DOC_FILE_6COLUMN_WORD_EXTENSION)
-                writeToTextFile(dirUri, fileNameWithExtension,sixColumnReport )
+                createTextFileWithExtension(
+                    fileNameWithoutExtension,
+                    dirUri,
+                    MainActivity.DOC_FILE_6COLUMN_WORD_EXTENSION
+                )
+                writeToTextFile(dirUri, fileNameWithExtension, sixColumnReport)
             }
         }
     }
@@ -4227,20 +4339,26 @@ class AInfo5ViewModel(
         if (companyReport.sectionReportList.isNotEmpty()) {
             for (page in 0 until companyReport.sectionReportList.size) {
                 val sectionPage = companyReport.sectionReportList[page]
-                sixColumnReport = sixColumnReport + "[H3] ${sectionPage.sectionName};${sectionPage.sectionIntroduction};${sectionPage.sixColumnTableExcel};;;;"
+                sixColumnReport =
+                    sixColumnReport + "[H3] ${sectionPage.sectionName};${sectionPage.sectionIntroduction};${sectionPage.sixColumnTableExcel};;;;"
             }
         }
         val fileNameWithoutExtension = getPresentCompanyName() + "_Excel"
-        val fileNameWithExtension = fileNameWithoutExtension + MainActivity.TXT_FILE_6COLUMN_EXCEL_EXTENSION
+        val fileNameWithExtension =
+            fileNameWithoutExtension + MainActivity.TXT_FILE_6COLUMN_EXCEL_EXTENSION
         val dirUriString = getTheCompanyDirectoryURIString()
         if (dirUriString != "") {
             val dirUri = dirUriString.toUri()
-            val fileExistsFlag = fileExists(fileNameWithExtension,dirUri)
-            if (fileExistsFlag == true){
-                writeToTextFile(dirUri, fileNameWithExtension,sixColumnReport )
+            val fileExistsFlag = fileExists(fileNameWithExtension, dirUri)
+            if (fileExistsFlag == true) {
+                writeToTextFile(dirUri, fileNameWithExtension, sixColumnReport)
             } else {
-                createTextFileWithExtension(fileNameWithoutExtension,dirUri,MainActivity.TXT_FILE_6COLUMN_EXCEL_EXTENSION)
-                writeToTextFile(dirUri, fileNameWithExtension,sixColumnReport )
+                createTextFileWithExtension(
+                    fileNameWithoutExtension,
+                    dirUri,
+                    MainActivity.TXT_FILE_6COLUMN_EXCEL_EXTENSION
+                )
+                writeToTextFile(dirUri, fileNameWithExtension, sixColumnReport)
             }
         }
     }
@@ -4259,20 +4377,26 @@ class AInfo5ViewModel(
         if (companyReport.sectionReportList.isNotEmpty()) {
             for (page in 0 until companyReport.sectionReportList.size) {
                 val sectionPage = companyReport.sectionReportList[page]
-                checkListWordReport = checkListWordReport + "[H3] ${sectionPage.sectionName};${sectionPage.sectionIntroduction};${sectionPage.checkListTableWord};;;;"
+                checkListWordReport =
+                    checkListWordReport + "[H3] ${sectionPage.sectionName};${sectionPage.sectionIntroduction};${sectionPage.checkListTableWord};;;;"
             }
         }
         val fileNameWithoutExtension = getPresentCompanyName() + "_Word"
-        val fileNameWithExtension = fileNameWithoutExtension + MainActivity.DOC_FILE_CHECKLIST_WORD_EXTENSION
+        val fileNameWithExtension =
+            fileNameWithoutExtension + MainActivity.DOC_FILE_CHECKLIST_WORD_EXTENSION
         val dirUriString = getTheCompanyDirectoryURIString()
         if (dirUriString != "") {
             val dirUri = dirUriString.toUri()
-            val fileExistsFlag = fileExists(fileNameWithExtension,dirUri)
-            if (fileExistsFlag == true){
-                writeToTextFile(dirUri, fileNameWithExtension,checkListWordReport )
+            val fileExistsFlag = fileExists(fileNameWithExtension, dirUri)
+            if (fileExistsFlag == true) {
+                writeToTextFile(dirUri, fileNameWithExtension, checkListWordReport)
             } else {
-                createTextFileWithExtension(fileNameWithoutExtension,dirUri,MainActivity.DOC_FILE_CHECKLIST_WORD_EXTENSION)
-                writeToTextFile(dirUri, fileNameWithExtension,checkListWordReport )
+                createTextFileWithExtension(
+                    fileNameWithoutExtension,
+                    dirUri,
+                    MainActivity.DOC_FILE_CHECKLIST_WORD_EXTENSION
+                )
+                writeToTextFile(dirUri, fileNameWithExtension, checkListWordReport)
             }
         }
     }
@@ -4291,20 +4415,26 @@ class AInfo5ViewModel(
         if (companyReport.sectionReportList.isNotEmpty()) {
             for (page in 0 until companyReport.sectionReportList.size) {
                 val sectionPage = companyReport.sectionReportList[page]
-                checkListExcelReport = checkListExcelReport + "[H3] ${sectionPage.sectionName};${sectionPage.sectionIntroduction};${sectionPage.checkListTableExcel};;;;"
+                checkListExcelReport =
+                    checkListExcelReport + "[H3] ${sectionPage.sectionName};${sectionPage.sectionIntroduction};${sectionPage.checkListTableExcel};;;;"
             }
         }
         val fileNameWithoutExtension = getPresentCompanyName() + "_Excel"
-        val fileNameWithExtension = fileNameWithoutExtension + MainActivity.TXT_FILE_CHECKLIST_EXCEL_EXTENSION
+        val fileNameWithExtension =
+            fileNameWithoutExtension + MainActivity.TXT_FILE_CHECKLIST_EXCEL_EXTENSION
         val dirUriString = getTheCompanyDirectoryURIString()
         if (dirUriString != "") {
             val dirUri = dirUriString.toUri()
-            val fileExistsFlag = fileExists(fileNameWithExtension,dirUri)
-            if (fileExistsFlag == true){
-                writeToTextFile(dirUri, fileNameWithExtension,checkListExcelReport )
+            val fileExistsFlag = fileExists(fileNameWithExtension, dirUri)
+            if (fileExistsFlag == true) {
+                writeToTextFile(dirUri, fileNameWithExtension, checkListExcelReport)
             } else {
-                createTextFileWithExtension(fileNameWithoutExtension,dirUri,MainActivity.TXT_FILE_CHECKLIST_EXCEL_EXTENSION)
-                writeToTextFile(dirUri, fileNameWithExtension,checkListExcelReport )
+                createTextFileWithExtension(
+                    fileNameWithoutExtension,
+                    dirUri,
+                    MainActivity.TXT_FILE_CHECKLIST_EXCEL_EXTENSION
+                )
+                writeToTextFile(dirUri, fileNameWithExtension, checkListExcelReport)
             }
         }
     }
@@ -5490,7 +5620,7 @@ class AInfo5ViewModel(
                             val stream = ByteArrayOutputStream()
                             val bitmap = photoUri?.let { uriToBitmap(it) }
                             if (bitmap != null) {
-                                val bitmapRotated = bitmap.let { rotateBitmap(it, 0.00) }
+                                val bitmapRotated = bitmap.let { rotateBitmap(it, 90.00) }
                                 bitmapRotated?.compress(Bitmap.CompressFormat.JPEG, 100, stream)
                                 val bitmapdata: ByteArray = stream.toByteArray()
                                 alterDocument(file.uri, bitmapdata)
@@ -5907,7 +6037,10 @@ class AInfo5ViewModel(
         return result
     }
 
-    fun makeLinkedHashMapFromML(input: MutableList<String>, screen: String = ""): LinkedHashMap<String, Boolean> {
+    fun makeLinkedHashMapFromML(
+        input: MutableList<String>,
+        screen: String = ""
+    ): LinkedHashMap<String, Boolean> {
         var result = linkedMapOf<String, Boolean>()
         if (input.isNotEmpty()) {
             for (index in 0 until input.size) {
