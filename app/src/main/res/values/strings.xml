@@ -9,7 +9,7 @@
     <string name="string_deletion_password">$DASPL#</string>
     <string name="string_submit">Submit</string>
     <string name="string_enter_the_company_name">Enter the Company Name</string>
-    <string name="string_enter_only_text_and_underscore_here">Enter only text and _ </string>
+    <string name="string_enter_only_text_and_numbers_here">Enter only text and numbers here </string>
     <string name="string_continue">Continue</string>
     <string name="string_button_for_taking_photos">Button For Taking Photos</string>
     <string name="large_text">
@@ -69,7 +69,7 @@
     <string name="string_observations_only">Observations Only</string>
     <string name="string_recommendations_and_standards">Recommendations and Standards</string>
     <string name="string_recommendations_only">Recommendations Only</string>
-    <string name="string_textview_that_displays_the_standards_selected">Textview that displays the standards selected</string>
+    <string name="string_textview_that_displays_the_standards_selected">Textview that displays the standards</string>
     <string name="string_questions_below">Questions Below</string>
     <string name="string_take_photo">Take Photo</string>
     <string name="string_button_for_capturing_images_using_the_camera">Button for capturing images using the camera.</string>
@@ -129,6 +129,8 @@
     <string name="string_Observations_Below">Observations Below</string>
     <string name="string_Recommendations_Below">Recommendations Below</string>
     <string name="string_Standards_Below">Standards Below</string>
+    <string name="string_score">Score</string>
+    <string name="string_button_score_view">Button to go to the Score View</string>
 
 
     <string-array name="Priority_Choices">

@@ -10,6 +10,7 @@ import com.example.auditapplication5.MainActivity
 import com.example.auditapplication5.R
 import com.example.auditapplication5.data.model.QuestionTemplateItemDC
 import com.example.auditapplication5.data.model.QuestionsFrameworkItemDC
+import com.example.auditapplication5.data.model.SectionAllDataDC
 
 import com.example.auditapplication5.databinding.QuestionsFrameworkItemBinding
 import com.example.auditapplication5.presentation.viewmodel.AInfo5ViewModel
@@ -17,6 +18,8 @@ import com.example.auditapplication5.presentation.viewmodel.AInfo5ViewModel
 class QuestionsFrameworkRVAdapter(
     private val questionsFrameworkML: MutableList<QuestionsFrameworkItemDC>,
     private val aInfo5ViewModel: AInfo5ViewModel,
+    private val currentPageIndex: Int,
+    private val presentSectionAllData: SectionAllDataDC,
     private val clickListener1: (questionsBlockTitle: String, questionsBlockItem: Int) -> Unit,
     private val clickListener2: (questionsBlockPageId: String) -> Unit
 ) : RecyclerView.Adapter<QuestionsFrameworkRVAdapter.ViewHolder>() {
@@ -54,33 +57,41 @@ class QuestionsFrameworkRVAdapter(
                 questionsFrameworkItem.questionsFrameworkTitle
             if (questionsFrameworkItem.serialStatus == MainActivity.PRIMARY_QUESTION_SET) {
                 binding.ibClearAndDelete.visibility = View.INVISIBLE
-            } else {
+            }
+            else {
                 binding.ibClearAndDelete.visibility = View.VISIBLE
             }
 
             binding.rvQuestionsTemplateItems.layoutManager =
                 LinearLayoutManager(binding.root.context)
+            val pageCode = questionsFrameworkItem.pageCode
+            val questionTemplateItemMLN = aInfo5ViewModel.getItemFromPageTemplateMLMLD(pageCode)?.questionsList
 
-            val questionTemplateItemML = aInfo5ViewModel.questionsList_LD.value
-            val currentPageIndex = aInfo5ViewModel.getThePresentSectionAllPagesFrameworkIndex()
+            if (questionTemplateItemMLN == null){
+                clickListener2(questionsFrameworkItem.pageCode)
+            }
 
-            val result = questionTemplateItemML?.let {
+            val result = questionTemplateItemMLN?.let {
                 aInfo5ViewModel.isQuestionDataItemListUpdatedInPresentSectionAllData(currentPageIndex,position,
                     it
                 )
             }
             if (result == false){
                 aInfo5ViewModel.updateQuestionDataItemListUsingTemplateInPresentSectionAllData(currentPageIndex,position,
-                    questionTemplateItemML
+                    questionTemplateItemMLN!!
                 )
             }
-            binding.rvQuestionsTemplateItems.adapter = questionTemplateItemML?.let {
+
+
+            binding.rvQuestionsTemplateItems.adapter = questionTemplateItemMLN?.let {
                 QuestionTemplateRVAdapter(
                     it,
                     aInfo5ViewModel,
                     position,
                     questionsFrameworkItem.questionsFrameworkTitle,
-                    questionsFrameworkItem.serialStatus
+                    questionsFrameworkItem.serialStatus,
+                    currentPageIndex,
+                    presentSectionAllData
                 )
             }
 
@@ -92,7 +103,6 @@ class QuestionsFrameworkRVAdapter(
                 } else if (questionsFrameworkItem.serialStatus == MainActivity.OTHER_QUESTION_SET){
                     binding.clTextviewAndDeleteOption.setBackgroundResource(R.drawable.border1dp_color_purple500_with_up_arrow_centered)
                 }
-
             } else {
                 binding.rvQuestionsTemplateItems.visibility = View.GONE
                 if (questionsFrameworkItem.serialStatus == MainActivity.PRIMARY_QUESTION_SET){
@@ -105,19 +115,18 @@ class QuestionsFrameworkRVAdapter(
             }
 
             binding.llQuestionsFrameworkItem.setOnClickListener {
-                clickListener2(questionsFrameworkItem.pageCode)
+
+                if (result == false){
+                    clickListener2(questionsFrameworkItem.pageCode)
+                }
                 isAnyItemExpanded(position)
                 questionsFrameworkItem.isExpandable = !questionsFrameworkItem.isExpandable
                 notifyItemChanged(position)
             }
-
-
             //Click Listener to ensure that the block can be deleted
             binding.ibClearAndDelete.setOnClickListener {
                 clickListener1(questionsFrameworkItem.questionsFrameworkTitle, position)
             }
-
-
         }
     }
 }

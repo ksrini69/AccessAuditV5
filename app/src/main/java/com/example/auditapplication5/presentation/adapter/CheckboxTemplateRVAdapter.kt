@@ -43,52 +43,52 @@ class CheckboxTemplateRVAdapter(
             if (screen == MainActivity.OBSERVATIONS_FRAGMENT_OBSERVATIONS) {
                 binding.buttonPriorityChoices.visibility = View.GONE
                 val observationsTemplateItemML = aInfo5ViewModel.observationsList_LD.value
-                val result = observationsTemplateItemML?.let {
-                    aInfo5ViewModel.isObsCheckboxesDataItemListUpdatedInPresentSectionAllData(
-                        currentPageIndex, checkboxesFrameworkIndex,
-                        it
-                    )
-                }
-                if (result == false) {
-                    aInfo5ViewModel.updateObsCheckboxesDataItemListUsingTemplateInPresentSectionAllData(
-                        currentPageIndex, checkboxesFrameworkIndex,
-                        observationsTemplateItemML
-                    )
-                }
+//                val result = observationsTemplateItemML?.let {
+//                    aInfo5ViewModel.isObsCheckboxesDataItemListUpdatedInPresentSectionAllData(
+//                        currentPageIndex, checkboxesFrameworkIndex,
+//                        it
+//                    )
+//                }
+//                if (result == false) {
+//                    aInfo5ViewModel.updateObsCheckboxesDataItemListUsingTemplateInPresentSectionAllData(
+//                        currentPageIndex, checkboxesFrameworkIndex,
+//                        observationsTemplateItemML
+//                    )
+//                }
             }
             else if (screen == MainActivity.OBSERVATIONS_FRAGMENT_RECOMMENDATIONS){
                 binding.buttonPriorityChoices.visibility = View.VISIBLE
                 val recommendationsTemplateItemML = aInfo5ViewModel.recommendationsList_LD.value
-                val result = recommendationsTemplateItemML?.let {
-                    aInfo5ViewModel.isRecoCheckboxesDataItemListUpdatedInPresentSectionAllData(
-                        currentPageIndex, checkboxesFrameworkIndex,
-                        it
-                    )
-                }
-                if (result == false) {
-                    aInfo5ViewModel.updateRecoCheckboxesDataItemListUsingTemplateInPresentSectionAllData(
-                        currentPageIndex, checkboxesFrameworkIndex,
-                        recommendationsTemplateItemML
-                    )
-                }
+//                val result = recommendationsTemplateItemML?.let {
+//                    aInfo5ViewModel.isRecoCheckboxesDataItemListUpdatedInPresentSectionAllData(
+//                        currentPageIndex, checkboxesFrameworkIndex,
+//                        it
+//                    )
+//                }
+//                if (result == false) {
+//                    aInfo5ViewModel.updateRecoCheckboxesDataItemListUsingTemplateInPresentSectionAllData(
+//                        currentPageIndex, checkboxesFrameworkIndex,
+//                        recommendationsTemplateItemML
+//                    )
+//                }
             }
             else if (screen == MainActivity.OBSERVATIONS_FRAGMENT_STANDARDS){
                 binding.buttonPriorityChoices.visibility = View.GONE
                 val standardsTemplateItemML = aInfo5ViewModel.standardsList_LD.value
-                val result = standardsTemplateItemML?.let {
-                    aInfo5ViewModel.isStdsCheckboxesDataItemListUpdatedInPresentSectionAllData(
-                        currentPageIndex,
-                        checkboxesFrameworkIndex,
-                        standardsTemplateItemML
-                    )
-                }
-                if (result == false) {
-                    aInfo5ViewModel.updateStdsCheckboxesDataItemListUsingTemplateInPresentSectionAllData(
-                        currentPageIndex,
-                        checkboxesFrameworkIndex,
-                        standardsTemplateItemML
-                    )
-                }
+//                val result = standardsTemplateItemML?.let {
+//                    aInfo5ViewModel.isStdsCheckboxesDataItemListUpdatedInPresentSectionAllData(
+//                        currentPageIndex,
+//                        checkboxesFrameworkIndex,
+//                        standardsTemplateItemML
+//                    )
+//                }
+//                if (result == false) {
+//                    aInfo5ViewModel.updateStdsCheckboxesDataItemListUsingTemplateInPresentSectionAllData(
+//                        currentPageIndex,
+//                        checkboxesFrameworkIndex,
+//                        standardsTemplateItemML
+//                    )
+//                }
             }
 
             if (!checkboxTemplateItem.checkboxVisibility) {

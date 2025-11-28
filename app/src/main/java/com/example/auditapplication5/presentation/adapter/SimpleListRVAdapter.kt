@@ -29,11 +29,7 @@ class SimpleListRVAdapter(
         if (codeNameAndDisplayFlag == true){
             code = codesAndNamesML[position].uniqueCodeName
             pagesPresent = codesAndNamesML[position].pagesPresent
-            if (pagesPresent == true){
-                name = codesAndNamesML[position].displayName + " - pages present"
-            } else {
-                name = codesAndNamesML[position].displayName
-            }
+            name = codesAndNamesML[position].displayName
         } else {
             name = namesList[position]
             code = ""
@@ -54,7 +50,13 @@ class SimpleListRVAdapter(
 
     inner class ViewHolder(val binding: RvSimpleListItemBinding) : RecyclerView.ViewHolder(binding.root){
         fun bind(name : String, code: String, pagesPresent: Boolean, clickListener: (name: String, code: String) -> Unit){
-            binding.tvSimpleListItem.text = name
+            var name1 = ""
+            if (pagesPresent == true){
+                name1 = name + " - pages present"
+            } else {
+                name1 = name
+            }
+            binding.tvSimpleListItem.text = name1
             binding.root.setOnClickListener {
                 clickListener(name, code)
             }

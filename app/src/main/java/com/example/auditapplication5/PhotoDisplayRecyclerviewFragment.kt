@@ -52,6 +52,7 @@ class PhotoDisplayRecyclerviewFragment : Fragment() {
                     || aInfo5ViewModel.getThePreviousScreenVariable() == MainActivity.OBSERVATIONS_FRAGMENT_RECOMMENDATIONS
                     || aInfo5ViewModel.getThePreviousScreenVariable() == MainActivity.OBSERVATIONS_FRAGMENT_STANDARDS){
                     aInfo5ViewModel.setTheScreenVariable(aInfo5ViewModel.getThePreviousScreenVariable())
+                    aInfo5ViewModel.setThePreviousScreenVariable(MainActivity.PHOTO_DISPLAY_RV_FRAGMENT)
                     findNavController().navigate(R.id.action_photoDisplayRecyclerviewFragment_to_observationsFragment)
                 }
             }

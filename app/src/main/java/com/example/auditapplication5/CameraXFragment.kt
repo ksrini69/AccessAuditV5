@@ -140,12 +140,26 @@ class CameraXFragment : Fragment() {
 
     }
 
-    override fun onPause() {
-        super.onPause()
-    }
+    override fun onStop() {
+        super.onStop()
 
-    override fun onDestroy() {
-        super.onDestroy()
+        //Update and save the Company Report into db
+        aInfo5ViewModel.updateSectionDetailsInCompanyReportAndSave(
+            aInfo5ViewModel.getPresentSectionCode(),
+            aInfo5ViewModel.getPresentSectionName(),
+            aInfo5ViewModel.getThePresentSectionAllData()
+        )
+
+        //Save the SectionPagesFramework and Data into db before stopping
+        val sectionPagesFrameworkAndDataID =
+            aInfo5ViewModel.getPresentCompanyCode() + aInfo5ViewModel.getPresentSectionCode() + MainActivity.SECTION_PAGES_FRAMEWORK_AND_DATA_ID
+        aInfo5ViewModel.saveThePresentSectionAllPagesFrameworkAndAllDataToDB(
+            aInfo5ViewModel.getThePresentSectionAllPagesFramework(),
+            aInfo5ViewModel.getThePresentSectionAllData(),
+            sectionPagesFrameworkAndDataID
+        )
+
+
     }
 
     //Functions below
@@ -202,8 +216,12 @@ class CameraXFragment : Fragment() {
         // Create time stamped name and MediaStore entry.
 //        val name = SimpleDateFormat(FILENAME_DEFAULT_FORMAT, Locale.CHINA)
 //            .format(System.currentTimeMillis()) + "_" + imageName
+        var presentSectionName = ""
+        if (aInfo5ViewModel.getLocationForPhotos().contains(aInfo5ViewModel.getPresentSectionCode())){
+           presentSectionName = aInfo5ViewModel.getPresentSectionName()
+        }
 
-        val photoName = aInfo5ViewModel.makePresentPhotoName(aInfo5ViewModel.getLocationForPhotos(), aInfo5ViewModel.getThePhotoCount())
+        val photoName = aInfo5ViewModel.makePresentPhotoName(aInfo5ViewModel.getLocationForPhotos(), aInfo5ViewModel.getThePhotoCount(),presentSectionName)
         aInfo5ViewModel.setPresentPhotoName(photoName)
         val contentValues = ContentValues().apply {
             put(MediaStore.MediaColumns.DISPLAY_NAME, photoName)
@@ -211,7 +229,6 @@ class CameraXFragment : Fragment() {
             put(MediaStore.Images.Media.RELATIVE_PATH, "Pictures/${aInfo5ViewModel.getPresentCompanyCode()}")
         }
 
-        //Log.d(MainActivity.TESTING_TAG, "takePhoto: PhotoName $photoName ")
 
         // Create output options object which contains file + metadata
         val outputOptions = activity?.let {
@@ -324,7 +341,7 @@ class CameraXFragment : Fragment() {
 
 
     companion object{
-        private const val TAG = "CameraXApp"
+        private const val TAG = "For Testing"
         private const val FILENAME_DEFAULT_FORMAT = "yyyy-MM-dd-HH-mm-ss-SSS"
         @RequiresApi(Build.VERSION_CODES.R)
         private val REQUIRED_PERMISSIONS =

@@ -61,10 +61,13 @@ class CheckboxesFrameworkRVAdapter(
                 LinearLayoutManager(binding.root.context)
 
             val screen = aInfo5ViewModel.getTheScreenVariable()
+            val pageCode = checkboxesFrameworkItem.pageCode
             val currentPageIndex = aInfo5ViewModel.getThePresentSectionAllPagesFrameworkIndex()
+            val itemFromPageTemplateMLMLD = aInfo5ViewModel.getItemFromPageTemplateMLMLD(pageCode)
             if (screen == MainActivity.OBSERVATIONS_FRAGMENT_OBSERVATIONS) {
-                val observationsTemplateItemML = aInfo5ViewModel.observationsList_LD.value
-                val result = observationsTemplateItemML?.let {
+                //val observationsTemplateItemML = aInfo5ViewModel.observationsList_LD.value
+                val observationsTemplateItemMLN = itemFromPageTemplateMLMLD?.observationsList
+                val result = observationsTemplateItemMLN?.let {
                     aInfo5ViewModel.isObsCheckboxesDataItemListUpdatedInPresentSectionAllData(
                         currentPageIndex, position,
                         it
@@ -73,18 +76,19 @@ class CheckboxesFrameworkRVAdapter(
                 if (result == false) {
                     aInfo5ViewModel.updateObsCheckboxesDataItemListUsingTemplateInPresentSectionAllData(
                         currentPageIndex, position,
-                        observationsTemplateItemML
+                        observationsTemplateItemMLN
                     )
                 }
-                binding.rvCheckboxesTemplateItems.adapter = observationsTemplateItemML?.let {
+                binding.rvCheckboxesTemplateItems.adapter = observationsTemplateItemMLN?.let {
                     CheckboxTemplateRVAdapter(
                         it, aInfo5ViewModel, screen, checkboxesFrameworkItem.serialStatus,checkboxesFrameworkItem.checkboxesFrameworkTitle, position
                     )
                 }
             }
             else if (screen == MainActivity.OBSERVATIONS_FRAGMENT_RECOMMENDATIONS) {
-                val recommendationsTemplateItemML = aInfo5ViewModel.recommendationsList_LD.value
-                val result = recommendationsTemplateItemML?.let {
+                //val recommendationsTemplateItemML = aInfo5ViewModel.recommendationsList_LD.value
+                val recommendationsTemplateItemMLN = itemFromPageTemplateMLMLD?.recommendationsList
+                val result = recommendationsTemplateItemMLN?.let {
                     aInfo5ViewModel.isRecoCheckboxesDataItemListUpdatedInPresentSectionAllData(
                         currentPageIndex, position,
                         it
@@ -93,7 +97,7 @@ class CheckboxesFrameworkRVAdapter(
                 if (result == false) {
                     aInfo5ViewModel.updateRecoCheckboxesDataItemListUsingTemplateInPresentSectionAllData(
                         currentPageIndex, position,
-                        recommendationsTemplateItemML
+                        recommendationsTemplateItemMLN
                     )
                 }
 //                val presentSectionAllData = aInfo5ViewModel.getThePresentSectionAllData()
@@ -101,29 +105,30 @@ class CheckboxesFrameworkRVAdapter(
 //                val recoFramework = aInfo5ViewModel.getThePresentSectionAllPagesFramework().sectionPageFrameworkList[currentPageIndex].recommendationsFrameworkList[position]
 //                Log.d(MainActivity.TESTING_TAG, "bind: RecoData ${recoData} and \n RecoFramework ${recoFramework}")
 
-                binding.rvCheckboxesTemplateItems.adapter = recommendationsTemplateItemML?.let {
+                binding.rvCheckboxesTemplateItems.adapter = recommendationsTemplateItemMLN?.let {
                     CheckboxTemplateRVAdapter(
                         it, aInfo5ViewModel, screen, checkboxesFrameworkItem.serialStatus, checkboxesFrameworkItem.checkboxesFrameworkTitle, position
                     )
                 }
             }
             else if (screen == MainActivity.OBSERVATIONS_FRAGMENT_STANDARDS) {
-                val standardsTemplateItemML = aInfo5ViewModel.standardsList_LD.value
-                val result = standardsTemplateItemML?.let {
+                //val standardsTemplateItemML = aInfo5ViewModel.standardsList_LD.value
+                val standardsTemplateItemMLN = itemFromPageTemplateMLMLD?.standardsList
+                val result = standardsTemplateItemMLN?.let {
                     aInfo5ViewModel.isStdsCheckboxesDataItemListUpdatedInPresentSectionAllData(
                         currentPageIndex,
                         position,
-                        standardsTemplateItemML
+                        standardsTemplateItemMLN
                     )
                 }
                 if (result == false) {
                     aInfo5ViewModel.updateStdsCheckboxesDataItemListUsingTemplateInPresentSectionAllData(
                         currentPageIndex,
                         position,
-                        standardsTemplateItemML
+                        standardsTemplateItemMLN
                     )
                 }
-                binding.rvCheckboxesTemplateItems.adapter = standardsTemplateItemML?.let {
+                binding.rvCheckboxesTemplateItems.adapter = standardsTemplateItemMLN?.let {
                     CheckboxTemplateRVAdapter(
                         it, aInfo5ViewModel, screen, checkboxesFrameworkItem.serialStatus, checkboxesFrameworkItem.checkboxesFrameworkTitle,position
                     )
@@ -150,7 +155,9 @@ class CheckboxesFrameworkRVAdapter(
                 if (isExpandable) View.VISIBLE else View.GONE
 
             binding.llCheckboxesFrameworkItem.setOnClickListener {
-                clickListener2(checkboxesFrameworkItem.pageCode)
+                if (itemFromPageTemplateMLMLD == null){
+                    clickListener2(checkboxesFrameworkItem.pageCode)
+                }
                 isAnyItemExpanded(position)
                 checkboxesFrameworkItem.isExpandable = !checkboxesFrameworkItem.isExpandable
                 notifyItemChanged(position)

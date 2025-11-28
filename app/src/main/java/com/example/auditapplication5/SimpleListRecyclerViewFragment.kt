@@ -4,7 +4,6 @@ import android.app.AlertDialog
 import android.app.DatePickerDialog
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -54,40 +53,53 @@ class SimpleListRecyclerViewFragment : Fragment() {
 
         aInfo5ViewModel.setTheScreenVariable(MainActivity.SIMPLE_LIST_RV_FRAGMENT)
 
-        //Observe and Display Status Message
-//        aInfo5ViewModel.message.observe(viewLifecycleOwner) {
-//            it.getContentIfNotHandled().let {
-//                Toast.makeText(context, it, Toast.LENGTH_SHORT).show()
-//            }
-//        }
-
         activity?.onBackPressedDispatcher?.addCallback(
             viewLifecycleOwner,
             object : OnBackPressedCallback(true) {
                 override fun handleOnBackPressed() {
                     if (aInfo5ViewModel.getThePreviousScreenVariable() == MainActivity.OPENING_SCREEN_FRAGMENT) {
                         findNavController().navigate(R.id.action_simpleListRecyclerViewFragment_to_openingScreenFragment)
-                    } else if (aInfo5ViewModel.getThePreviousScreenVariable() == MainActivity.SECTION_FRAGMENT){
+                    }
+                    else if (aInfo5ViewModel.getThePreviousScreenVariable() == MainActivity.SECTION_FRAGMENT) {
+                        aInfo5ViewModel.setTheScreenVariable(MainActivity.SECTION_FRAGMENT)
+                        aInfo5ViewModel.setThePreviousScreenVariable(MainActivity.NOT_RELEVANT)
+                        aInfo5ViewModel.setTheSectionAllDataLoadedFlagMLD(false)
+                        findNavController().navigate(R.id.action_simpleListRecyclerViewFragment_to_sectionAndIntrosFragment)
+                    }
+                    else if (aInfo5ViewModel.getThePreviousScreenVariable() == MainActivity.SECTION_FRAGMENT_SECTION_CHOICE) {
+                        aInfo5ViewModel.setTheScreenVariable(MainActivity.SECTION_FRAGMENT_SECTION_CHOICE)
+                        aInfo5ViewModel.setThePreviousScreenVariable(MainActivity.NOT_RELEVANT)
+                        aInfo5ViewModel.setTheSectionAllDataLoadedFlagMLD(true)
+                        findNavController().navigate(R.id.action_simpleListRecyclerViewFragment_to_sectionAndIntrosFragment)
+                    }
+                    else if (aInfo5ViewModel.getThePreviousScreenVariable() == MainActivity.SECTION_FRAGMENT_EDIT_1) {
+                        if (aInfo5ViewModel.editCompletedFlagLD.value == false){
+                            aInfo5ViewModel.setTheEditCompletedFlagMLD(true)
+                        }
                         aInfo5ViewModel.setTheScreenVariable(MainActivity.SECTION_FRAGMENT)
                         aInfo5ViewModel.setThePreviousScreenVariable(MainActivity.NOT_RELEVANT)
                         findNavController().navigate(R.id.action_simpleListRecyclerViewFragment_to_sectionAndIntrosFragment)
-                    } else if (aInfo5ViewModel.getThePreviousScreenVariable() == MainActivity.SECTION_FRAGMENT_SECTION_CHOICE) {
+                    }
+                    else if (aInfo5ViewModel.getThePreviousScreenVariable() == MainActivity.SECTION_FRAGMENT_EDIT_2) {
+                        if (aInfo5ViewModel.editCompletedFlagLD.value == false){
+                            aInfo5ViewModel.setTheEditCompletedFlagMLD(true)
+                        }
                         aInfo5ViewModel.setTheScreenVariable(MainActivity.SECTION_FRAGMENT_SECTION_CHOICE)
                         aInfo5ViewModel.setThePreviousScreenVariable(MainActivity.NOT_RELEVANT)
                         findNavController().navigate(R.id.action_simpleListRecyclerViewFragment_to_sectionAndIntrosFragment)
-                    } else if (aInfo5ViewModel.getThePreviousScreenVariable() == MainActivity.SECTION_FRAGMENT_EDIT_1){
+                    }
+                    else if (aInfo5ViewModel.getThePreviousScreenVariable() == MainActivity.SECTION_FRAGMENT_DELETE_1) {
+                        if (aInfo5ViewModel.deleteCompletedFlagLD.value == false){
+                            aInfo5ViewModel.setTheDeleteCompletedFlagMLD(true)
+                        }
                         aInfo5ViewModel.setTheScreenVariable(MainActivity.SECTION_FRAGMENT)
                         aInfo5ViewModel.setThePreviousScreenVariable(MainActivity.NOT_RELEVANT)
                         findNavController().navigate(R.id.action_simpleListRecyclerViewFragment_to_sectionAndIntrosFragment)
-                    } else if (aInfo5ViewModel.getThePreviousScreenVariable() == MainActivity.SECTION_FRAGMENT_EDIT_2){
-                        aInfo5ViewModel.setTheScreenVariable(MainActivity.SECTION_FRAGMENT_SECTION_CHOICE)
-                        aInfo5ViewModel.setThePreviousScreenVariable(MainActivity.NOT_RELEVANT)
-                        findNavController().navigate(R.id.action_simpleListRecyclerViewFragment_to_sectionAndIntrosFragment)
-                    } else if (aInfo5ViewModel.getThePreviousScreenVariable()== MainActivity.SECTION_FRAGMENT_DELETE_1){
-                        aInfo5ViewModel.setTheScreenVariable(MainActivity.SECTION_FRAGMENT)
-                        aInfo5ViewModel.setThePreviousScreenVariable(MainActivity.NOT_RELEVANT)
-                        findNavController().navigate(R.id.action_simpleListRecyclerViewFragment_to_sectionAndIntrosFragment)
-                    } else if (aInfo5ViewModel.getThePreviousScreenVariable() == MainActivity.SECTION_FRAGMENT_DELETE_2){
+                    }
+                    else if (aInfo5ViewModel.getThePreviousScreenVariable() == MainActivity.SECTION_FRAGMENT_DELETE_2) {
+                        if (aInfo5ViewModel.deleteCompletedFlagLD.value == false){
+                            aInfo5ViewModel.setTheDeleteCompletedFlagMLD(true)
+                        }
                         aInfo5ViewModel.setTheScreenVariable(MainActivity.SECTION_FRAGMENT_SECTION_CHOICE)
                         aInfo5ViewModel.setThePreviousScreenVariable(MainActivity.NOT_RELEVANT)
                         findNavController().navigate(R.id.action_simpleListRecyclerViewFragment_to_sectionAndIntrosFragment)
@@ -96,27 +108,54 @@ class SimpleListRecyclerViewFragment : Fragment() {
 
             })
 
+        aInfo5ViewModel.allConditionsMetSLRVFLD.observe(viewLifecycleOwner){
+            if (it == true){
+                binding.pbSimpleListRecyclerView.visibility = View.GONE
+                binding.clSimpleListRecyclerviewHolder.isEnabled = true
+            } else {
+                binding.pbSimpleListRecyclerView.visibility = View.VISIBLE
+                binding.clSimpleListRecyclerviewHolder.isEnabled = false
+            }
+        }
+
+
+        var parentFolderURIString = aInfo5ViewModel.getTheParentFolderURIString()
 
         //Getting the Parent Folder URI for saving Audits from DB
-        if (aInfo5ViewModel.getTheParentFolderURIString() == "") {
-            aInfo5ViewModel.getParentFolderURIStringLD.observe(viewLifecycleOwner) { list ->
-                if (list.isEmpty()) {
-                    aInfo5ViewModel.setTheParentFolderURIString("")
-                } else {
-                    var parentFolderURIString = ""
-                    for (item in list) {
-                        parentFolderURIString += item.framework.toString()
-                    }
-                    aInfo5ViewModel.setTheParentFolderURIString(parentFolderURIString)
-                    val result =
-                        (activity as MainActivity).areUriPermissionsGranted(parentFolderURIString)
-                    if (!result) {
-                        (activity as MainActivity).takePersistableURIPermissions(
-                            parentFolderURIString.toUri()
-                        )
+        if (parentFolderURIString == "") {
+            aInfo5ViewModel.parentFolderUploadedSLRVFlagLD.observe(viewLifecycleOwner){parentFolderUploadedFlag ->
+                if (parentFolderUploadedFlag == false){
+                    aInfo5ViewModel.getParentFolderURIStringLD.observe(viewLifecycleOwner) { list ->
+                        if (list.isEmpty()) {
+                            aInfo5ViewModel.setTheParentFolderURIString("")
+                        }
+                        else {
+                            for (item in list) {
+                                parentFolderURIString += item.framework.toString()
+                            }
+                            aInfo5ViewModel.setTheParentFolderURIString(parentFolderURIString)
+                            val result =
+                                (activity as MainActivity).areUriPermissionsGranted(parentFolderURIString)
+                            if (!result) {
+                                (activity as MainActivity).takePersistableURIPermissions(
+                                    parentFolderURIString.toUri()
+                                )
+                            }
+                        }
+                        aInfo5ViewModel.setTheParentFolderUploadedSLRVFlagMLD(true)
                     }
                 }
             }
+        }
+        else {
+            val result =
+                (activity as MainActivity).areUriPermissionsGranted(parentFolderURIString)
+            if (!result) {
+                (activity as MainActivity).takePersistableURIPermissions(
+                    parentFolderURIString.toUri()
+                )
+            }
+            aInfo5ViewModel.setTheParentFolderUploadedSLRVFlagMLD(true)
         }
 
         //Action Bar
@@ -125,21 +164,48 @@ class SimpleListRecyclerViewFragment : Fragment() {
 
         //Depending on the value of the previous screen, get the list
         if (aInfo5ViewModel.getThePreviousScreenVariable() == MainActivity.OPENING_SCREEN_FRAGMENT) {
-            if (aInfo5ViewModel.getTheCompanyCodeAndDisplayNameML().isEmpty()) {
-                aInfo5ViewModel.getMLOfCompanyCodesAndNamesLD.observe(viewLifecycleOwner) { list ->
-                    var companyCodesAndNamesListString = ""
-                    if (list.isEmpty()) {
-                        companyCodesAndNamesListString = ""
-                    } else {
-                        companyCodesAndNamesListString = ""
-                        for (item in list) {
-                            companyCodesAndNamesListString += item.framework
-                        }
-                        aInfo5ViewModel.setTheCompanyCodeAndDisplayNameML(
-                            aInfo5ViewModel.stringToCodeAndDisplayNameList(
-                                companyCodesAndNamesListString
-                            )
+            aInfo5ViewModel.setTheCompanySectionCDListUploadedSLRVFlagMLD(true)
+            aInfo5ViewModel.areAllAuditsDeletedMLD.observe(viewLifecycleOwner){deletedFlag ->
+                if (deletedFlag == true){
+                    val companyCodesAndNamesListString = ""
+                    aInfo5ViewModel.setTheCompanyCodeAndDisplayNameML(
+                        aInfo5ViewModel.stringToCodeAndDisplayNameList(
+                            companyCodesAndNamesListString
                         )
+                    )
+                    aInfo5ViewModel.saveCompanyCodeAndDisplayIntoDatabase()
+                    loadRecyclerView(
+                        aInfo5ViewModel.getThePreviousScreenVariable(),
+                        mutableListOf(),
+                        aInfo5ViewModel.getTheCompanyCodeAndDisplayNameML()
+                    )
+                    aInfo5ViewModel.areAllAuditsDeletedMLD.value = false
+                }
+                else {
+                    if (aInfo5ViewModel.getTheCompanyCodeAndDisplayNameML().isEmpty()) {
+                        aInfo5ViewModel.getMLOfCompanyCodesAndNamesLD.observe(viewLifecycleOwner) { list ->
+                            var companyCodesAndNamesListString = ""
+                            if (list.isEmpty()) {
+                                companyCodesAndNamesListString = ""
+                            } else {
+                                companyCodesAndNamesListString = ""
+                                for (item in list) {
+                                    companyCodesAndNamesListString += item.framework
+                                }
+                                aInfo5ViewModel.setTheCompanyCodeAndDisplayNameML(
+                                    aInfo5ViewModel.stringToCodeAndDisplayNameList(
+                                        companyCodesAndNamesListString
+                                    )
+                                )
+                                loadRecyclerView(
+                                    aInfo5ViewModel.getThePreviousScreenVariable(),
+                                    mutableListOf(),
+                                    aInfo5ViewModel.getTheCompanyCodeAndDisplayNameML()
+                                )
+                            }
+                        }
+                    }
+                    else {
                         loadRecyclerView(
                             aInfo5ViewModel.getThePreviousScreenVariable(),
                             mutableListOf(),
@@ -147,78 +213,85 @@ class SimpleListRecyclerViewFragment : Fragment() {
                         )
                     }
                 }
-            } else {
-                loadRecyclerView(
-                    aInfo5ViewModel.getThePreviousScreenVariable(),
-                    mutableListOf(),
-                    aInfo5ViewModel.getTheCompanyCodeAndDisplayNameML()
-                )
             }
-        } else if (aInfo5ViewModel.getThePreviousScreenVariable() == MainActivity.SECTION_FRAGMENT_SECTION_CHOICE || aInfo5ViewModel.getThePreviousScreenVariable() == MainActivity.SECTION_FRAGMENT) {
+        }
+        else if (aInfo5ViewModel.getThePreviousScreenVariable() == MainActivity.SECTION_FRAGMENT_SECTION_CHOICE || aInfo5ViewModel.getThePreviousScreenVariable() == MainActivity.SECTION_FRAGMENT) {
+            aInfo5ViewModel.setTheSectionAllDataLoadedFlagMLD(false)
             if (aInfo5ViewModel.getTheCompanySectionCodeAndDisplayNameML().isEmpty()) {
-                val companySectionListIDML =
-                    mutableListOf<String>(aInfo5ViewModel.getPresentCompanyCode() + MainActivity.COMPANY_SECTION_LIST_ID)
-                aInfo5ViewModel.getAInfo5ByIds(companySectionListIDML)
-                    .observe(viewLifecycleOwner) { list ->
-                        var sectionCodesAndNamesListString = ""
-                        if (list.isEmpty()) {
-                            var defaultSectionListString = ""
-                            val defaultSectionList = aInfo5ViewModel.getDefaultSectionList
-                            defaultSectionList.observe(viewLifecycleOwner) { templateSectionList ->
-                                if (templateSectionList.isEmpty()) {
-                                    val defaultSectionListML =
-                                        resources.getStringArray(R.array.Default_Section_Names)
-                                            .toMutableList()
-                                    defaultSectionListString =
-                                        aInfo5ViewModel.mlToStringUsingDelimiter1(defaultSectionListML)
-                                } else {
-                                    defaultSectionListString = ""
-                                    for (item in templateSectionList) {
-                                        defaultSectionListString += item.template_string
+                aInfo5ViewModel.setTheCompanySectionCDListUploadedSLRVFlagMLD(false)
+                aInfo5ViewModel.companySectionCDListUploadedSLRVFlagLD.observe(viewLifecycleOwner){ flag ->
+                    if (flag == false){
+                        val companySectionListIDML =
+                            mutableListOf<String>(aInfo5ViewModel.getPresentCompanyCode() + MainActivity.COMPANY_SECTION_LIST_ID)
+                        aInfo5ViewModel.getAInfo5ByIds(companySectionListIDML)
+                            .observe(viewLifecycleOwner) { list ->
+                                var sectionCodesAndNamesListString = ""
+                                if (list.isEmpty()) {
+                                    var defaultSectionListString = ""
+                                    val defaultSectionList = aInfo5ViewModel.getDefaultSectionList
+                                    defaultSectionList.observe(viewLifecycleOwner) { templateSectionList ->
+                                        if (templateSectionList.isEmpty()) {
+                                            val defaultSectionListML =
+                                                resources.getStringArray(R.array.Default_Section_Names)
+                                                    .toMutableList()
+                                            defaultSectionListString =
+                                                aInfo5ViewModel.mlToStringUsingDelimiter1(
+                                                    defaultSectionListML
+                                                )
+                                        }
+                                        else {
+                                            defaultSectionListString = ""
+                                            for (item in templateSectionList) {
+                                                defaultSectionListString += item.template_string
+                                            }
+                                        }
+                                        val sectionCodesAndNamesML =
+                                            aInfo5ViewModel.mlStringToCodeAndDisplayNameListWithUniqueCodes(
+                                                defaultSectionListString,
+                                                MainActivity.FLAG_VALUE_SECTION
+                                            )
+                                        val sectionCodesAndNamesMLString =
+                                            aInfo5ViewModel.codeAndDisplayNameListToString(
+                                                sectionCodesAndNamesML
+                                            )
+                                        val companySectionsCDListID =
+                                            aInfo5ViewModel.getPresentCompanyCode() + MainActivity.COMPANY_SECTION_LIST_ID
+                                        val aInfo5 = AInfo5(
+                                            companySectionsCDListID,
+                                            sectionCodesAndNamesMLString
+                                        )
+                                        aInfo5ViewModel.insertAInfo5(aInfo5)
+                                        aInfo5ViewModel.setTheCompanySectionCodeAndDisplayNameML(
+                                            sectionCodesAndNamesML
+                                        )
+                                        loadRecyclerView(
+                                            aInfo5ViewModel.getThePreviousScreenVariable(),
+                                            mutableListOf(),
+                                            aInfo5ViewModel.getTheCompanySectionCodeAndDisplayNameML()
+                                        )
                                     }
                                 }
-                                val sectionCodesAndNamesML =
-                                    aInfo5ViewModel.mlStringToCodeAndDisplayNameListWithUniqueCodes(
-                                        defaultSectionListString,
-                                        MainActivity.FLAG_VALUE_SECTION
+                                else {
+                                    sectionCodesAndNamesListString = ""
+                                    for (item in list) {
+                                        sectionCodesAndNamesListString += item.framework
+                                    }
+                                    aInfo5ViewModel.setTheCompanySectionCodeAndDisplayNameML(
+                                        aInfo5ViewModel.stringToCodeAndDisplayNameList(
+                                            sectionCodesAndNamesListString
+                                        )
                                     )
-                                val sectionCodesAndNamesMLString =
-                                    aInfo5ViewModel.codeAndDisplayNameListToString(
-                                        sectionCodesAndNamesML
+                                    loadRecyclerView(
+                                        aInfo5ViewModel.getThePreviousScreenVariable(),
+                                        mutableListOf(),
+                                        aInfo5ViewModel.getTheCompanySectionCodeAndDisplayNameML()
                                     )
-                                val companySectionsCDListID =
-                                    aInfo5ViewModel.getPresentCompanyCode() + MainActivity.COMPANY_SECTION_LIST_ID
-                                val aInfo5 = AInfo5(
-                                    companySectionsCDListID,
-                                    sectionCodesAndNamesMLString
-                                )
-                                aInfo5ViewModel.insertAInfo5(aInfo5)
-                                aInfo5ViewModel.setTheCompanySectionCodeAndDisplayNameML(
-                                    sectionCodesAndNamesML
-                                )
-                                loadRecyclerView(
-                                    aInfo5ViewModel.getThePreviousScreenVariable(),
-                                    mutableListOf(),
-                                    aInfo5ViewModel.getTheCompanySectionCodeAndDisplayNameML()
-                                )
+                                }
+                                aInfo5ViewModel.setTheCompanySectionCDListUploadedSLRVFlagMLD(true)
                             }
-                        } else {
-                            sectionCodesAndNamesListString = ""
-                            for (item in list) {
-                                sectionCodesAndNamesListString += item.framework
-                            }
-                            aInfo5ViewModel.setTheCompanySectionCodeAndDisplayNameML(
-                                aInfo5ViewModel.stringToCodeAndDisplayNameList(
-                                    sectionCodesAndNamesListString
-                                )
-                            )
-                            loadRecyclerView(
-                                aInfo5ViewModel.getThePreviousScreenVariable(),
-                                mutableListOf(),
-                                aInfo5ViewModel.getTheCompanySectionCodeAndDisplayNameML()
-                            )
-                        }
                     }
+                }
+
             }
             else {
                 loadRecyclerView(
@@ -227,12 +300,24 @@ class SimpleListRecyclerViewFragment : Fragment() {
                     aInfo5ViewModel.getTheCompanySectionCodeAndDisplayNameML()
                 )
             }
-        } else if (aInfo5ViewModel.getThePreviousScreenVariable() == MainActivity.SECTION_FRAGMENT_EDIT_1 || aInfo5ViewModel.getThePreviousScreenVariable() == MainActivity.SECTION_FRAGMENT_EDIT_2) {
+        }
+        else if (aInfo5ViewModel.getThePreviousScreenVariable() == MainActivity.SECTION_FRAGMENT_EDIT_1 || aInfo5ViewModel.getThePreviousScreenVariable() == MainActivity.SECTION_FRAGMENT_EDIT_2) {
+            aInfo5ViewModel.setTheCompanySectionCDListUploadedSLRVFlagMLD(true)
             val editList = aInfo5ViewModel.getTheEditML()
-            loadRecyclerView(aInfo5ViewModel.getThePreviousScreenVariable(), editList, mutableListOf())
-        } else if (aInfo5ViewModel.getThePreviousScreenVariable() == MainActivity.SECTION_FRAGMENT_DELETE_1 || aInfo5ViewModel.getThePreviousScreenVariable() == MainActivity.SECTION_FRAGMENT_DELETE_2) {
+            loadRecyclerView(
+                aInfo5ViewModel.getThePreviousScreenVariable(),
+                editList,
+                mutableListOf()
+            )
+        }
+        else if (aInfo5ViewModel.getThePreviousScreenVariable() == MainActivity.SECTION_FRAGMENT_DELETE_1 || aInfo5ViewModel.getThePreviousScreenVariable() == MainActivity.SECTION_FRAGMENT_DELETE_2) {
+            aInfo5ViewModel.setTheCompanySectionCDListUploadedSLRVFlagMLD(true)
             val deleteML = aInfo5ViewModel.getTheDeleteML()
-            loadRecyclerView(aInfo5ViewModel.getThePreviousScreenVariable(), deleteML, mutableListOf())
+            loadRecyclerView(
+                aInfo5ViewModel.getThePreviousScreenVariable(),
+                deleteML,
+                mutableListOf()
+            )
         }
     }
 
@@ -301,18 +386,21 @@ class SimpleListRecyclerViewFragment : Fragment() {
     private fun companyListItemClicked(companyName: String, companyCode: String) {
         val presentCompanyCodeAndDisplay = CodeNameAndDisplayNameDC(companyCode, companyName)
 
-        //Putting only the present company CodeAndDisplay into the db
-        val presentCompanyID = presentCompanyCodeAndDisplay.uniqueCodeName + MainActivity.PRESENT_COMPANY_ID
-        val aInfo5PresentCompany = AInfo5(presentCompanyID, companyName)
-        aInfo5ViewModel.insertAInfo5(aInfo5PresentCompany)
+        //Putting the present company CodeAndDisplay into the db
+        val presentCompanyID =
+            presentCompanyCodeAndDisplay.uniqueCodeName + MainActivity.PRESENT_COMPANY_ID
+        val presentCompanyAInfo5 = AInfo5(presentCompanyID, companyName)
+        aInfo5ViewModel.insertAInfo5(presentCompanyAInfo5)
         aInfo5ViewModel.setTheCompanyNameToBeUpdatedFlag(true)
         aInfo5ViewModel.setTheAuditDateToBeUpdatedFlag(true)
+        aInfo5ViewModel.companySectionCDMLToBeUpdatedFlagMLD.value = true
 
         aInfo5ViewModel.setThePresentCompanyCodeAndDisplayName(presentCompanyCodeAndDisplay)
         if (aInfo5ViewModel.getTheParentFolderURIString() == "") {
             val intent = Intent(Intent.ACTION_OPEN_DOCUMENT_TREE)
             (activity as MainActivity).openDocumentTree(intent)
-        } else {
+        }
+        else {
             val dirExists =
                 aInfo5ViewModel.directoryExists(
                     companyName,
@@ -343,26 +431,27 @@ class SimpleListRecyclerViewFragment : Fragment() {
         aInfo5ViewModel.setThePresentSectionCodeAndDisplayName(sectionCodeAndDisplayName)
         val presentSectionNameID =
             aInfo5ViewModel.getPresentCompanyCode() + aInfo5ViewModel.getPresentSectionCode() + MainActivity.PRESENT_SECTION_ID
-        val aInfo5SectionName = AInfo5(presentSectionNameID, sectionName.replace("- pages present", "").trim())
+        val aInfo5SectionName =
+            AInfo5(presentSectionNameID, sectionName.replace("- pages present", "").trim())
         aInfo5ViewModel.insertAInfo5(aInfo5SectionName)
-        aInfo5ViewModel.addUniqueItemToPresentCompanyAllIds(presentSectionNameID)
+
+        aInfo5ViewModel.setFlagForSectionNameToBeUpdated(true)
         aInfo5ViewModel.clearThePresentSectionAllPagesFramework()
         aInfo5ViewModel.setTheSectionAllPagesFrameworkLoadedFlagMLD(false)
-        aInfo5ViewModel.sectionAllDataLoadedFlagMLD.value = false
+        aInfo5ViewModel.setTheSectionAllDataLoadedFlagMLD(false)
         aInfo5ViewModel.setTheScreenVariable(MainActivity.SECTION_FRAGMENT_SECTION_CHOICE)
         findNavController().navigate(R.id.action_simpleListRecyclerViewFragment_to_sectionAndIntrosFragment)
     }
 
-    //In this function, the code has no role to play
     private fun editItemClicked(editOptionChosen: String = "", code: String = "") {
         val editingOptionsML = resources.getStringArray(R.array.Edit_Choices_2).toMutableList()
-        if (editOptionChosen == editingOptionsML[0]){
+        if (editOptionChosen == editingOptionsML[0]) {
             aInfo5ViewModel.setTheCompanyNameToBeUpdatedFlag(true)
             editCompanyName()
-        } else if (editOptionChosen == editingOptionsML[1]){
+        } else if (editOptionChosen == editingOptionsML[1]) {
             aInfo5ViewModel.setTheAuditDateToBeUpdatedFlag(true)
             editAuditDate()
-        } else if (editOptionChosen == editingOptionsML[2]){
+        } else if (editOptionChosen == editingOptionsML[2]) {
             aInfo5ViewModel.setFlagForSectionNameToBeUpdated(true)
             editSectionName()
         }
@@ -370,58 +459,49 @@ class SimpleListRecyclerViewFragment : Fragment() {
 
     private fun deleteItemClicked(deleteOptionChosen: String = "", code: String = "") {
         val deletingOptionsML = resources.getStringArray(R.array.Delete_Choices_2).toMutableList()
-        if (deleteOptionChosen == deletingOptionsML[0]){
+        if (deleteOptionChosen == deletingOptionsML[0]) {
+            aInfo5ViewModel.setTheDeleteCompletedFlagMLD(false)
             deleteCompany()
-        } else if (deleteOptionChosen == deletingOptionsML[1]){
+        } else if (deleteOptionChosen == deletingOptionsML[1]) {
+            aInfo5ViewModel.setTheDeleteCompletedFlagMLD(false)
             deleteSection()
         }
 
     }
 
-    fun editCompanyName(){
+    fun editCompanyName() {
         //Move to the Enter Name Fragment to edit the company name
-        val companyDirectoryUriId = aInfo5ViewModel.getPresentCompanyCode() + MainActivity.COMPANY_DIRECTORY_URI_ID
-        aInfo5ViewModel.getAInfo5ByIds(mutableListOf(companyDirectoryUriId)).observe(viewLifecycleOwner){list ->
-            var companyDirectoryURIString = ""
-            if (list.isNotEmpty()){
-                for (item in list){
-                    companyDirectoryURIString += item.framework
-                }
-                aInfo5ViewModel.setTheCompanyDirectoryURIString(companyDirectoryURIString)
-            }
-        }
         aInfo5ViewModel.setThePreviousScreen2Variable(aInfo5ViewModel.getThePreviousScreenVariable())
         aInfo5ViewModel.setThePreviousScreenVariable(MainActivity.SIMPLE_LIST_RV_FRAGMENT)
         findNavController().navigate(R.id.action_simpleListRecyclerViewFragment_to_enterNameFragment)
     }
 
-    fun editAuditDate(){
+    fun editAuditDate() {
         datePickerDialog()
-        if (aInfo5ViewModel.getThePreviousScreenVariable() == MainActivity.SECTION_FRAGMENT_EDIT_1){
+        if (aInfo5ViewModel.getThePreviousScreenVariable() == MainActivity.SECTION_FRAGMENT_EDIT_1) {
             aInfo5ViewModel.setTheScreenVariable(MainActivity.SECTION_FRAGMENT)
             aInfo5ViewModel.setThePreviousScreenVariable(MainActivity.NOT_RELEVANT)
-        } else if (aInfo5ViewModel.getThePreviousScreenVariable() == MainActivity.SECTION_FRAGMENT_EDIT_2){
+        }
+        else if (aInfo5ViewModel.getThePreviousScreenVariable() == MainActivity.SECTION_FRAGMENT_EDIT_2) {
             aInfo5ViewModel.setTheScreenVariable(MainActivity.SECTION_FRAGMENT_SECTION_CHOICE)
             aInfo5ViewModel.setThePreviousScreenVariable(MainActivity.NOT_RELEVANT)
         }
-        aInfo5ViewModel.setTheAuditDateToBeUpdatedFlag(true)
         findNavController().navigate(R.id.action_simpleListRecyclerViewFragment_to_sectionAndIntrosFragment)
     }
 
-    fun editSectionName(){
+    fun editSectionName() {
         //Move to the Enter Name Fragment to edit the section name
         aInfo5ViewModel.setThePreviousScreen2Variable(aInfo5ViewModel.getThePreviousScreenVariable())
         aInfo5ViewModel.setThePreviousScreenVariable(MainActivity.SIMPLE_LIST_RV_FRAGMENT)
         findNavController().navigate(R.id.action_simpleListRecyclerViewFragment_to_enterNameFragment)
     }
 
-    fun deleteCompany(){
+    fun deleteCompany() {
         showDialogForCompanyDeletion()
     }
 
-    fun deleteSection(){
+    fun deleteSection() {
         showDialogForSectionDeletion()
-
     }
 
     private fun showDialogForSectionDeletion() {
@@ -433,20 +513,11 @@ class SimpleListRecyclerViewFragment : Fragment() {
             .setMessage(message)
             .setPositiveButton("Yes") { dialog, _ ->
                 val presentSectionCode = aInfo5ViewModel.getPresentSectionCode()
-                val presentCompanyAllIDS = aInfo5ViewModel.getThePresentCompanyAllIds()
-                //Remove section name from Present Company Section List and store it in the DB
-                aInfo5ViewModel.deleteSectionInTheCompanySectionCodeAndDisplayNameML(aInfo5ViewModel.getThePresentSectionCodeAndDisplayName())
-                val companySectionListID =
-                    aInfo5ViewModel.getPresentCompanyCode() + MainActivity.COMPANY_SECTION_LIST_ID
-                aInfo5ViewModel.saveTheCompanySectionCodeAndDisplayMLIntoDB(companySectionListID)
-                //Delete the section data using present company AllIDs from the Database directly
-                for (item in presentCompanyAllIDS){
-                    if (item.contains(presentSectionCode)){
-                        //Log.d(MainActivity.TESTING_TAG, "deleteSection: Cool it ${aInfo5ViewModel.getThePreviousScreenVariable()}")
-                        val aInfo5 = AInfo5(item)
-                        aInfo5ViewModel.deleteAInfo5(aInfo5)
-                    }
-                }
+
+                //presentSectionDeletion(presentSectionCode)
+
+                aInfo5ViewModel.deletePresentSection(aInfo5ViewModel.getPresentSectionCode(), aInfo5ViewModel.getPresentSectionName())
+
                 aInfo5ViewModel.setTheScreenVariable(MainActivity.SECTION_FRAGMENT)
                 aInfo5ViewModel.setThePreviousScreenVariable(MainActivity.NOT_RELEVANT)
                 findNavController().navigate(R.id.action_simpleListRecyclerViewFragment_to_sectionAndIntrosFragment)
@@ -470,27 +541,20 @@ class SimpleListRecyclerViewFragment : Fragment() {
         builder.setTitle(title)
             .setMessage(message)
             .setPositiveButton("Yes") { dialog, _ ->
-                val presentCompanyCode = aInfo5ViewModel.getPresentCompanyCode()
-                val presentCompanAllIDS = aInfo5ViewModel.getThePresentCompanyAllIds()
-                //Remove Company in the List of Companies and store the remaining list
                 aInfo5ViewModel.deleteCompanyInCompanyCodeAndDisplayNameML(aInfo5ViewModel.getThePresentCompanyCodeAndDisplayName())
                 aInfo5ViewModel.saveCompanyCodeAndDisplayIntoDatabase()
-                //Remove items in the database
-                for (item in presentCompanAllIDS){
-                    if (item.contains(presentCompanyCode)){
-                        Log.d(MainActivity.TESTING_TAG, "deleteCompany: $item ")
-                        val aInfo5 = AInfo5(item)
-                        aInfo5ViewModel.deleteAInfo5(aInfo5)
-                    }
-                }
-                findNavController().navigate(R.id.action_simpleListRecyclerViewFragment_to_openingScreenFragment)
+
+                //presentCompanyDeletion()
+                aInfo5ViewModel.deletePresentCompany(aInfo5ViewModel.getPresentCompanyName())
                 dialog.dismiss()
+                findNavController().navigate(R.id.action_simpleListRecyclerViewFragment_to_openingScreenFragment)
+
             }
             .setNeutralButton("No") { dialog, _ ->
-                if (aInfo5ViewModel.getThePreviousScreenVariable()== MainActivity.SECTION_FRAGMENT_DELETE_1){
+                if (aInfo5ViewModel.getThePreviousScreenVariable() == MainActivity.SECTION_FRAGMENT_DELETE_1) {
                     aInfo5ViewModel.setTheScreenVariable(MainActivity.SECTION_FRAGMENT)
                     aInfo5ViewModel.setThePreviousScreenVariable(MainActivity.NOT_RELEVANT)
-                } else if (aInfo5ViewModel.getThePreviousScreenVariable()== MainActivity.SECTION_FRAGMENT_DELETE_2){
+                } else if (aInfo5ViewModel.getThePreviousScreenVariable() == MainActivity.SECTION_FRAGMENT_DELETE_2) {
                     aInfo5ViewModel.setTheScreenVariable(MainActivity.SECTION_FRAGMENT_SECTION_CHOICE)
                     aInfo5ViewModel.setThePreviousScreenVariable(MainActivity.NOT_RELEVANT)
                 }
@@ -558,7 +622,10 @@ class SimpleListRecyclerViewFragment : Fragment() {
                 val aInfo5 = AInfo5(dateID, currentDate)
                 aInfo5ViewModel.insertAInfo5(aInfo5)
                 aInfo5ViewModel.setTheCompanyAuditDate(currentDate)
-                aInfo5ViewModel.addUniqueItemToPresentCompanyAllIds(dateID)
+                aInfo5ViewModel.setTheAuditDateToBeUpdatedFlag(true)
+                aInfo5ViewModel.setTheEditCompletedFlagMLD(true)
+                aInfo5ViewModel.setTheCompanyAuditDateUploadedFlagMLD(false)
+                aInfo5ViewModel.setTheAuditDateUpdatedInReportSIFFlagMLD(false)
             },
             myear,
             month,
@@ -566,6 +633,7 @@ class SimpleListRecyclerViewFragment : Fragment() {
         )
         datepickerdialog.show()
     }
+
 
 
 }

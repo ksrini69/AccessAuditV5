@@ -50,8 +50,10 @@ class GotoRecyclerviewFragment : Fragment() {
         //Action Bar
         val actionBar = (activity as MainActivity).supportActionBar
         actionBar?.hide()
+
         //Set Screen
         aInfo5ViewModel.setTheScreenVariable(MainActivity.GOTO_RECYCLERVIEW_FRAGMENT)
+
         //Get the appropriate list to be given to the recycler view
         val presentSectionAllPagesFramework = aInfo5ViewModel.presentSectionAllPagesFramework
         loadRecyclerView(presentSectionAllPagesFramework)

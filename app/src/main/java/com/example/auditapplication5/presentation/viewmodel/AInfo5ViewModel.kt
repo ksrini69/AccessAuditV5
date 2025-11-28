@@ -8,6 +8,7 @@ import android.graphics.Matrix
 import android.net.Uri
 import android.provider.OpenableColumns
 import android.util.Log
+import android.widget.Toast
 import androidx.core.net.toUri
 import androidx.documentfile.provider.DocumentFile
 import androidx.lifecycle.*
@@ -83,6 +84,7 @@ class AInfo5ViewModel(
     fun setStatusMessage(input: String) {
         statusMessage.value = Event(input)
     }
+
 //Company, Audit Date, Intro and Section related Variables and Functions
 
     // Getting the Parent Folder URI from the database
@@ -190,58 +192,131 @@ class AInfo5ViewModel(
         companyNameToBeUpdatedFlag = input
     }
 
-    //Present Company All IDs variable and functions
-    private var presentCompanyAllIds = mutableListOf<String>()
-    fun setThePresentCompanyAllIds(input: MutableList<String>) {
-        presentCompanyAllIds = input
-    }
-
-    fun setThePresentCompanyAllIdsUsingString(input: String) {
+    fun deletePresentCompany(presentCompanyName: String) {
         viewModelScope.launch(Dispatchers.Default) {
-            val mutableList = stringToMLUsingDlimiter1(input)
+            val context = getApplication<Application>().applicationContext
+            val companyDirectoryUriId =
+                getPresentCompanyCode() + MainActivity.COMPANY_DIRECTORY_URI_ID
+            val companyDirectoryAInfo5 = AInfo5(companyDirectoryUriId)
+            deleteAInfo5(companyDirectoryAInfo5)
 
-            withContext(Dispatchers.Main) {
-                presentCompanyAllIds = mutableList
+            val companySectionListID =
+                getPresentCompanyCode() + MainActivity.COMPANY_SECTION_LIST_ID
+            val companySectionListAInfo5 = AInfo5(companySectionListID)
+            deleteAInfo5(companySectionListAInfo5)
+
+            val presentCompanyNameID = getPresentCompanyCode() + MainActivity.PRESENT_COMPANY_ID
+            val presentCompanyAInfo5 = AInfo5(presentCompanyNameID)
+            deleteAInfo5(presentCompanyAInfo5)
+
+            val presentSectionNameID =
+                getPresentCompanyCode() + getPresentSectionCode() + MainActivity.PRESENT_SECTION_ID
+            val presentSectionNameAInfo5 = AInfo5(presentSectionNameID)
+            deleteAInfo5(presentSectionNameAInfo5)
+
+            val dateID = getPresentCompanyCode() + MainActivity.COMPANY_AUDIT_DATE_ID
+            val companyAuditDateAInfo5 = AInfo5(dateID)
+            deleteAInfo5(companyAuditDateAInfo5)
+
+            //Deleting the company photographs
+            val photoID = getPresentCompanyCode() + MainActivity.PHOTOS_LIST_ID
+            val companyPhotosAInfo5 = AInfo5(photoID)
+            deleteAInfo5(companyPhotosAInfo5)
+
+            //Deleting the Company Report
+            val companyReportID = getPresentCompanyCode() + MainActivity.COMPANY_REPORT_ID
+            val companyReportAInfo5 = AInfo5(companyReportID)
+            deleteAInfo5(companyReportAInfo5)
+
+            //Deleting the Present Section Framework and Data
+            val sectionPagesFrameworkAndDataID =
+                getPresentCompanyCode() + getPresentSectionCode() + MainActivity.SECTION_PAGES_FRAMEWORK_AND_DATA_ID
+            val presentSectionFrameworkAndDataAInfo5 = AInfo5(sectionPagesFrameworkAndDataID)
+            deleteAInfo5(presentSectionFrameworkAndDataAInfo5)
+
+            //Deleting all the section framework and data
+            val sectionCodeAndDisplayML = getTheCompanySectionCodeAndDisplayNameML()
+            for (item in sectionCodeAndDisplayML) {
+                val sectionPagesFrameworkDataID =
+                    getPresentCompanyCode() + item.uniqueCodeName + MainActivity.SECTION_PAGES_FRAMEWORK_AND_DATA_ID
+                val sectionFrameworkAndDataAInfo5 = AInfo5(sectionPagesFrameworkDataID)
+                deleteAInfo5(sectionFrameworkAndDataAInfo5)
             }
-        }
-    }
 
-    fun getThePresentCompanyAllIds(): MutableList<String> {
-        return presentCompanyAllIds
-    }
+            //Deleting all the present sections
+            for (item in sectionCodeAndDisplayML) {
+                val presentSectionID =
+                    getPresentCompanyCode() + item.uniqueCodeName + MainActivity.PRESENT_SECTION_ID
+                val presentSectionAInfo5 = AInfo5(presentSectionID)
+                deleteAInfo5(presentSectionAInfo5)
+            }
 
-    fun addUniqueItemToPresentCompanyAllIds(input: String) {
-        var flagPresent = false
-        if (presentCompanyAllIds.isNotEmpty()) {
-            for (index in 0 until presentCompanyAllIds.size) {
-                if (presentCompanyAllIds[index].trim() == input.trim()) {
-                    flagPresent = true
-                    break
+
+            //Delete All File ID based URIs
+            val wordFileNameWithoutExtension = getPresentCompanyName() + "_Word"
+            val threeColumnWordFileWithExtension =
+                wordFileNameWithoutExtension + MainActivity.DOC_FILE_3COLUMN_WORD_EXTENSION
+            val threeColumnWordFileAInfo5 = AInfo5(threeColumnWordFileWithExtension)
+            deleteAInfo5(threeColumnWordFileAInfo5)
+
+            val sixColumnWordFileWithExtension =
+                wordFileNameWithoutExtension + MainActivity.DOC_FILE_6COLUMN_WORD_EXTENSION
+            val sixColumnWordFileAInfo5 = AInfo5(sixColumnWordFileWithExtension)
+            deleteAInfo5(sixColumnWordFileAInfo5)
+
+            val excelFileNameWithoutExtension = getPresentCompanyName() + "_Excel"
+
+            val threeColumnExcelFileWithExtension =
+                excelFileNameWithoutExtension + MainActivity.TXT_FILE_3COLUMN_EXCEL_EXTENSION
+            val threeColumnExcelFileAInfo5 = AInfo5(threeColumnExcelFileWithExtension)
+            deleteAInfo5(threeColumnExcelFileAInfo5)
+
+            val sixColumnExcelFileWithExtension =
+                excelFileNameWithoutExtension + MainActivity.TXT_FILE_6COLUMN_EXCEL_EXTENSION
+            val sixColumnExcelFileAInfo5 = AInfo5(sixColumnExcelFileWithExtension)
+            deleteAInfo5(sixColumnExcelFileAInfo5)
+
+            val checklistWordFileWithExtension =
+                wordFileNameWithoutExtension + MainActivity.DOC_FILE_CHECKLIST_WORD_EXTENSION
+            val checklistWordFileAInfo5 = AInfo5(checklistWordFileWithExtension)
+            deleteAInfo5(checklistWordFileAInfo5)
+
+            val checklistExcelFileWithExtension =
+                excelFileNameWithoutExtension + MainActivity.TXT_FILE_CHECKLIST_EXCEL_EXTENSION
+            val checklistExcelFileAInfo5 = AInfo5(checklistExcelFileWithExtension)
+            deleteAInfo5(checklistExcelFileAInfo5)
+
+            //Renaming the CompanyDirectory suitably
+            val newCompanyName = presentCompanyName + "_DELETED_FROM_DB"
+            try {
+                val renamedCompanyUri = renameDocument(
+                    getTheParentFolderURIString().toUri(),
+                    presentCompanyName,
+                    newCompanyName
+                )
+                withContext(Dispatchers.Main) {
+                    if (renamedCompanyUri != null) {
+                        Toast.makeText(
+                            context,
+                            "The company has been successfully deleted from the db",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+                }
+            } catch (e: FileSystemException) {
+                withContext(Dispatchers.Main) {
+                    Toast.makeText(
+                        context,
+                        "There has been an error while renaming the deleted company folder. Please see $e",
+                        Toast.LENGTH_SHORT
+                    ).show()
                 }
             }
-            if (flagPresent == false) {
-                presentCompanyAllIds.add(input.trim())
+
+            withContext(Dispatchers.Main) {
+                setTheDeleteCompletedFlagMLD(true)
             }
-        } else {
-            setThePresentCompanyAllIds(mutableListOf(input))
         }
-
-    }
-
-    //Save Present company all ids into the database
-    fun savePresentCompanyAllIdsIntoDB(presentCompanyCode: String) {
-        viewModelScope.launch(Dispatchers.IO) {
-            val presentCompanyAllIdsId =
-                presentCompanyCode + MainActivity.PRESENT_COMPANY_ALL_IDs_ID
-            val presentCompanyAllIdsString = mlToStringUsingDelimiter1(presentCompanyAllIds)
-            val aInfo5 = AInfo5(presentCompanyAllIdsId, presentCompanyAllIdsString)
-            insertAInfo5(aInfo5)
-        }
-
-    }
-
-    fun clearPresentCompanyAllIds() {
-        presentCompanyAllIds = mutableListOf()
     }
 
     var companyAuditDate = ""
@@ -287,12 +362,79 @@ class AInfo5ViewModel(
         companySectionCodeAndDisplayNameML = input
     }
 
+    fun loadTheDefaultCompanySectionList(defaultSectionListString: String) {
+        viewModelScope.launch(Dispatchers.Default) {
+            val sectionCodesAndNamesML =
+                mlStringToCodeAndDisplayNameListWithUniqueCodes(
+                    defaultSectionListString,
+                    MainActivity.FLAG_VALUE_SECTION
+                )
+            val sectionCodesAndNamesMLString =
+                codeAndDisplayNameListToString(
+                    sectionCodesAndNamesML
+                )
+            val companySectionsCDListID =
+                getPresentCompanyCode() + MainActivity.COMPANY_SECTION_LIST_ID
+            val aInfo5 = AInfo5(
+                companySectionsCDListID,
+                sectionCodesAndNamesMLString
+            )
+            insertAInfo5(aInfo5)
+
+            withContext(Dispatchers.Main) {
+                setTheCompanySectionCodeAndDisplayNameML(
+                    sectionCodesAndNamesML
+                )
+                setTheCompanySectionListUploadedFlagMLD(true)
+            }
+        }
+    }
+
+    fun loadTheCompanySectionList(companySectionListString: String) {
+        viewModelScope.launch(Dispatchers.Default) {
+            val sectionCodesAndNamesML = stringToCodeAndDisplayNameList(
+                companySectionListString
+            )
+            val companySectionsCDListID =
+                getPresentCompanyCode() + MainActivity.COMPANY_SECTION_LIST_ID
+            val aInfo5 = AInfo5(
+                companySectionsCDListID,
+                companySectionListString
+            )
+            insertAInfo5(aInfo5)
+            withContext(Dispatchers.Main) {
+                setTheCompanySectionCodeAndDisplayNameML(
+                    sectionCodesAndNamesML
+                )
+                companySectionCDMLToBeUpdatedFlagMLD.value = false
+                setTheCompanySectionListUploadedFlagMLD(true)
+            }
+
+        }
+    }
+
     fun addToTheCompanySectionCodeAndDisplayNameML(input: CodeNameAndDisplayNameDC) {
         companySectionCodeAndDisplayNameML.add(input)
     }
 
-    fun deleteSectionInTheCompanySectionCodeAndDisplayNameML(input: CodeNameAndDisplayNameDC) {
-        companySectionCodeAndDisplayNameML.remove(input)
+    fun deleteSectionInTheCompanySectionCodeAndDisplayNameMLAndSave(input: CodeNameAndDisplayNameDC) {
+        viewModelScope.launch(Dispatchers.Default) {
+            val newCompanySectionCodeAndDisplayML = mutableListOf<CodeNameAndDisplayNameDC>()
+            if (companySectionCodeAndDisplayNameML.isNotEmpty()) {
+                for (index in 0 until companySectionCodeAndDisplayNameML.size) {
+                    if (companySectionCodeAndDisplayNameML[index].uniqueCodeName != input.uniqueCodeName) {
+                        newCompanySectionCodeAndDisplayML.add(companySectionCodeAndDisplayNameML[index])
+                    }
+                }
+
+                withContext(Dispatchers.Main) {
+                    setTheCompanySectionCodeAndDisplayNameML(newCompanySectionCodeAndDisplayML)
+                    val companySectionListID =
+                        getPresentCompanyCode() + MainActivity.COMPANY_SECTION_LIST_ID
+                    saveTheCompanySectionCodeAndDisplayMLIntoDB(companySectionListID)
+                }
+            }
+        }
     }
 
     fun modifyDisplayNameOfSpecificSectionInSectionCDML(
@@ -307,10 +449,19 @@ class AInfo5ViewModel(
         }
     }
 
-    fun changePagesPresentToTrueInPresentSectionCodeAndDisplayNameList(sectionCode: String) {
+    fun changePagesPresentToTrueInCompanySectionCodeAndDisplayNameList(sectionCode: String) {
         for (item in companySectionCodeAndDisplayNameML) {
             if (item.uniqueCodeName == sectionCode) {
                 item.pagesPresent = true
+                break
+            }
+        }
+    }
+
+    fun changePagesPresentToFalseInCompanySectionCodeAndDisplayNameList(sectionCode: String) {
+        for (item in companySectionCodeAndDisplayNameML) {
+            if (item.uniqueCodeName == sectionCode) {
+                item.pagesPresent = false
                 break
             }
         }
@@ -325,6 +476,49 @@ class AInfo5ViewModel(
         }
     }
 
+    fun clearTheCompanySectionCodeAndDisplayML() {
+        companySectionCodeAndDisplayNameML.clear()
+    }
+
+    var companySectionCDMLToBeUpdatedFlagMLD = MutableLiveData<Boolean?>()
+
+    fun deletePresentSection(presentSectionCode: String, sectionName: String = "") {
+        viewModelScope.launch(Dispatchers.Default) {
+
+            //Delete the Section Photographs
+            deleteSectionPhotosInCompanyPhotosListAndSaveToDb(presentSectionCode)
+            saveCompanyPhotoDetailsListToDB()
+
+            val sectionCodeAndDisplayML = getTheCompanySectionCodeAndDisplayNameML()
+            for (item in sectionCodeAndDisplayML) {
+                if (item.uniqueCodeName == presentSectionCode) {
+                    val sectionPagesFrameworkDataID =
+                        getPresentCompanyCode() + item.uniqueCodeName + MainActivity.SECTION_PAGES_FRAMEWORK_AND_DATA_ID
+                    val sectionFrameworkAndDataAInfo5 = AInfo5(sectionPagesFrameworkDataID)
+                    deleteAInfo5(sectionFrameworkAndDataAInfo5)
+                }
+            }
+
+
+            for (item in sectionCodeAndDisplayML) {
+                if (item.uniqueCodeName == presentSectionCode) {
+                    val presentSectionID =
+                        getPresentCompanyCode() + item.uniqueCodeName + MainActivity.PRESENT_SECTION_ID
+                    val presentSectionAInfo5 = AInfo5(presentSectionID)
+                    deleteAInfo5(presentSectionAInfo5)
+                }
+            }
+
+            deleteSectionReportInCompanyReportAndSave(presentSectionCode)
+            //Delete the section in the CompanySectionCodeAndDisplayNameML
+            deleteSectionInTheCompanySectionCodeAndDisplayNameMLAndSave(
+                getThePresentSectionCodeAndDisplayName()
+            )
+            withContext(Dispatchers.Main) {
+                setTheDeleteCompletedFlagMLD(true)
+            }
+        }
+    }
 
     //Present Section CodeAndDisplayName
     private var presentSectionCodeAndDisplayName = CodeNameAndDisplayNameDC()
@@ -360,6 +554,16 @@ class AInfo5ViewModel(
     fun setFlagForSectionNameToBeUpdated(input: Boolean) {
         sectionNameToBeUpdatedFlag = input
     }
+
+    var sectionFrameworkAndDataToBeUploadedFlag: Boolean = true
+    fun getTheSectionFrameworkAndDataToBeUploadedFlag(): Boolean {
+        return sectionFrameworkAndDataToBeUploadedFlag
+    }
+
+    fun setTheSectionFrameworkAndDataToBeUploadedFlag(input: Boolean) {
+        sectionFrameworkAndDataToBeUploadedFlag = input
+    }
+
 
     // Holding variables for Undo operation in Introductions etc
     private var holdingVariableInIntroductions = ""
@@ -406,12 +610,20 @@ class AInfo5ViewModel(
         sectionPageFramework: SectionPageFrameworkDC,
         indexAt: Int
     ) {
-        presentSectionAllPagesFramework.sectionPageFrameworkList.add(indexAt, sectionPageFramework)
+        if (presentSectionAllPagesFramework.sectionPageFrameworkList.size > indexAt) {
+            presentSectionAllPagesFramework.sectionPageFrameworkList.add(
+                indexAt,
+                sectionPageFramework
+            )
+        } else {
+            presentSectionAllPagesFramework.sectionPageFrameworkList.add(sectionPageFramework)
+        }
     }
 
-    fun deletePageFrameworkInPresentSectionAllPagesFramework(indexAt: Int) {
-        presentSectionAllPagesFramework.sectionPageFrameworkList.removeAt(indexAt)
-
+    fun deletePageFrameworkInPresentSectionAllPagesFramework(currentPageIndex: Int) {
+        if (presentSectionAllPagesFramework.sectionPageFrameworkList.size > currentPageIndex) {
+            presentSectionAllPagesFramework.sectionPageFrameworkList.removeAt(currentPageIndex)
+        }
     }
 
     fun resetThePageNumbersOfPresentSectionAllPagesFramework() {
@@ -429,87 +641,115 @@ class AInfo5ViewModel(
         pageTitle: String,
         pageIndex: Int
     ) {
-        presentSectionAllPagesFramework.sectionPageFrameworkList[pageIndex].pageTitle = pageTitle
+        if (presentSectionAllPagesFramework.sectionPageFrameworkList.size > pageIndex) {
+            presentSectionAllPagesFramework.sectionPageFrameworkList[pageIndex].pageTitle =
+                pageTitle
+        }
     }
 
     fun updatePageFrameworkNumberInPresentSectionAllPagesFramework(
         pageNumber: Int,
         pageIndex: Int
     ) {
-        presentSectionAllPagesFramework.sectionPageFrameworkList[pageIndex].pageNumber = pageNumber
+        if (presentSectionAllPagesFramework.sectionPageFrameworkList.size > pageIndex) {
+            presentSectionAllPagesFramework.sectionPageFrameworkList[pageIndex].pageNumber =
+                pageNumber
+        }
     }
 
     fun addPageFrameworkQuestionsInPresentSectionAllPagesFramework(
         input: QuestionsFrameworkItemDC,
         currentPageIndex: Int
     ) {
-        presentSectionAllPagesFramework.sectionPageFrameworkList[currentPageIndex].questionsFrameworkList.add(
-            input
-        )
-
+        if (presentSectionAllPagesFramework.sectionPageFrameworkList.size > currentPageIndex) {
+            presentSectionAllPagesFramework.sectionPageFrameworkList[currentPageIndex].questionsFrameworkList.add(
+                input
+            )
+        }
     }
 
     fun deletePageFrameworkQuestionsInPresentSectionAllPagesFramework(
         pageIndex: Int,
         questionsListPosition: Int
     ) {
-        presentSectionAllPagesFramework.sectionPageFrameworkList[pageIndex].questionsFrameworkList.removeAt(
-            questionsListPosition
-        )
+        if (presentSectionAllPagesFramework.sectionPageFrameworkList.size > pageIndex) {
+            presentSectionAllPagesFramework.sectionPageFrameworkList[pageIndex].questionsFrameworkList.removeAt(
+                questionsListPosition
+            )
+        }
     }
 
     fun addPageFrameworkObservationsInPresentSectionAllPagesFramework(
         input: CheckboxesFrameworkItemDC,
         pageIndex: Int
     ) {
-        presentSectionAllPagesFramework.sectionPageFrameworkList[pageIndex].observationsFrameworkList.add(
-            input
-        )
+        if (presentSectionAllPagesFramework.sectionPageFrameworkList.size > pageIndex) {
+            presentSectionAllPagesFramework.sectionPageFrameworkList[pageIndex].observationsFrameworkList.add(
+                input
+            )
+        }
+
     }
 
     fun deletePageFrameworkObservationsInPresentSectionAllPagesFramework(
         pageIndex: Int,
         observationsListPosition: Int
     ) {
-        presentSectionAllPagesFramework.sectionPageFrameworkList[pageIndex].observationsFrameworkList.removeAt(
-            observationsListPosition
-        )
+        if (presentSectionAllPagesFramework.sectionPageFrameworkList.size > pageIndex) {
+            presentSectionAllPagesFramework.sectionPageFrameworkList[pageIndex].observationsFrameworkList.removeAt(
+                observationsListPosition
+            )
+        }
+
     }
 
     fun addPageFrameworkRecommendationsInPresentSectionAllPagesFramework(
         input: CheckboxesFrameworkItemDC,
         pageIndex: Int
     ) {
-        presentSectionAllPagesFramework.sectionPageFrameworkList[pageIndex].recommendationsFrameworkList.add(
-            input
-        )
+        if (presentSectionAllPagesFramework.sectionPageFrameworkList.size > pageIndex) {
+            presentSectionAllPagesFramework.sectionPageFrameworkList[pageIndex].recommendationsFrameworkList.add(
+                input
+            )
+        }
     }
 
     fun deletePageFrameworkRecommendationsInPresentSectionAllPagesFramework(
         pageIndex: Int,
         recommendationsListPosition: Int
     ) {
-        presentSectionAllPagesFramework.sectionPageFrameworkList[pageIndex].recommendationsFrameworkList.removeAt(
-            recommendationsListPosition
-        )
+        if (presentSectionAllPagesFramework.sectionPageFrameworkList.size > pageIndex) {
+            if (presentSectionAllPagesFramework.sectionPageFrameworkList[pageIndex].recommendationsFrameworkList.size > recommendationsListPosition) {
+                presentSectionAllPagesFramework.sectionPageFrameworkList[pageIndex].recommendationsFrameworkList.removeAt(
+                    recommendationsListPosition
+                )
+            }
+        }
     }
 
     fun addPageFrameworkStandardsInPresentSectionAllPagesFramework(
         input: CheckboxesFrameworkItemDC,
         pageIndex: Int
     ) {
-        presentSectionAllPagesFramework.sectionPageFrameworkList[pageIndex].standardsFrameworkList.add(
-            input
-        )
+        if (presentSectionAllPagesFramework.sectionPageFrameworkList.size > pageIndex) {
+            presentSectionAllPagesFramework.sectionPageFrameworkList[pageIndex].standardsFrameworkList.add(
+                input
+            )
+        }
+
     }
 
     fun deletePageFrameworkStandardsInPresentSectionAllPagesFramework(
         pageIndex: Int,
         standardsListPosition: Int
     ) {
-        presentSectionAllPagesFramework.sectionPageFrameworkList[pageIndex].standardsFrameworkList.removeAt(
-            standardsListPosition
-        )
+        if (presentSectionAllPagesFramework.sectionPageFrameworkList.size > pageIndex) {
+            if (presentSectionAllPagesFramework.sectionPageFrameworkList[pageIndex].standardsFrameworkList.size > standardsListPosition) {
+                presentSectionAllPagesFramework.sectionPageFrameworkList[pageIndex].standardsFrameworkList.removeAt(
+                    standardsListPosition
+                )
+            }
+        }
     }
 
     fun clearThePresentSectionAllPagesFramework() {
@@ -524,24 +764,34 @@ class AInfo5ViewModel(
         viewModelScope.launch(Dispatchers.Default) {
             var sectionAllPagesFramework = SectionAllPagesFrameworkDC()
             var sectionAllData = SectionAllDataDC()
+            var uniquePageCodesList = mutableListOf<String>()
             if (sectionAllPagesFrameworkString != "") {
                 sectionAllPagesFramework =
                     stringToSectionAllPagesFramework(sectionAllPagesFrameworkString)
+                uniquePageCodesList =
+                    getUniqueListOfPageCodesFromAllPagesFramework(sectionAllPagesFramework)
                 if (sectionAllDataString == "") {
                     sectionAllData = createPresentSectionAllDataUsingSectionAllPagesFramework(
                         sectionAllPagesFramework
                     )
                 } else {
-                    sectionAllData = stringToSectionAllData(sectionAllDataString)
+                    val sectionAllData1 = stringToSectionAllData(sectionAllDataString)
+                    if (sectionAllData.sectionAllPagesData.sectionPageDataList.size != sectionAllPagesFramework.sectionPageFrameworkList.size) {
+                        sectionAllData = equaliseTheFrameworkAndDataStructureSizes(
+                            sectionAllData1,
+                            sectionAllPagesFramework
+                        )
+                    } else {
+                        sectionAllData = sectionAllData1
+                    }
                 }
             } else {
-                sectionAllPagesFramework =
-                    stringToSectionAllPagesFramework(sectionAllPagesFrameworkString)
                 sectionAllPagesFramework.sectionPageFrameworkList.add(defaultSectionPageFramework)
                 sectionAllData = createPresentSectionAllDataUsingSectionAllPagesFramework(
                     sectionAllPagesFramework
                 )
             }
+
             val sectionPagesFrameworkAndDataID =
                 getPresentCompanyCode() + getPresentSectionCode() + MainActivity.SECTION_PAGES_FRAMEWORK_AND_DATA_ID
             saveThePresentSectionAllPagesFrameworkAndAllDataToDB(
@@ -551,16 +801,57 @@ class AInfo5ViewModel(
             )
 
             withContext(Dispatchers.Main) {
-                //this@AInfo5ViewModel.presentSectionAllPagesFramework = sectionAllPagesFramework
                 this@AInfo5ViewModel.setThePresentSectionAllPagesFramework(sectionAllPagesFramework)
                 this@AInfo5ViewModel.setThePresentSectionAllData(sectionAllData)
-                //this@AInfo5ViewModel.presentSectionAllData = sectionAllData
-                setThePageCountMLD(sectionAllPagesFramework.sectionPageFrameworkList.size)
-                etPageNameMLD.value =
-                    sectionAllPagesFramework.sectionPageFrameworkList[sectionAllPagesFramework.sectionPageFrameworkList.size - 1].pageTitle
-                setTheSectionAllPagesFrameworkLoadedFlagMLD(true)
-                sectionAllDataLoadedFlagMLD.value = true
+
+                if (sectionAllPagesFramework.sectionPageFrameworkList.isNotEmpty()) {
+                    this@AInfo5ViewModel.setThePresentSectionAllPagesFrameworkIndex(
+                        sectionAllPagesFramework.sectionPageFrameworkList.size - 1
+                    )
+                    this@AInfo5ViewModel.setTheUniqueListOfSectionPageCodes(uniquePageCodesList)
+
+                    this@AInfo5ViewModel.setThePageCountMLD(sectionAllPagesFramework.sectionPageFrameworkList.size)
+                    this@AInfo5ViewModel.etPageNameMLD.value =
+                        sectionAllPagesFramework.sectionPageFrameworkList[sectionAllPagesFramework.sectionPageFrameworkList.size - 1].pageTitle
+                }
+                this@AInfo5ViewModel.setTheSectionAllPagesFrameworkLoadedFlagMLD(true)
+                this@AInfo5ViewModel.setTheSectionAllDataLoadedFlagMLD(true)
+                //this@AInfo5ViewModel.isTextUpdatedMLD.value = false
             }
+        }
+    }
+
+    fun loadTheDefaultPresentSectionAllPagesFrameworkAndAllData() {
+        if (getThePresentSectionAllPagesFramework().sectionPageFrameworkList.isEmpty()) {
+            addPageFrameworkToPresentSectionAllPagesFramework(defaultSectionPageFramework, 0)
+            val sectionAllData = createPresentSectionAllDataUsingSectionAllPagesFramework(
+                getThePresentSectionAllPagesFramework()
+            )
+            setThePresentSectionAllData(sectionAllData)
+
+            val sectionPagesFrameworkAndDataID =
+                getPresentCompanyCode() + getPresentSectionCode() + MainActivity.SECTION_PAGES_FRAMEWORK_AND_DATA_ID
+            saveThePresentSectionAllPagesFrameworkAndAllDataToDB(
+                getThePresentSectionAllPagesFramework(),
+                getThePresentSectionAllData(),
+                sectionPagesFrameworkAndDataID
+            )
+        }
+        if (getThePresentSectionAllPagesFramework().sectionPageFrameworkList.isNotEmpty()) {
+            this@AInfo5ViewModel.setThePresentSectionAllPagesFrameworkIndex(
+                getThePresentSectionAllPagesFramework().sectionPageFrameworkList.size - 1
+            )
+
+            this@AInfo5ViewModel.setThePageCountMLD(getThePresentSectionAllPagesFramework().sectionPageFrameworkList.size)
+            this@AInfo5ViewModel.etPageNameMLD.value =
+                getThePresentSectionAllPagesFramework().sectionPageFrameworkList[getThePresentSectionAllPagesFramework().sectionPageFrameworkList.size - 1].pageTitle
+            //Put true to pagesPresent in CompanySectionCodeAndDisplayML
+            this@AInfo5ViewModel.changePagesPresentToTrueInCompanySectionCodeAndDisplayNameList(
+                getPresentSectionCode()
+            )
+            val companySectionsCDListID =
+                getPresentCompanyCode() + MainActivity.COMPANY_SECTION_LIST_ID
+            saveTheCompanySectionCodeAndDisplayMLIntoDB(companySectionsCDListID)
         }
     }
 
@@ -574,14 +865,76 @@ class AInfo5ViewModel(
         return presentSectionAllPagesFrameworkIndex
     }
 
-    //This is meant to set the Observations View upon entry into the fragment
-    private var observationsViewUponEntryFlag: Boolean? = false
-    fun setTheObservationsViewUponEntryFlag(input: Boolean?) {
-        observationsViewUponEntryFlag = input
-    }
 
-    fun getTheObservationsViewUponEntryFlag(): Boolean? {
-        return observationsViewUponEntryFlag
+    fun getUniqueListOfPageCodesFromAllPagesFramework(sectionAllPagesFramework: SectionAllPagesFrameworkDC): MutableList<String> {
+        val result = mutableListOf<String>()
+        if (sectionAllPagesFramework.sectionPageFrameworkList.isNotEmpty()) {
+            for (pageIndex in 0 until sectionAllPagesFramework.sectionPageFrameworkList.size) {
+                val pageInFramework = sectionAllPagesFramework.sectionPageFrameworkList[pageIndex]
+
+                val pagePageCode = pageInFramework.pageCode
+                if (!result.contains(pagePageCode)) {
+                    result.add(pagePageCode)
+                }
+                if (!isItemPresentInPageTemplateList(pagePageCode)) {
+
+                }
+
+                if (pageInFramework.questionsFrameworkList.isNotEmpty()) {
+                    val questionsList = pageInFramework.questionsFrameworkList
+                    for (questionIndex in 0 until questionsList.size) {
+                        val questionsPageCode = questionsList[questionIndex].pageCode
+                        if (!result.contains(questionsPageCode)) {
+                            result.add(questionsPageCode)
+                        }
+                        if (!isItemPresentInPageTemplateList(questionsPageCode)) {
+
+                        }
+                    }
+                }
+
+                if (pageInFramework.observationsFrameworkList.isNotEmpty()) {
+                    val observationsList = pageInFramework.observationsFrameworkList
+                    for (observationsIndex in 0 until observationsList.size) {
+                        val observationsPageCode = observationsList[observationsIndex].pageCode
+                        if (!result.contains(observationsPageCode)) {
+                            result.add(observationsPageCode)
+                        }
+                        if (!isItemPresentInPageTemplateList(observationsPageCode)) {
+
+                        }
+                    }
+                }
+
+                if (pageInFramework.recommendationsFrameworkList.isNotEmpty()) {
+                    val recommendationsList = pageInFramework.recommendationsFrameworkList
+                    for (recommendationsIndex in 0 until recommendationsList.size) {
+                        val recommendationsPageCode =
+                            recommendationsList[recommendationsIndex].pageCode
+                        if (!result.contains(recommendationsPageCode)) {
+                            result.add(recommendationsPageCode)
+                        }
+                        if (!isItemPresentInPageTemplateList(recommendationsPageCode)) {
+
+                        }
+                    }
+                }
+
+                if (pageInFramework.standardsFrameworkList.isNotEmpty()) {
+                    val standardsList = pageInFramework.standardsFrameworkList
+                    for (standardsIndex in 0 until standardsList.size) {
+                        val standardsPageCode = standardsList[standardsIndex].pageCode
+                        if (!result.contains(standardsPageCode)) {
+                            result.add(standardsPageCode)
+                        }
+                        if (!isItemPresentInPageTemplateList(standardsPageCode)) {
+
+                        }
+                    }
+                }
+            }
+        }
+        return result
     }
 
     //This live data flag is meant to indicate if the All Pages Framework is uploaded or not
@@ -593,6 +946,17 @@ class AInfo5ViewModel(
     fun setTheSectionAllPagesFrameworkLoadedFlagMLD(input: Boolean?) {
         sectionAllPagesFrameworkLoadedFlagMLD.value = input
     }
+
+    //The below variable checks if the Framework has been updated or not in the ParentChildRVFragment
+    private var frameworkUpdatedInParentChildRVFragmentFlag: Boolean = false
+    fun setTheFrameworkUpdatedInParentChildRVFragmentFlag(input: Boolean) {
+        frameworkUpdatedInParentChildRVFragmentFlag = input
+    }
+
+    fun getTheFrameworkUpdatedInParentChildRVFragmentFlag(): Boolean {
+        return frameworkUpdatedInParentChildRVFragmentFlag
+    }
+
 
     fun questionsFrameworkItemToML(questionsFrameworkItem: QuestionsFrameworkItemDC): MutableList<String> {
         val result = mutableListOf<String>()
@@ -1187,6 +1551,7 @@ class AInfo5ViewModel(
                     setThePageGroupIDsList(pageGroupIDsList)
                     templateIDsUploadingCompletedMLD.value = templateIDsList.isNotEmpty()
                     pageGroupIDsUploadingCompletedMLD.value = pageGroupIDsList.isNotEmpty()
+                    setTheTemplateStringUploadedMAFlagMLD(true)
                 }
             }
         }
@@ -1225,6 +1590,7 @@ class AInfo5ViewModel(
                 }
                 withContext(Dispatchers.Main) {
                     addUniqueItemToTheParentChildParentItemML(rvParentChildParentItem)
+                    setTheParentChildParentListUploadedMAFlagMLD(true)
                 }
             }
         }
@@ -1243,6 +1609,7 @@ class AInfo5ViewModel(
         }
         return resultList
     }
+
 
     private var parentChildParentItemML = mutableListOf<RVParentChildParentItemDC>()
     fun setTheParentChildParentItemML(input: MutableList<RVParentChildParentItemDC>) {
@@ -1271,6 +1638,7 @@ class AInfo5ViewModel(
 
     var templateIDsUploadingCompletedMLD = MutableLiveData<Boolean?>()
     var pageGroupIDsUploadingCompletedMLD = MutableLiveData<Boolean?>()
+    var parentChildParentItemMLUploadedMLD = MutableLiveData<Boolean?>()
 
     //This function gets the Display Name from the Page Code
     fun extractDisplayNameFromPageCode(pageCode: String): String {
@@ -1307,47 +1675,261 @@ class AInfo5ViewModel(
         return result
     }
 
-    //Database string converted to Page Template and
-    //setting the Template MLDs also
+    //Templates string from DB converted to Page Template and
+    //adding to the Template MLDs
+    fun templateStringsToPageTemplatesAndAddingToTemplatesListMLD(
+        aInfo5TemplatesML: MutableList<AInfo5Templates>,
+        presentSectionAllPagesFramework: SectionAllPagesFrameworkDC = SectionAllPagesFrameworkDC(),
+        presentSectionAllData: SectionAllDataDC = SectionAllDataDC()
+    ) {
+        viewModelScope.launch(Dispatchers.Default) {
+            if (aInfo5TemplatesML.isNotEmpty()) {
+                val pageTemplateML = mutableListOf<PageTemplateDC>()
+                for (item in aInfo5TemplatesML) {
+                    var pageTemplate = PageTemplateDC()
+                    if (item.id == "PC_General_Entry_01_PC") {
+                        pageTemplate = getTheDefaultPageTemplate()
+                    } else {
+                        pageTemplate.pageCode = item.id
+                        val pageTemplateString = item.template_string
+                        if (pageTemplateString != "" && pageTemplateString != null) {
+                            pageTemplate.questionsList =
+                                dbStringToQuestionTemplateItemList(pageTemplateString)
+                            if (pageTemplateString.contains(delimiterLevel2)) {
+                                val delimiter2Items = pageTemplateString.split(delimiterLevel2)
+                                for (itemLevel2 in delimiter2Items) {
+                                    val takeFirst13Characters = itemLevel2.take(13)
+                                    if (takeFirst13Characters != "") {
+                                        if (takeFirst13Characters.contains("Obs Remarks")) {
+                                            pageTemplate.observationsList =
+                                                dbStringtoCheckboxTemplateItemList(itemLevel2)
+                                        } else if (takeFirst13Characters.contains("Reco Remarks")) {
+                                            pageTemplate.recommendationsList =
+                                                dbStringtoCheckboxTemplateItemList(itemLevel2)
+                                        } else if (takeFirst13Characters.contains("Standards")) {
+                                            pageTemplate.standardsList =
+                                                dbStringtoCheckboxTemplateItemList(itemLevel2)
+                                        }
+                                    }
+                                }
+                            }
+                        } else {
+                            pageTemplate.pageCode = item.id + "-" + MainActivity.TEMPLATE_NOT_IN_DB
+                        }
+                    }
+                    pageTemplateML.add(pageTemplate)
+                }
+                withContext(Dispatchers.Main) {
+                    addUniquePageMLToPageTemplateMLMLD(pageTemplateML)
+                    setTheAllTemplatesUploadedFlagMLD(true)
+                }
+
+                //Check if presentSectionAllData is suitably updated wrt templates
+                isDataItemListUpdatedInPresentSectionAllData(
+                    presentSectionAllPagesFramework,
+                    presentSectionAllData
+                )
+                withContext(Dispatchers.Main) {
+                    setTheSectionAllDataLoadedFlagMLD(true)
+                }
+            }
+        }
+    }
+
+    fun isDataItemListUpdatedInPresentSectionAllData(
+        presentSectionAllPagesFramework: SectionAllPagesFrameworkDC,
+        presentSectionAllData: SectionAllDataDC
+    ) {
+        if (presentSectionAllPagesFramework.sectionPageFrameworkList.isNotEmpty()) {
+            setThePresentSectionAllPagesFramework(presentSectionAllPagesFramework)
+            if (presentSectionAllData.sectionAllPagesData.sectionPageDataList.isNotEmpty()) {
+                setThePresentSectionAllData(presentSectionAllData)
+            }
+            for (currentPageIndex in 0 until presentSectionAllPagesFramework.sectionPageFrameworkList.size) {
+                //Check the questions list first and update
+                val questionsFrameworkList =
+                    presentSectionAllPagesFramework.sectionPageFrameworkList[currentPageIndex].questionsFrameworkList
+                if (questionsFrameworkList.isNotEmpty()) {
+                    for (questionsFrameworkIndex in 0 until questionsFrameworkList.size) {
+                        val pageCode = questionsFrameworkList[questionsFrameworkIndex].pageCode
+                        val questionTemplateItemMLN =
+                            getItemFromPageTemplateMLMLD(pageCode)?.questionsList
+                        val result = questionTemplateItemMLN?.let {
+                            isQuestionDataItemListUpdatedInPresentSectionAllData(
+                                currentPageIndex, questionsFrameworkIndex,
+                                it
+                            )
+                        }
+                        if (result == false) {
+                            updateQuestionDataItemListUsingTemplateInPresentSectionAllData(
+                                currentPageIndex, questionsFrameworkIndex,
+                                questionTemplateItemMLN
+                            )
+                        }
+                    }
+                }
+                //Check the observations list and update
+                val observationsFrameworkList =
+                    presentSectionAllPagesFramework.sectionPageFrameworkList[currentPageIndex].observationsFrameworkList
+                if (observationsFrameworkList.isNotEmpty()) {
+                    for (observationsFrameworkIndex in 0 until observationsFrameworkList.size) {
+                        val pageCode =
+                            observationsFrameworkList[observationsFrameworkIndex].pageCode
+                        val observationsTemplateItemMLN =
+                            getItemFromPageTemplateMLMLD(pageCode)?.observationsList
+                        val result = observationsTemplateItemMLN?.let {
+                            isObsCheckboxesDataItemListUpdatedInPresentSectionAllData(
+                                currentPageIndex, observationsFrameworkIndex,
+                                it
+                            )
+                        }
+                        if (result == false) {
+                            updateObsCheckboxesDataItemListUsingTemplateInPresentSectionAllData(
+                                currentPageIndex, observationsFrameworkIndex,
+                                observationsTemplateItemMLN
+                            )
+                        }
+                    }
+                }
+                //Check the recommendations list and update
+                val recommendationsFrameworkList =
+                    presentSectionAllPagesFramework.sectionPageFrameworkList[currentPageIndex].recommendationsFrameworkList
+                if (recommendationsFrameworkList.isNotEmpty()) {
+                    for (recommendationsFrameworkIndex in 0 until recommendationsFrameworkList.size) {
+                        val pageCode =
+                            recommendationsFrameworkList[recommendationsFrameworkIndex].pageCode
+                        val recommendationsTemplateItemMLN =
+                            getItemFromPageTemplateMLMLD(pageCode)?.recommendationsList
+                        val result = recommendationsTemplateItemMLN?.let {
+                            isRecoCheckboxesDataItemListUpdatedInPresentSectionAllData(
+                                currentPageIndex, recommendationsFrameworkIndex,
+                                it
+                            )
+                        }
+                        if (result == false) {
+                            updateRecoCheckboxesDataItemListUsingTemplateInPresentSectionAllData(
+                                currentPageIndex, recommendationsFrameworkIndex,
+                                recommendationsTemplateItemMLN
+                            )
+                        }
+                    }
+                }
+                //Check the standards list and update if needed
+                val standardsFrameworkList =
+                    presentSectionAllPagesFramework.sectionPageFrameworkList[currentPageIndex].standardsFrameworkList
+                if (standardsFrameworkList.isNotEmpty()) {
+                    for (standardsFrameworkIndex in 0 until standardsFrameworkList.size) {
+                        val pageCode = standardsFrameworkList[standardsFrameworkIndex].pageCode
+                        val standardsTemplateItemMLN =
+                            getItemFromPageTemplateMLMLD(pageCode)?.standardsList
+                        val result = standardsTemplateItemMLN?.let {
+                            isStdsCheckboxesDataItemListUpdatedInPresentSectionAllData(
+                                currentPageIndex,
+                                standardsFrameworkIndex,
+                                standardsTemplateItemMLN
+                            )
+                        }
+                        if (result == false) {
+                            updateStdsCheckboxesDataItemListUsingTemplateInPresentSectionAllData(
+                                currentPageIndex,
+                                standardsFrameworkIndex,
+                                standardsTemplateItemMLN
+                            )
+                        }
+                    }
+                }
+            }
+            //Save the SectionPagesFramework and Data into db before stopping
+            val sectionPagesFrameworkAndDataID =
+                getPresentCompanyCode() + getPresentSectionCode() + MainActivity.SECTION_PAGES_FRAMEWORK_AND_DATA_ID
+            saveThePresentSectionAllPagesFrameworkAndAllDataToDB(
+                getThePresentSectionAllPagesFramework(),
+                getThePresentSectionAllData(),
+                sectionPagesFrameworkAndDataID
+            )
+        }
+    }
+
     fun dbStringToPageTemplateAndAddingToTemplatesList(
         pageCode: String,
         pageTemplateString: String
     ) {
         viewModelScope.launch(Dispatchers.Default) {
             var pageTemplate = PageTemplateDC()
-            pageTemplate.pageCode = pageCode
-            pageTemplate.questionsList = dbStringToQuestionTemplateItemList(pageTemplateString)
-            if (pageTemplateString != "") {
-                if (pageTemplateString.contains(delimiterLevel2)) {
-                    val delimiter2Items = pageTemplateString.split(delimiterLevel2)
-                    for (itemLevel2 in delimiter2Items) {
-                        val takeFirst13Characters = itemLevel2.take(13)
-                        if (takeFirst13Characters != "") {
-                            if (takeFirst13Characters.contains("Obs Remarks")) {
-                                pageTemplate.observationsList =
-                                    dbStringtoCheckboxTemplateItemList(itemLevel2)
-                            } else if (takeFirst13Characters.contains("Reco Remarks")) {
-                                pageTemplate.recommendationsList =
-                                    dbStringtoCheckboxTemplateItemList(itemLevel2)
-                            } else if (takeFirst13Characters.contains("Standards")) {
-                                pageTemplate.standardsList =
-                                    dbStringtoCheckboxTemplateItemList(itemLevel2)
+            if (pageCode == "PC_General_Entry_01_PC") {
+                pageTemplate = getTheDefaultPageTemplate()
+            } else {
+                pageTemplate.pageCode = pageCode
+                pageTemplate.questionsList = dbStringToQuestionTemplateItemList(pageTemplateString)
+                if (pageTemplateString != "") {
+                    if (pageTemplateString.contains(delimiterLevel2)) {
+                        val delimiter2Items = pageTemplateString.split(delimiterLevel2)
+                        for (itemLevel2 in delimiter2Items) {
+                            val takeFirst13Characters = itemLevel2.take(13)
+                            if (takeFirst13Characters != "") {
+                                if (takeFirst13Characters.contains("Obs Remarks")) {
+                                    pageTemplate.observationsList =
+                                        dbStringtoCheckboxTemplateItemList(itemLevel2)
+                                } else if (takeFirst13Characters.contains("Reco Remarks")) {
+                                    pageTemplate.recommendationsList =
+                                        dbStringtoCheckboxTemplateItemList(itemLevel2)
+                                } else if (takeFirst13Characters.contains("Standards")) {
+                                    pageTemplate.standardsList =
+                                        dbStringtoCheckboxTemplateItemList(itemLevel2)
+                                }
                             }
                         }
                     }
+                } else {
+                    pageTemplate.pageCode = pageCode + "-" + MainActivity.TEMPLATE_NOT_IN_DB
                 }
-            } else {
-                pageTemplate = getTheDefaultPageTemplate()
             }
             withContext(Dispatchers.Main) {
                 addUniquePageToPageTemplateList(pageTemplate)
-                setTheQuestionsListMLD(pageTemplate.questionsList)
-                setTheObservationsListMLD(pageTemplate.observationsList)
-                setTheRecommendationsListMLD(pageTemplate.recommendationsList)
-                setTheStandardsListMLD(pageTemplate.standardsList)
-                presentTemplateUploadedFlagMLD.value = true
+                //setTheQuestionsListMLD(pageTemplate.questionsList)
+                //setTheObservationsListMLD(pageTemplate.observationsList)
+                //setTheRecommendationsListMLD(pageTemplate.recommendationsList)
+                //setTheStandardsListMLD(pageTemplate.standardsList)
+                //presentTemplateUploadedFlagMLD.value = true
             }
         }
+    }
+
+    fun dbStringToPageTemplateAndAddingToTemplatesListMainScope(
+        pageCode: String,
+        pageTemplateString: String
+    ) {
+        var pageTemplate = PageTemplateDC()
+        pageTemplate.pageCode = pageCode
+        pageTemplate.questionsList = dbStringToQuestionTemplateItemList(pageTemplateString)
+        if (pageTemplateString != "") {
+            if (pageTemplateString.contains(delimiterLevel2)) {
+                val delimiter2Items = pageTemplateString.split(delimiterLevel2)
+                for (itemLevel2 in delimiter2Items) {
+                    val takeFirst13Characters = itemLevel2.take(13)
+                    if (takeFirst13Characters != "") {
+                        if (takeFirst13Characters.contains("Obs Remarks")) {
+                            pageTemplate.observationsList =
+                                dbStringtoCheckboxTemplateItemList(itemLevel2)
+                        } else if (takeFirst13Characters.contains("Reco Remarks")) {
+                            pageTemplate.recommendationsList =
+                                dbStringtoCheckboxTemplateItemList(itemLevel2)
+                        } else if (takeFirst13Characters.contains("Standards")) {
+                            pageTemplate.standardsList =
+                                dbStringtoCheckboxTemplateItemList(itemLevel2)
+                        }
+                    }
+                }
+            }
+        } else {
+            pageTemplate = getTheDefaultPageTemplate()
+        }
+        addUniquePageToPageTemplateList(pageTemplate)
+        setTheQuestionsListMLD(pageTemplate.questionsList)
+        setTheObservationsListMLD(pageTemplate.observationsList)
+        setTheRecommendationsListMLD(pageTemplate.recommendationsList)
+        setTheStandardsListMLD(pageTemplate.standardsList)
+        //presentTemplateUploadedFlagMLD.value = true
     }
 
     //Flag to check if the template has been uploaded or not
@@ -1427,26 +2009,6 @@ class AInfo5ViewModel(
                 }
             }
         }
-
-//        if (input != "" && input.contains(delimiterLevel2)) {
-//            val delimiter2Items = input.split(delimiterLevel2)
-//            for (itemLevel2 in delimiter2Items) {
-//                if (itemLevel2 != "" && itemLevel2.contains(delimiterLevel1)) {
-//                    val delimiter1Items = itemLevel2.split(delimiterLevel1)
-//                    val size = delimiter1Items.size
-//                    val checkItem = delimiter1Items[0]
-//                    if (checkItem.contains("Obs")) {
-//                        if (size >= 2) {
-//                            val checkboxItem = CheckboxTemplateItemDC()
-//                            checkboxItem.checkboxLabel = delimiter1Items[0]
-//                            checkboxItem.checkboxVisibility = delimiter1Items[1].toBoolean()
-//                            result.add(checkboxItem)
-//                        }
-//                    }
-//                }
-//            }
-//        }
-
         return result
     }
 
@@ -1513,6 +2075,7 @@ class AInfo5ViewModel(
         return defaultPageTemplate
     }
 
+
     //Current page template that is being displayed
     private var currentPageTemplate = PageTemplateDC()
     fun setTheCurrentPageTemplate(input: PageTemplateDC) {
@@ -1536,12 +2099,29 @@ class AInfo5ViewModel(
 
     }
 
+    fun getThePageTemplateList(): MutableList<PageTemplateDC> {
+        return pageTemplateList
+    }
+
+    fun getTheListOfPageCodesInPageTemplateList(): MutableList<String> {
+        val result = mutableListOf<String>()
+        if (pageTemplateList.isNotEmpty()) {
+            for (index in 0 until pageTemplateList.size) {
+                val pageCode = pageTemplateList[index].pageCode
+                if (!result.contains(pageCode)) {
+                    result.add(pageCode)
+                }
+            }
+        }
+        return result
+    }
+
     //True represents that the item is present
     fun isItemPresentInPageTemplateList(pageCode: String): Boolean {
         var result = false
-        if (pageCode != ""){
+        if (pageCode != "") {
             for (item in pageTemplateList) {
-                if (item.pageCode == pageCode) {
+                if (item.pageCode == pageCode || item.pageCode.contains(MainActivity.TEMPLATE_NOT_IN_DB)) {
                     result = true
                     break
                 }
@@ -1568,6 +2148,65 @@ class AInfo5ViewModel(
     }
 
     //Mutable Live Data for Template Lists for Child RV to access
+    private var pageTemplateMLMLD = MutableLiveData<MutableList<PageTemplateDC>>()
+    val pageTemplateML_LD: LiveData<MutableList<PageTemplateDC>>
+        get() = pageTemplateMLMLD
+
+    fun isItemPresentInPageTemplateMLMLD(pageCode: String): Boolean {
+        var result = false
+        if (pageCode != "") {
+            val list = pageTemplateMLMLD.value ?: mutableListOf()
+            val iterator = list.iterator()
+            while (iterator.hasNext()) {
+                val item = iterator.next()
+                if (item.pageCode == pageCode || item.pageCode.contains(MainActivity.TEMPLATE_NOT_IN_DB)) {
+                    result = true
+                    break
+                }
+            }
+        }
+        return result
+    }
+
+    fun addUniquePageMLToPageTemplateMLMLD(input: MutableList<PageTemplateDC>) {
+        val currentList = pageTemplateMLMLD.value ?: mutableListOf()
+        for (newItem in input) {
+            var exists = false
+            val iterator = currentList.iterator()
+            while (iterator.hasNext()) {
+                val existingItem = iterator.next()
+                if (existingItem.pageCode == newItem.pageCode) {
+                    exists = true
+                    break
+                }
+            }
+            if (!exists) {
+                currentList.add(newItem)
+            }
+        }
+        pageTemplateMLMLD.value = currentList
+    }
+
+    fun getItemFromPageTemplateMLMLD(pageCode: String): PageTemplateDC? {
+        val currentList = pageTemplateMLMLD.value ?: mutableListOf()
+        val iterator = currentList.iterator()
+        while (iterator.hasNext()) {
+            val item = iterator.next()
+            if (item.pageCode == pageCode) {
+                return item
+            }
+        }
+        return null
+    }
+
+
+    fun clearThePageTemplateMLMLD() {
+        val currentList = pageTemplateMLMLD.value ?: mutableListOf()
+        currentList.clear()
+        pageTemplateMLMLD.value = currentList
+    }
+
+
     private var questionsListMLD = MutableLiveData<MutableList<QuestionTemplateItemDC>>()
     val questionsList_LD: LiveData<MutableList<QuestionTemplateItemDC>>
         get() = questionsListMLD
@@ -1604,6 +2243,19 @@ class AInfo5ViewModel(
     //False indicates that it has not been uploaded yet.
     var presentTemplateUploadedFlagMLD = MutableLiveData<Boolean?>()
 
+    //This Flag indicates whether all templates have been uploaded.
+    //True indicates yes and False no.
+    var allTemplatesUploadedFlagMLD = MutableLiveData<Boolean?>()
+    fun setTheAllTemplatesUploadedFlagMLD(input: Boolean?) {
+        allTemplatesUploadedFlagMLD.value = input
+    }
+
+    var specificTemplatesUploadedFlagMLD = MutableLiveData<Boolean?>()
+    fun setTheSpecificTemplatesUploadedFlagMLD(input: Boolean?) {
+        specificTemplatesUploadedFlagMLD.value = input
+    }
+
+
 //Data Related Variables and Functions
 
     //Mutable Live Data variables for the EditTexts and TextViews that Matter
@@ -1621,6 +2273,11 @@ class AInfo5ViewModel(
     var tvStandardsMLD = MutableLiveData<String>()
 
     var etPageNameMLD = MutableLiveData<String>()
+
+    var isKeyboardVisibleMLD = MutableLiveData<Boolean?>()
+
+
+    var areAllAuditsDeletedMLD = MutableLiveData<Boolean?>()
 
     //    val etPageNameLD : LiveData<String>
 //    get() = etPageNameMLD
@@ -1644,6 +2301,16 @@ class AInfo5ViewModel(
 
     fun setSectionNameMLD(input: String) {
         sectionNameMLD.value = input
+    }
+
+    //This Flag is meant to indicate whether the RV needs to be reloaded
+    //If True, Yes. If False, No.
+    private var reloadRVPageFlagMLD = MutableLiveData<Boolean?>()
+    val reloadRVPageFlagLD: LiveData<Boolean?>
+        get() = reloadRVPageFlagMLD
+
+    fun setTheReloadRVPageFlagMLD(input: Boolean?) {
+        reloadRVPageFlagMLD.value = input
     }
 
     fun sectionNameFormatForDisplay(sectionName: String?): String {
@@ -1684,12 +2351,30 @@ class AInfo5ViewModel(
                 val companyIntroDataString = companyIntroDataToString(companyIntroData)
                 val aInfo5Intro = AInfo5(companyIntroID, companyIntroDataString)
                 insertAInfo5(aInfo5Intro)
-                addUniqueItemToPresentCompanyAllIds(companyIntroID)
             }
         }
     }
 
     //Variables to store section data
+
+    //The variable below stores a unique list of sectionPageCodes
+    //that are gotten from the Framework List. PageCodes that have the
+    //templates loaded are not included.
+    var uniqueListOfSectionPageCodes = mutableListOf<String>()
+    fun setTheUniqueListOfSectionPageCodes(input: MutableList<String>) {
+        uniqueListOfSectionPageCodes = input
+    }
+
+    fun getTheUniqueListOfSectionPageCodes(): MutableList<String> {
+        return uniqueListOfSectionPageCodes
+    }
+
+    fun addToTheUniqueListOfSectionPageCodes(input: String) {
+        if (!uniqueListOfSectionPageCodes.contains(input)) {
+            uniqueListOfSectionPageCodes.add(input)
+        }
+    }
+
 
     val defaultSectionPageData = SectionPageDataDC("General Entry", 1)
     fun getTheDefaultSectionPageData(): SectionPageDataDC {
@@ -1705,11 +2390,22 @@ class AInfo5ViewModel(
         sectionPageData: SectionPageDataDC,
         indexAt: Int
     ) {
-        presentSectionAllData.sectionAllPagesData.sectionPageDataList.add(indexAt, sectionPageData)
+        if (presentSectionAllData.sectionAllPagesData.sectionPageDataList.size > indexAt) {
+            presentSectionAllData.sectionAllPagesData.sectionPageDataList.add(
+                indexAt,
+                sectionPageData
+            )
+        } else {
+            presentSectionAllData.sectionAllPagesData.sectionPageDataList.add(sectionPageData)
+        }
+
     }
 
     fun deleteSectionPageDataInPresentSectionAllData(currentPageIndex: Int) {
-        presentSectionAllData.sectionAllPagesData.sectionPageDataList.removeAt(currentPageIndex)
+        if (presentSectionAllData.sectionAllPagesData.sectionPageDataList.size > currentPageIndex) {
+            presentSectionAllData.sectionAllPagesData.sectionPageDataList.removeAt(currentPageIndex)
+        }
+
     }
 
     fun resetThePageNumbersOfPresentSectionAllData() {
@@ -1747,7 +2443,6 @@ class AInfo5ViewModel(
                     }
                     sectionPageData.questionsFrameworkDataItemList = questionsFrameworkDataItemList
                 }
-
                 if (pageFramework.observationsFrameworkList.isNotEmpty()) {
                     val observationsFrameworkDataItemList =
                         mutableListOf<CheckboxesFrameworkDataItemDC>()
@@ -1764,7 +2459,6 @@ class AInfo5ViewModel(
                     sectionPageData.observationsFrameworkDataItemList =
                         observationsFrameworkDataItemList
                 }
-
                 if (pageFramework.recommendationsFrameworkList.isNotEmpty()) {
                     val recommendationsFrameworkDataItemList =
                         mutableListOf<CheckboxesFrameworkDataItemDC>()
@@ -1797,9 +2491,102 @@ class AInfo5ViewModel(
                     sectionPageData.standardsFrameworkDataItemList = standardsFrameworkDataItemList
                 }
                 sectionAllPagesData.sectionPageDataList.add(sectionPageData)
+
             }
         }
         return presentSectionAllData
+    }
+
+    fun equaliseTheFrameworkAndDataStructureSizes(
+        presentSectionAllData: SectionAllDataDC,
+        presentSectionAllPagesFramework: SectionAllPagesFrameworkDC
+    ): SectionAllDataDC {
+        val result: SectionAllDataDC
+        result = presentSectionAllData
+        if (presentSectionAllPagesFramework.sectionPageFrameworkList.size > presentSectionAllData.sectionAllPagesData.sectionPageDataList.size) {
+            if (presentSectionAllPagesFramework.sectionPageFrameworkList.isNotEmpty()) {
+                for (index in presentSectionAllData.sectionAllPagesData.sectionPageDataList.size until presentSectionAllPagesFramework.sectionPageFrameworkList.size) {
+                    val pageFramework =
+                        presentSectionAllPagesFramework.sectionPageFrameworkList[index]
+                    val sectionPageData = SectionPageDataDC()
+                    sectionPageData.pageTitle = pageFramework.pageTitle
+                    sectionPageData.pageNumber = pageFramework.pageNumber
+
+                    if (pageFramework.questionsFrameworkList.isNotEmpty()) {
+                        val questionsFrameworkDataItemList =
+                            mutableListOf<QuestionsFrameworkDataItemDC>()
+                        val questionsFrameworkList = pageFramework.questionsFrameworkList
+                        for (qIndex in 0 until questionsFrameworkList.size) {
+                            val questionsFrameworkDataItem = QuestionsFrameworkDataItemDC()
+                            questionsFrameworkDataItem.questionsFrameworkTitle =
+                                questionsFrameworkList[qIndex].questionsFrameworkTitle
+                            questionsFrameworkDataItem.pageCode =
+                                questionsFrameworkList[qIndex].pageCode
+                            questionsFrameworkDataItemList.add(questionsFrameworkDataItem)
+                        }
+                        sectionPageData.questionsFrameworkDataItemList =
+                            questionsFrameworkDataItemList
+                    }
+
+                    if (pageFramework.observationsFrameworkList.isNotEmpty()) {
+                        val observationsFrameworkDataItemList =
+                            mutableListOf<CheckboxesFrameworkDataItemDC>()
+                        val observationsCheckboxesFrameworkList =
+                            pageFramework.observationsFrameworkList
+                        for (oIndex in 0 until observationsCheckboxesFrameworkList.size) {
+                            val checkboxesFrameworkDataItem = CheckboxesFrameworkDataItemDC()
+                            checkboxesFrameworkDataItem.checkboxesFrameworkTitle =
+                                observationsCheckboxesFrameworkList[oIndex].checkboxesFrameworkTitle
+                            checkboxesFrameworkDataItem.pageCode =
+                                observationsCheckboxesFrameworkList[oIndex].pageCode
+                            observationsFrameworkDataItemList.add(checkboxesFrameworkDataItem)
+                        }
+                        sectionPageData.observationsFrameworkDataItemList =
+                            observationsFrameworkDataItemList
+                    }
+
+                    if (pageFramework.recommendationsFrameworkList.isNotEmpty()) {
+                        val recommendationsFrameworkDataItemList =
+                            mutableListOf<CheckboxesFrameworkDataItemDC>()
+                        val recommendationsCheckboxesFrameworkList =
+                            pageFramework.recommendationsFrameworkList
+                        for (rIndex in 0 until recommendationsCheckboxesFrameworkList.size) {
+                            val checkboxesFrameworkDataItem = CheckboxesFrameworkDataItemDC()
+                            checkboxesFrameworkDataItem.checkboxesFrameworkTitle =
+                                recommendationsCheckboxesFrameworkList[rIndex].checkboxesFrameworkTitle
+                            checkboxesFrameworkDataItem.pageCode =
+                                recommendationsCheckboxesFrameworkList[rIndex].pageCode
+                            recommendationsFrameworkDataItemList.add(checkboxesFrameworkDataItem)
+                        }
+                        sectionPageData.recommendationsFrameworkDataItemList =
+                            recommendationsFrameworkDataItemList
+                    }
+
+                    if (pageFramework.standardsFrameworkList.isNotEmpty()) {
+                        val standardsFrameworkDataItemList =
+                            mutableListOf<CheckboxesFrameworkDataItemDC>()
+                        val standardsCheckboxesFrameworkList =
+                            pageFramework.standardsFrameworkList
+                        for (rIndex in 0 until standardsCheckboxesFrameworkList.size) {
+                            val checkboxesFrameworkDataItem = CheckboxesFrameworkDataItemDC()
+                            checkboxesFrameworkDataItem.checkboxesFrameworkTitle =
+                                standardsCheckboxesFrameworkList[rIndex].checkboxesFrameworkTitle
+                            checkboxesFrameworkDataItem.pageCode =
+                                standardsCheckboxesFrameworkList[rIndex].pageCode
+                            standardsFrameworkDataItemList.add(checkboxesFrameworkDataItem)
+                        }
+                        sectionPageData.standardsFrameworkDataItemList =
+                            standardsFrameworkDataItemList
+                    }
+                    result.sectionAllPagesData.sectionPageDataList.add(sectionPageData)
+                }
+            }
+        } else if (presentSectionAllPagesFramework.sectionPageFrameworkList.size < presentSectionAllData.sectionAllPagesData.sectionPageDataList.size) {
+            for (index in presentSectionAllPagesFramework.sectionPageFrameworkList.size until presentSectionAllData.sectionAllPagesData.sectionPageDataList.size) {
+                result.sectionAllPagesData.sectionPageDataList.removeAt(index)
+            }
+        }
+        return result
     }
 
     fun setThePresentSectionAllDataUsingString(input: String) {
@@ -1837,6 +2624,20 @@ class AInfo5ViewModel(
         }
     }
 
+    fun saveThePresentSectionAllPagesFrameworkAndAllDataToDBMainActivity(
+        sectionAllPagesFramework: SectionAllPagesFrameworkDC,
+        sectionAllData: SectionAllDataDC,
+        sectionIDForDB: String
+    ) {
+        val sectionAllPagesFrameworkString =
+            sectionAllPagesFrameworkToString(sectionAllPagesFramework)
+        val sectionAllDataString = sectionAllDataToString(sectionAllData)
+        val aInfo5 =
+            AInfo5(sectionIDForDB, sectionAllPagesFrameworkString, sectionAllDataString)
+        insertAInfo5(aInfo5)
+
+    }
+
     fun getThePresentSectionAllData(): SectionAllDataDC {
         return presentSectionAllData
     }
@@ -1858,102 +2659,266 @@ class AInfo5ViewModel(
     }
 
     fun updatePageTitleInSectionPageDataInPresentSectionAllData(pageTitle: String, pageIndex: Int) {
-        presentSectionAllData.sectionAllPagesData.sectionPageDataList[pageIndex].pageTitle =
-            pageTitle
+        if (presentSectionAllData.sectionAllPagesData.sectionPageDataList.size > pageIndex) {
+            presentSectionAllData.sectionAllPagesData.sectionPageDataList[pageIndex].pageTitle =
+                pageTitle
+        }
     }
 
     fun updatePageNumberInSectionPageDataInPresentSectionAllData(pageNumber: Int, pageIndex: Int) {
-        presentSectionAllData.sectionAllPagesData.sectionPageDataList[pageIndex].pageNumber =
-            pageNumber
+        if (presentSectionAllData.sectionAllPagesData.sectionPageDataList.size > pageIndex) {
+            presentSectionAllData.sectionAllPagesData.sectionPageDataList[pageIndex].pageNumber =
+                pageNumber
+        }
     }
 
     fun updateObservationsInObsForThePresentSectionAllData(observations: String, pageIndex: Int) {
-        presentSectionAllData.sectionAllPagesData.sectionPageDataList[pageIndex].observations =
-            observations
+        if (presentSectionAllData.sectionAllPagesData.sectionPageDataList.size > pageIndex) {
+            presentSectionAllData.sectionAllPagesData.sectionPageDataList[pageIndex].observations =
+                observations
+        }
+
     }
 
     fun updatePicturePathsInObsForThePresentSectionAllData(picturePaths: String, pageIndex: Int) {
-        presentSectionAllData.sectionAllPagesData.sectionPageDataList[pageIndex].photoPaths =
-            picturePaths
+        if (presentSectionAllData.sectionAllPagesData.sectionPageDataList.size > pageIndex) {
+            presentSectionAllData.sectionAllPagesData.sectionPageDataList[pageIndex].photoPaths =
+                picturePaths
+        }
+    }
+
+    fun updatePicturePathsInSectionIntroForThePresentSectionAllData(picturePaths: String) {
+        presentSectionAllData.picturePathsInIntroductions = picturePaths
     }
 
     fun updateRecommendationsInObsForThePresentSectionAllData(
         recommendations: String,
         pageIndex: Int
     ) {
-        presentSectionAllData.sectionAllPagesData.sectionPageDataList[pageIndex].recommendations =
-            recommendations
+        if (presentSectionAllData.sectionAllPagesData.sectionPageDataList.size > pageIndex) {
+            presentSectionAllData.sectionAllPagesData.sectionPageDataList[pageIndex].recommendations =
+                recommendations
+        }
+
     }
 
     fun updateStandardsInObsForThePresentSectionAllData(standards: String, pageIndex: Int) {
-        presentSectionAllData.sectionAllPagesData.sectionPageDataList[pageIndex].standards =
-            standards
+        if (presentSectionAllData.sectionAllPagesData.sectionPageDataList.size > pageIndex) {
+            presentSectionAllData.sectionAllPagesData.sectionPageDataList[pageIndex].standards =
+                standards
+        }
+
     }
 
     fun addQuestionsFrameworkDataItemInThePresentSectionAllData(
         questionsFrameworkDataItem: QuestionsFrameworkDataItemDC,
         pageIndex: Int
     ) {
-        presentSectionAllData.sectionAllPagesData.sectionPageDataList[pageIndex].questionsFrameworkDataItemList.add(
-            questionsFrameworkDataItem
-        )
+        if (presentSectionAllData.sectionAllPagesData.sectionPageDataList.size > pageIndex) {
+            presentSectionAllData.sectionAllPagesData.sectionPageDataList[pageIndex].questionsFrameworkDataItemList.add(
+                questionsFrameworkDataItem
+            )
+        }
     }
 
     fun deleteQuestionsFrameworkDataItemInThePresentSectionAllData(pageIndex: Int, indexAt: Int) {
-        presentSectionAllData.sectionAllPagesData.sectionPageDataList[pageIndex].questionsFrameworkDataItemList.removeAt(
-            indexAt
-        )
+        if (presentSectionAllData.sectionAllPagesData.sectionPageDataList.size > pageIndex) {
+            if (presentSectionAllData.sectionAllPagesData.sectionPageDataList[pageIndex].questionsFrameworkDataItemList.size > indexAt) {
+                presentSectionAllData.sectionAllPagesData.sectionPageDataList[pageIndex].questionsFrameworkDataItemList.removeAt(
+                    indexAt
+                )
+            }
+        }
     }
 
     fun addObservationsFrameworkDataItemInThePresentSectionAllData(
         observationsFrameworkDataItem: CheckboxesFrameworkDataItemDC,
         pageIndex: Int
     ) {
-        presentSectionAllData.sectionAllPagesData.sectionPageDataList[pageIndex].observationsFrameworkDataItemList.add(
-            observationsFrameworkDataItem
-        )
+        if (presentSectionAllData.sectionAllPagesData.sectionPageDataList.size > pageIndex) {
+            presentSectionAllData.sectionAllPagesData.sectionPageDataList[pageIndex].observationsFrameworkDataItemList.add(
+                observationsFrameworkDataItem
+            )
+        }
+
     }
 
     fun deleteObservationsFrameworkDataItemInThePresentSectionAllData(
         pageIndex: Int,
         indexAt: Int
     ) {
-        presentSectionAllData.sectionAllPagesData.sectionPageDataList[pageIndex].observationsFrameworkDataItemList.removeAt(
-            indexAt
-        )
+        if (presentSectionAllData.sectionAllPagesData.sectionPageDataList.size > pageIndex) {
+            if (presentSectionAllData.sectionAllPagesData.sectionPageDataList[pageIndex].observationsFrameworkDataItemList.size > indexAt) {
+                presentSectionAllData.sectionAllPagesData.sectionPageDataList[pageIndex].observationsFrameworkDataItemList.removeAt(
+                    indexAt
+                )
+            }
+        }
     }
 
     fun addRecommendationsFrameworkDataItemInThePresentSectionAllData(
         recommendationsFrameworkDataItem: CheckboxesFrameworkDataItemDC,
         pageIndex: Int
     ) {
-        presentSectionAllData.sectionAllPagesData.sectionPageDataList[pageIndex].recommendationsFrameworkDataItemList.add(
-            recommendationsFrameworkDataItem
-        )
+        if (presentSectionAllData.sectionAllPagesData.sectionPageDataList.size > pageIndex) {
+            presentSectionAllData.sectionAllPagesData.sectionPageDataList[pageIndex].recommendationsFrameworkDataItemList.add(
+                recommendationsFrameworkDataItem
+            )
+        }
+
     }
 
     fun deleteRecommendationsFrameworkDataItemInThePresentSectionAllData(
         pageIndex: Int,
         indexAt: Int
     ) {
-        presentSectionAllData.sectionAllPagesData.sectionPageDataList[pageIndex].recommendationsFrameworkDataItemList.removeAt(
-            indexAt
-        )
+        if (presentSectionAllData.sectionAllPagesData.sectionPageDataList.size > pageIndex) {
+            if (presentSectionAllData.sectionAllPagesData.sectionPageDataList[pageIndex].recommendationsFrameworkDataItemList.size > indexAt) {
+                presentSectionAllData.sectionAllPagesData.sectionPageDataList[pageIndex].recommendationsFrameworkDataItemList.removeAt(
+                    indexAt
+                )
+            }
+        }
     }
 
     fun addStandardsFrameworkDataItemInThePresentSectionAllData(
         standardsFrameworkDataItem: CheckboxesFrameworkDataItemDC,
         pageIndex: Int
     ) {
-        presentSectionAllData.sectionAllPagesData.sectionPageDataList[pageIndex].standardsFrameworkDataItemList.add(
-            standardsFrameworkDataItem
-        )
+        if (presentSectionAllData.sectionAllPagesData.sectionPageDataList.size > pageIndex) {
+            presentSectionAllData.sectionAllPagesData.sectionPageDataList[pageIndex].standardsFrameworkDataItemList.add(
+                standardsFrameworkDataItem
+            )
+        }
     }
 
     fun deleteStandardsFrameworkDataItemInThePresentSectionAllData(pageIndex: Int, indexAt: Int) {
-        presentSectionAllData.sectionAllPagesData.sectionPageDataList[pageIndex].standardsFrameworkDataItemList.removeAt(
-            indexAt
-        )
+        if (presentSectionAllData.sectionAllPagesData.sectionPageDataList.size > pageIndex) {
+            if (presentSectionAllData.sectionAllPagesData.sectionPageDataList[pageIndex].standardsFrameworkDataItemList.size > indexAt) {
+                presentSectionAllData.sectionAllPagesData.sectionPageDataList[pageIndex].standardsFrameworkDataItemList.removeAt(
+                    indexAt
+                )
+            }
+        }
+
+    }
+
+    fun isTemplateDataItemListUpdatedInPresentSectionAllData(
+        currentPageIndex: Int,
+        questionsFrameworkIndex: Int,
+        questionTemplateList: MutableList<QuestionTemplateItemDC>
+    ): Boolean {
+        var result = false
+        if (questionTemplateList.isNotEmpty()) {
+            val presentSectionAllData = getThePresentSectionAllData()
+            if (presentSectionAllData.sectionAllPagesData.sectionPageDataList.size >= currentPageIndex) {
+                if (presentSectionAllData.sectionAllPagesData.sectionPageDataList[currentPageIndex].questionsFrameworkDataItemList.size >= questionsFrameworkIndex) {
+                    val questionsDataItemList =
+                        presentSectionAllData.sectionAllPagesData.sectionPageDataList[currentPageIndex].questionsFrameworkDataItemList[questionsFrameworkIndex].questionDataItemList
+                    if (questionsDataItemList.isEmpty()) {
+                        result = false
+                    } else {
+                        if (questionsDataItemList.size != questionTemplateList.size) {
+                            result = false
+                        } else {
+                            var anyItemMismatched = false
+                            for (indexT in 0 until questionTemplateList.size) {
+                                if (questionTemplateList[indexT].blockNumber != questionsDataItemList[indexT].blockNumber) {
+                                    anyItemMismatched = true
+                                    break
+                                }
+                            }
+                            result = anyItemMismatched != true
+                        }
+                    }
+                } else {
+                    result = false
+                }
+            } else {
+                result = false
+            }
+        }
+        return result
+    }
+
+    fun updateTemplateDataItemListUsingTemplatesInPresentSectionAllData(
+        currentPageIndex: Int,
+        questionsFrameworkIndex: Int,
+        questionTemplateList: MutableList<QuestionTemplateItemDC>
+    ) {
+        if (questionTemplateList.isNotEmpty()) {
+            if (presentSectionAllData.sectionAllPagesData.sectionPageDataList.size >= currentPageIndex) {
+                if (presentSectionAllData.sectionAllPagesData.sectionPageDataList[currentPageIndex].questionsFrameworkDataItemList.size >= questionsFrameworkIndex) {
+                    val questionsDataItemList =
+                        presentSectionAllData.sectionAllPagesData.sectionPageDataList[currentPageIndex].questionsFrameworkDataItemList[questionsFrameworkIndex].questionDataItemList
+                    if (questionsDataItemList.size != questionTemplateList.size) {
+                        if (questionsDataItemList.isEmpty()) {
+                            val questionsDataItemList1 = mutableListOf<QuestionDataItemDC>()
+                            for (index in 0 until questionTemplateList.size) {
+                                val questionDataItemDC = QuestionDataItemDC()
+                                questionDataItemDC.blockNumber =
+                                    questionTemplateList[index].blockNumber
+                                questionDataItemDC.mandatoryValue =
+                                    questionTemplateList[index].mandatory
+                                questionsDataItemList1.add(questionDataItemDC)
+                            }
+                            presentSectionAllData.sectionAllPagesData.sectionPageDataList[currentPageIndex].questionsFrameworkDataItemList[questionsFrameworkIndex].questionDataItemList =
+                                questionsDataItemList1
+
+                        } else {
+                            val questionsDataItemList1 = mutableListOf<QuestionDataItemDC>()
+                            for (indexT in 0 until questionTemplateList.size) {
+                                val tBlockNumber = questionTemplateList[indexT].blockNumber
+                                var itemPresentFlag = false
+                                var indexDPresent = 0
+                                for (indexD in 0 until questionsDataItemList.size) {
+                                    if (questionsDataItemList[indexD].blockNumber == tBlockNumber) {
+                                        itemPresentFlag = true
+                                        indexDPresent = indexD
+                                        break
+                                    }
+                                }
+                                if (itemPresentFlag == true) {
+                                    val questionDataItem = questionsDataItemList[indexDPresent]
+                                    questionsDataItemList1.add(questionDataItem)
+                                } else {
+                                    val questionDataItem = QuestionDataItemDC()
+                                    questionDataItem.blockNumber = tBlockNumber
+                                    questionsDataItemList1.add(questionDataItem)
+                                }
+                            }
+                            presentSectionAllData.sectionAllPagesData.sectionPageDataList[currentPageIndex].questionsFrameworkDataItemList[questionsFrameworkIndex].questionDataItemList =
+                                questionsDataItemList1
+
+                        }
+                    } else {
+                        val questionsDataItemList1 = mutableListOf<QuestionDataItemDC>()
+                        for (indexT in 0 until questionTemplateList.size) {
+                            val tBlockNumber = questionTemplateList[indexT].blockNumber
+                            var itemPresentFlag = false
+                            var indexDPresent = 0
+                            for (indexD in 0 until questionsDataItemList.size) {
+                                if (questionsDataItemList[indexD].blockNumber == tBlockNumber) {
+                                    itemPresentFlag = true
+                                    indexDPresent = indexD
+                                    break
+                                }
+                            }
+                            if (itemPresentFlag == true) {
+                                val questionDataItem = questionsDataItemList[indexDPresent]
+                                questionsDataItemList1.add(questionDataItem)
+                            } else {
+                                val questionDataItem = QuestionDataItemDC()
+                                questionDataItem.blockNumber = tBlockNumber
+                                questionsDataItemList1.add(questionDataItem)
+                            }
+                        }
+                        presentSectionAllData.sectionAllPagesData.sectionPageDataList[currentPageIndex].questionsFrameworkDataItemList[questionsFrameworkIndex].questionDataItemList =
+                            questionsDataItemList1
+                    }
+                }
+            }
+        }
     }
 
 
@@ -2268,8 +3233,17 @@ class AInfo5ViewModel(
         questionsFrameworkIndex: Int,
         questionDataIndex: Int
     ) {
-        presentSectionAllData.sectionAllPagesData.sectionPageDataList[currentPageIndex].questionsFrameworkDataItemList[questionsFrameworkIndex].questionDataItemList[questionDataIndex].data1Value =
-            data1Value
+        if (presentSectionAllData.sectionAllPagesData.sectionPageDataList.size > currentPageIndex) {
+            if (presentSectionAllData.sectionAllPagesData.sectionPageDataList[currentPageIndex].questionsFrameworkDataItemList.size > questionsFrameworkIndex) {
+                if (presentSectionAllData.sectionAllPagesData.sectionPageDataList[currentPageIndex].questionsFrameworkDataItemList[questionsFrameworkIndex].questionDataItemList.size > questionDataIndex) {
+                    presentSectionAllData.sectionAllPagesData.sectionPageDataList[currentPageIndex].questionsFrameworkDataItemList[questionsFrameworkIndex].questionDataItemList[questionDataIndex].data1Value =
+                        data1Value
+//                    val sectionPagesFrameworkAndDataID =
+//                        getPresentCompanyCode() + getPresentSectionCode() + MainActivity.SECTION_PAGES_FRAMEWORK_AND_DATA_ID
+//                    saveThePresentSectionAllPagesFrameworkAndAllDataToDBMainActivity(getThePresentSectionAllPagesFramework(),getThePresentSectionAllData(),sectionPagesFrameworkAndDataID)
+                }
+            }
+        }
     }
 
     fun updateData1ValueInObservations(
@@ -2324,8 +3298,19 @@ class AInfo5ViewModel(
         questionsFrameworkIndex: Int,
         questionDataIndex: Int
     ) {
-        presentSectionAllData.sectionAllPagesData.sectionPageDataList[currentPageIndex].questionsFrameworkDataItemList[questionsFrameworkIndex].questionDataItemList[questionDataIndex].data2Value =
-            data2Value
+        if (presentSectionAllData.sectionAllPagesData.sectionPageDataList.size > currentPageIndex) {
+            if (presentSectionAllData.sectionAllPagesData.sectionPageDataList[currentPageIndex].questionsFrameworkDataItemList.size > questionsFrameworkIndex) {
+                if (presentSectionAllData.sectionAllPagesData.sectionPageDataList[currentPageIndex].questionsFrameworkDataItemList[questionsFrameworkIndex].questionDataItemList.size > questionDataIndex) {
+                    presentSectionAllData.sectionAllPagesData.sectionPageDataList[currentPageIndex].questionsFrameworkDataItemList[questionsFrameworkIndex].questionDataItemList[questionDataIndex].data2Value =
+                        data2Value
+//                    val sectionPagesFrameworkAndDataID =
+//                        getPresentCompanyCode() + getPresentSectionCode() + MainActivity.SECTION_PAGES_FRAMEWORK_AND_DATA_ID
+//                    saveThePresentSectionAllPagesFrameworkAndAllDataToDBMainActivity(getThePresentSectionAllPagesFramework(),getThePresentSectionAllData(),sectionPagesFrameworkAndDataID)
+                }
+
+            }
+        }
+
     }
 
     fun updateData2ValueInObservations(
@@ -2380,8 +3365,18 @@ class AInfo5ViewModel(
         questionsFrameworkIndex: Int,
         questionDataIndex: Int
     ) {
-        presentSectionAllData.sectionAllPagesData.sectionPageDataList[currentPageIndex].questionsFrameworkDataItemList[questionsFrameworkIndex].questionDataItemList[questionDataIndex].data3Value =
-            data3Value
+        if (presentSectionAllData.sectionAllPagesData.sectionPageDataList.size > currentPageIndex) {
+            if (presentSectionAllData.sectionAllPagesData.sectionPageDataList[currentPageIndex].questionsFrameworkDataItemList.size > questionsFrameworkIndex) {
+                if (presentSectionAllData.sectionAllPagesData.sectionPageDataList[currentPageIndex].questionsFrameworkDataItemList[questionsFrameworkIndex].questionDataItemList.size > questionDataIndex) {
+                    presentSectionAllData.sectionAllPagesData.sectionPageDataList[currentPageIndex].questionsFrameworkDataItemList[questionsFrameworkIndex].questionDataItemList[questionDataIndex].data3Value =
+                        data3Value
+//                    val sectionPagesFrameworkAndDataID =
+//                        getPresentCompanyCode() + getPresentSectionCode() + MainActivity.SECTION_PAGES_FRAMEWORK_AND_DATA_ID
+//                    saveThePresentSectionAllPagesFrameworkAndAllDataToDBMainActivity(getThePresentSectionAllPagesFramework(),getThePresentSectionAllData(),sectionPagesFrameworkAndDataID)
+                }
+            }
+        }
+
     }
 
     fun updateData3ValueInObservations(
@@ -2437,8 +3432,17 @@ class AInfo5ViewModel(
         questionsFrameworkIndex: Int,
         questionDataIndex: Int
     ) {
-        presentSectionAllData.sectionAllPagesData.sectionPageDataList[currentPageIndex].questionsFrameworkDataItemList[questionsFrameworkIndex].questionDataItemList[questionDataIndex].buttonOptionChosen =
-            buttonChoice
+        if (presentSectionAllData.sectionAllPagesData.sectionPageDataList.size > currentPageIndex) {
+            if (presentSectionAllData.sectionAllPagesData.sectionPageDataList[currentPageIndex].questionsFrameworkDataItemList.size > questionsFrameworkIndex) {
+                if (presentSectionAllData.sectionAllPagesData.sectionPageDataList[currentPageIndex].questionsFrameworkDataItemList[questionsFrameworkIndex].questionDataItemList.size > questionDataIndex) {
+                    presentSectionAllData.sectionAllPagesData.sectionPageDataList[currentPageIndex].questionsFrameworkDataItemList[questionsFrameworkIndex].questionDataItemList[questionDataIndex].buttonOptionChosen =
+                        buttonChoice
+//                    val sectionPagesFrameworkAndDataID =
+//                        getPresentCompanyCode() + getPresentSectionCode() + MainActivity.SECTION_PAGES_FRAMEWORK_AND_DATA_ID
+//                    saveThePresentSectionAllPagesFrameworkAndAllDataToDBMainActivity(getThePresentSectionAllPagesFramework(),getThePresentSectionAllData(),sectionPagesFrameworkAndDataID)
+                }
+            }
+        }
     }
 
     fun updateButtonChoiceTextInObservations(
@@ -2447,6 +3451,7 @@ class AInfo5ViewModel(
     ) {
         val oldValue = oldButtonChoiceTextValue
         val newValue = buttonChoiceTextValue
+
         if (etObservationsMLD.value?.contains(oldValue) == true) {
             etObservationsMLD.value = etObservationsMLD.value!!.replace(oldValue, newValue)
         } else {
@@ -2464,8 +3469,14 @@ class AInfo5ViewModel(
         obsFrameworkIndex: Int,
         obsDataIndex: Int
     ) {
-        presentSectionAllData.sectionAllPagesData.sectionPageDataList[currentPageIndex].observationsFrameworkDataItemList[obsFrameworkIndex].checkboxDataItemML[obsDataIndex].checkboxTickedValue =
-            obsChoice
+        if (presentSectionAllData.sectionAllPagesData.sectionPageDataList.size > currentPageIndex) {
+            if (presentSectionAllData.sectionAllPagesData.sectionPageDataList[currentPageIndex].observationsFrameworkDataItemList.size > obsFrameworkIndex) {
+                if (presentSectionAllData.sectionAllPagesData.sectionPageDataList[currentPageIndex].observationsFrameworkDataItemList[obsFrameworkIndex].checkboxDataItemML.size > obsDataIndex) {
+                    presentSectionAllData.sectionAllPagesData.sectionPageDataList[currentPageIndex].observationsFrameworkDataItemList[obsFrameworkIndex].checkboxDataItemML[obsDataIndex].checkboxTickedValue =
+                        obsChoice
+                }
+            }
+        }
     }
 
     fun updateObsCheckboxValueInObservations(
@@ -2496,8 +3507,14 @@ class AInfo5ViewModel(
         recoFrameworkIndex: Int,
         recoDataIndex: Int
     ) {
-        presentSectionAllData.sectionAllPagesData.sectionPageDataList[currentPageIndex].recommendationsFrameworkDataItemList[recoFrameworkIndex].checkboxDataItemML[recoDataIndex].checkboxTickedValue =
-            recoChoice
+        if (presentSectionAllData.sectionAllPagesData.sectionPageDataList.size > currentPageIndex) {
+            if (presentSectionAllData.sectionAllPagesData.sectionPageDataList[currentPageIndex].recommendationsFrameworkDataItemList.size > recoFrameworkIndex) {
+                if (presentSectionAllData.sectionAllPagesData.sectionPageDataList[currentPageIndex].recommendationsFrameworkDataItemList[recoFrameworkIndex].checkboxDataItemML.size > recoDataIndex) {
+                    presentSectionAllData.sectionAllPagesData.sectionPageDataList[currentPageIndex].recommendationsFrameworkDataItemList[recoFrameworkIndex].checkboxDataItemML[recoDataIndex].checkboxTickedValue =
+                        recoChoice
+                }
+            }
+        }
     }
 
     fun updateRecoPriorityValueInPresentSectionAllData(
@@ -2506,8 +3523,15 @@ class AInfo5ViewModel(
         recoFrameworkIndex: Int,
         recoDataIndex: Int
     ) {
-        presentSectionAllData.sectionAllPagesData.sectionPageDataList[currentPageIndex].recommendationsFrameworkDataItemList[recoFrameworkIndex].checkboxDataItemML[recoDataIndex].priorityValues =
-            recoPriorityValue
+        if (presentSectionAllData.sectionAllPagesData.sectionPageDataList.size > currentPageIndex) {
+            if (presentSectionAllData.sectionAllPagesData.sectionPageDataList[currentPageIndex].recommendationsFrameworkDataItemList.size > recoFrameworkIndex) {
+                if (presentSectionAllData.sectionAllPagesData.sectionPageDataList[currentPageIndex].recommendationsFrameworkDataItemList[recoFrameworkIndex].checkboxDataItemML.size > recoDataIndex) {
+                    presentSectionAllData.sectionAllPagesData.sectionPageDataList[currentPageIndex].recommendationsFrameworkDataItemList[recoFrameworkIndex].checkboxDataItemML[recoDataIndex].priorityValues =
+                        recoPriorityValue
+                }
+            }
+        }
+
     }
 
     fun updateRecoCheckboxValueWithPriorityInRecommendations(
@@ -2556,8 +3580,14 @@ class AInfo5ViewModel(
         stdsFrameworkIndex: Int,
         stdsDataIndex: Int
     ) {
-        presentSectionAllData.sectionAllPagesData.sectionPageDataList[currentPageIndex].standardsFrameworkDataItemList[stdsFrameworkIndex].checkboxDataItemML[stdsDataIndex].checkboxTickedValue =
-            stdsChoice
+        if (presentSectionAllData.sectionAllPagesData.sectionPageDataList.size > currentPageIndex) {
+            if (presentSectionAllData.sectionAllPagesData.sectionPageDataList[currentPageIndex].standardsFrameworkDataItemList.size > stdsFrameworkIndex) {
+                if (presentSectionAllData.sectionAllPagesData.sectionPageDataList[currentPageIndex].standardsFrameworkDataItemList[stdsFrameworkIndex].checkboxDataItemML.size > stdsDataIndex) {
+                    presentSectionAllData.sectionAllPagesData.sectionPageDataList[currentPageIndex].standardsFrameworkDataItemList[stdsFrameworkIndex].checkboxDataItemML[stdsDataIndex].checkboxTickedValue =
+                        stdsChoice
+                }
+            }
+        }
     }
 
     fun updateStdsCheckboxValueInStandards(
@@ -2569,11 +3599,11 @@ class AInfo5ViewModel(
         if (tvStandardsMLD.value?.contains(stdsCheckboxValue) == true) {
             if (!isChecked) {
                 tvStandardsMLD.value = tvStandardsMLD.value!!.replace(stdsCheckboxValue, "")
-            } else if (isChecked) {
-                tvStandardsMLD.value = tvStandardsMLD.value + stdsCheckboxValue
             }
         } else {
-            tvStandardsMLD.value = tvStandardsMLD.value + stdsCheckboxValue
+            if (isChecked) {
+                tvStandardsMLD.value = tvStandardsMLD.value + stdsCheckboxValue
+            }
         }
         updateStandardsInObsForThePresentSectionAllData(
             tvStandardsMLD.value.toString(),
@@ -2582,8 +3612,13 @@ class AInfo5ViewModel(
     }
 
     //This flag checks if the section data has been loaded from the db
-    var sectionAllDataLoadedFlagMLD = MutableLiveData<Boolean?>()
+    private var sectionAllDataLoadedFlagMLD = MutableLiveData<Boolean?>()
+    val sectionAllDataLoadedFlagLD: LiveData<Boolean?>
+        get() = sectionAllDataLoadedFlagMLD
 
+    fun setTheSectionAllDataLoadedFlagMLD(input: Boolean?) {
+        sectionAllDataLoadedFlagMLD.value = input
+    }
 
     fun questionDataItemToML(questionDataItem: QuestionDataItemDC): MutableList<String> {
         val result = mutableListOf<String>()
@@ -3317,7 +4352,10 @@ class AInfo5ViewModel(
                     2 -> {
                         companyIntroData.introduction = stringList[0]
                         companyIntroData.picturePathsInIntroductions = stringList[1]
-
+                    }
+                    3 -> {
+                        companyIntroData.introduction = stringList[0]
+                        companyIntroData.picturePathsInIntroductions = stringList[1]
                     }
                     else -> {
                         companyIntroData.introduction = stringList[0]
@@ -3335,6 +4373,389 @@ class AInfo5ViewModel(
         return companyIntroData
     }
 
+    //MLD Flag to ensure that the edit has been completed. True stands for completion
+    //False means that it is not yet complete
+    private var editCompletedFlagMLD = MutableLiveData<Boolean?>(true)
+    val editCompletedFlagLD: LiveData<Boolean?>
+        get() = editCompletedFlagMLD
+
+    fun setTheEditCompletedFlagMLD(input: Boolean) {
+        editCompletedFlagMLD.value = input
+    }
+
+    //MLD Flag to ensure that the delete has been completed. True stands for completion
+    //False means that it is not yet complete
+    private var deleteCompletedFlagMLD = MutableLiveData(true)
+    val deleteCompletedFlagLD: LiveData<Boolean?>
+        get() = deleteCompletedFlagMLD
+
+    fun setTheDeleteCompletedFlagMLD(input: Boolean) {
+        deleteCompletedFlagMLD.value = input
+    }
+
+    //MLD Flag to ensure companyReport has been uploaded. True stands for completion
+    //False means that it is not yet complete
+    private var companyReportUploadedFlagMLD = MutableLiveData(true)
+    val companyReportUploadedFlagLD: LiveData<Boolean?>
+        get() = companyReportUploadedFlagMLD
+
+    fun setTheCompanyReportUploadedFlagMLD(input: Boolean) {
+        companyReportUploadedFlagMLD.value = input
+    }
+
+    //MLD Flag to ensure companyIntroReport has been uploaded. True stands for completion
+    //False means that it is not yet complete
+    private var companyPhotosUploadedFlagMLD = MutableLiveData(true)
+    val companyPhotosUploadedFlagLD: LiveData<Boolean?>
+        get() = companyPhotosUploadedFlagMLD
+
+    fun setTheCompanyPhotosUploadedFlagMLD(input: Boolean) {
+        companyPhotosUploadedFlagMLD.value = input
+    }
+
+    //MLD Flag to ensure companyDirUri has been uploaded. True stands for completion
+    //False means that it is not yet complete
+    private var companyDirectoryURIUploadedFlagMLD = MutableLiveData(true)
+    val companyDirectoryURIUploadedFlagLD: LiveData<Boolean?>
+        get() = companyDirectoryURIUploadedFlagMLD
+
+    fun setTheCompanyDirectoryURIUploadedFlagMLD(input: Boolean) {
+        companyDirectoryURIUploadedFlagMLD.value = input
+    }
+
+    //MLD Flag to ensure companySectionList has been uploaded. True stands for completion
+    //False means that it is not yet complete
+    private var companySectionListUploadedFlagMLD = MutableLiveData(true)
+    val companySectionListUploadedFlagLD: LiveData<Boolean?>
+        get() = companySectionListUploadedFlagMLD
+
+    fun setTheCompanySectionListUploadedFlagMLD(input: Boolean) {
+        companySectionListUploadedFlagMLD.value = input
+    }
+
+    //MLD Flag to ensure companyName has been uploaded. True stands for completion
+    //False means that it is not yet complete
+    private var companyNameUploadedFlagMLD = MutableLiveData(true)
+    val companyNameUploadedFlagLD: LiveData<Boolean?>
+        get() = companyNameUploadedFlagMLD
+
+    fun setTheCompanyNameUploadedFlagMLD(input: Boolean) {
+        companyNameUploadedFlagMLD.value = input
+    }
+
+    //MLD Flag to ensure companyAuditDate has been uploaded. True stands for completion
+    //False means that it is not yet complete
+    private var companyAuditDateUploadedFlagMLD = MutableLiveData(true)
+    val companyAuditDateUploadedFlagLD: LiveData<Boolean?>
+        get() = companyAuditDateUploadedFlagMLD
+
+    fun setTheCompanyAuditDateUploadedFlagMLD(input: Boolean) {
+        companyAuditDateUploadedFlagMLD.value = input
+    }
+
+
+    //All Conditions Met MLD - combines the MLD for ParentChildParent, SectionFramework, SectionData and Templates
+
+    val allConditionsMetLD = MediatorLiveData<Boolean>().apply {
+        val observer = Observer<Boolean?> {
+            val parentChildParentUploaded = parentChildParentItemMLUploadedMLD.value ?: false
+            val frameworkUploaded = sectionAllPagesFrameworkLoadedFlagLD.value ?: false
+            val dataUploaded = sectionAllDataLoadedFlagLD.value ?: false
+            val templatesLoaded = allTemplatesUploadedFlagMLD.value ?: false
+            val editCompletedFlag = editCompletedFlagLD.value ?: false
+            val deleteCompletedFlag = deleteCompletedFlagLD.value ?: false
+
+            // Set true only if all are true
+            this.value = parentChildParentUploaded && frameworkUploaded && dataUploaded
+                    && templatesLoaded && editCompletedFlag && deleteCompletedFlag
+        }
+        addSource(parentChildParentItemMLUploadedMLD, observer)
+        addSource(sectionAllPagesFrameworkLoadedFlagLD, observer)
+        addSource(sectionAllDataLoadedFlagLD, observer)
+        addSource(allTemplatesUploadedFlagMLD, observer)
+        addSource(editCompletedFlagLD, observer)
+        addSource(deleteCompletedFlagLD, observer)
+    }
+
+    //MLD Flag to ensure companyAuditDate has been updated in the companyReport.
+    // True stands for completion. False means that it is not yet complete
+    private var auditDateUpdatedInReportSIFFlagMLD = MutableLiveData(true)
+    val auditDateUpdatedInReportSIFFlagLD: LiveData<Boolean?>
+        get() = auditDateUpdatedInReportSIFFlagMLD
+    fun setTheAuditDateUpdatedInReportSIFFlagMLD(input: Boolean) {
+        auditDateUpdatedInReportSIFFlagMLD.value = input
+    }
+
+    //MLD Flag to ensure Company Intros has been updated in the companyReport.
+    // True stands for completion. False means that it is not yet complete
+    private var companyIntroUpdatedInReportSIFFlagMLD = MutableLiveData(true)
+    val companyIntroUpdatedInReportSIFFlagLD: LiveData<Boolean?>
+        get() = companyIntroUpdatedInReportSIFFlagMLD
+    fun setTheCompanyIntroUpdatedInReportSIFFlagMLD(input: Boolean) {
+        companyIntroUpdatedInReportSIFFlagMLD.value = input
+    }
+
+    //MLD Flag to ensure Section Intros has been updated in the companyReport.
+    // True stands for completion. False means that it is not yet complete
+    private var sectionIntroUpdatedInReportSIFFlagMLD = MutableLiveData(true)
+    val sectionIntroUpdatedInReportSIFFlagLD: LiveData<Boolean?>
+        get() = sectionIntroUpdatedInReportSIFFlagMLD
+    fun setTheSectionIntroUpdatedInReportSIFFlagMLD(input: Boolean) {
+        sectionIntroUpdatedInReportSIFFlagMLD.value = input
+    }
+
+    //MLD Flag to ensure Section Pages has been updated in the companyReport.
+    // True stands for completion. False means that it is not yet complete
+    private var sectionPagesUpdatedInReportSIFFlagMLD = MutableLiveData(true)
+    val sectionPagesUpdatedInReportSIFFlagLD: LiveData<Boolean?>
+        get() = sectionPagesUpdatedInReportSIFFlagMLD
+    fun setTheSectionPagesUpdatedInReportSIFFlagMLD(input: Boolean) {
+        sectionPagesUpdatedInReportSIFFlagMLD.value = input
+    }
+
+
+
+    val allConditionsMetSectionAndIntrosLD = MediatorLiveData<Boolean>().apply {
+        val observer = Observer<Boolean?> {
+            val editCompletedFlag = editCompletedFlagLD.value ?: false
+            val deleteCompletedFlag = deleteCompletedFlagLD.value ?: false
+            val companyIntroReportUploadedFlag = companyReportUploadedFlagLD.value ?: false
+            val companyPhotosUploadedFlag = companyPhotosUploadedFlagLD.value ?: false
+            val companyDirectoryURIUploadedFlag = companyDirectoryURIUploadedFlagLD.value ?: false
+            val companySectionListUploadedFlag = companySectionListUploadedFlagLD.value ?: false
+            val companyNameUploadedFlag = companyNameUploadedFlagLD.value ?: false
+            val companyAuditDateUploadedFlag = companyAuditDateUploadedFlagLD.value?: false
+            val companyIntroUpdatedInReportFlag = companyIntroUpdatedInReportSIFFlagLD.value?: false
+            val sectionIntroUpdatedInReportFlag = sectionIntroUpdatedInReportSIFFlagLD.value?: false
+            val sectionPagesUpdatedInReportFlag = sectionPagesUpdatedInReportSIFFlagLD.value?:false
+
+            // Set true only if all are true
+            this.value =
+                editCompletedFlag && deleteCompletedFlag && companyIntroReportUploadedFlag
+                        && companyPhotosUploadedFlag
+                        && companyDirectoryURIUploadedFlag
+                        && companySectionListUploadedFlag
+                        && companyNameUploadedFlag
+                        && companyAuditDateUploadedFlag
+                        && companyIntroUpdatedInReportFlag
+                        && sectionIntroUpdatedInReportFlag
+                        && sectionPagesUpdatedInReportFlag
+
+        }
+        addSource(editCompletedFlagLD, observer)
+        addSource(deleteCompletedFlagLD, observer)
+        addSource(companyReportUploadedFlagLD, observer)
+        addSource(companyPhotosUploadedFlagLD, observer)
+        addSource(companyDirectoryURIUploadedFlagLD, observer)
+        addSource(companySectionListUploadedFlagLD, observer)
+        addSource(companyNameUploadedFlagLD, observer)
+        addSource(companyAuditDateUploadedFlagLD, observer)
+        addSource(companyIntroUpdatedInReportSIFFlagLD, observer)
+        addSource(sectionIntroUpdatedInReportSIFFlagLD, observer)
+        addSource(sectionPagesUpdatedInReportSIFFlagLD, observer)
+    }
+
+    val auditDateReportUpdateTriggerLD = MediatorLiveData<Boolean>().apply {
+        val triggerUpdate = Observer<Boolean?> {
+            val auditUploaded = companyAuditDateUploadedFlagLD.value ?: false
+            val reportUploaded = companyReportUploadedFlagLD.value ?: false
+            value = auditUploaded && reportUploaded
+            if (value == true) {
+                updateTheCompanyNameAuditDateAndIntroInCompanyReportAndSave(
+                    getThePresentCompanyCodeAndDisplayName().uniqueCodeName,
+                    "",
+                    getTheCompanyAuditDate(), ""
+                )
+            }
+        }
+        addSource(companyAuditDateUploadedFlagLD, triggerUpdate)
+        addSource(companyReportUploadedFlagLD, triggerUpdate)
+    }
+
+
+    val updateCompanyReportLD = MediatorLiveData<Boolean>().apply {
+        val observer = Observer<Boolean?> {
+            val companyReportUploadedFlag = companyReportUploadedFlagLD.value?: false
+            if (companyReportUploadedFlag) {
+                if (companyAuditDateUploadedFlagLD.value == true){
+                    if (!companyReport.companyAuditDate.contains(getTheCompanyAuditDate())){
+                        updateTheCompanyNameAuditDateAndIntroInCompanyReportAndSave(getPresentCompanyCode(),"",getTheCompanyAuditDate(), "")
+                    }
+                }
+            }
+        }
+        addSource(companyReportUploadedFlagLD, observer)
+        addSource(companyAuditDateUploadedFlagLD, observer)
+    }
+
+
+    //MLD Flag to ensure parent folder has been uploaded. True stands for completion
+    //False means that it is not yet complete
+    private var parentFolderUploadedMAFlagMLD = MutableLiveData(false)
+    val parentFolderUploadedMAFlagLD: LiveData<Boolean?>
+        get() = parentFolderUploadedMAFlagMLD
+    fun setTheParentFolderUploadedMAFlagMLD(input: Boolean) {
+        parentFolderUploadedMAFlagMLD.value = input
+    }
+
+    //MLD Flag to ensure templates have been uploaded.
+    // True stands for completion False means that it is not yet complete
+    private var templatesUploadedMAFlagMLD = MutableLiveData(false)
+    val templatesUploadedMAFlagLD: LiveData<Boolean?>
+        get() = templatesUploadedMAFlagMLD
+    fun setTheTemplatesUploadedMAFlagMLD(input: Boolean) {
+        templatesUploadedMAFlagMLD.value = input
+    }
+
+    //MLD Flag to ensure templateString has been uploaded.
+    // True stands for completion False means that it is not yet complete
+    private var templateStringUploadedMAFlagMLD = MutableLiveData(false)
+    val templateStringUploadedMAFlagLD: LiveData<Boolean?>
+        get() = templateStringUploadedMAFlagMLD
+    fun setTheTemplateStringUploadedMAFlagMLD(input: Boolean) {
+        templateStringUploadedMAFlagMLD.value = input
+    }
+
+    //MLD Flag to ensure ParentChildParentItemList has been uploaded.
+    // True stands for completion False means that it is not yet complete
+    private var parentChildParentListUploadedMAFlagMLD = MutableLiveData(false)
+    val parentChildParentListUploadedMAFlagLD: LiveData<Boolean?>
+        get() = parentChildParentListUploadedMAFlagMLD
+    fun setTheParentChildParentListUploadedMAFlagMLD(input: Boolean) {
+        parentChildParentListUploadedMAFlagMLD.value = input
+    }
+
+    val allConditionsMetMainActivityLD = MediatorLiveData<Boolean>().apply {
+        val observer = Observer<Boolean?> {
+            val parentFolderUploadedMAFlag = parentFolderUploadedMAFlagLD.value?: false
+            val templatesUploadedFlag = templatesUploadedMAFlagLD.value?: false
+            val templateStringUploadedFlag = templateStringUploadedMAFlagLD.value?: false
+            val parentChildParentListUploadedFlag = parentChildParentListUploadedMAFlagLD.value?: false
+
+            // Set true only if all are true
+            this.value = parentFolderUploadedMAFlag && templatesUploadedFlag
+                    && templateStringUploadedFlag && parentChildParentListUploadedFlag
+
+        }
+        addSource(parentFolderUploadedMAFlagLD, observer)
+        addSource(templatesUploadedMAFlagLD, observer)
+        addSource(templateStringUploadedMAFlagLD, observer)
+        addSource(parentChildParentListUploadedMAFlagLD, observer)
+
+    }
+
+    //MLD Flag to ensure CompanyNameList has been uploaded.
+    // True stands for completion False means that it is not yet complete
+    private var companyNameListUploadedENFFlagMLD = MutableLiveData(false)
+    val companyNameListUploadedENFFlagLD: LiveData<Boolean?>
+        get() = companyNameListUploadedENFFlagMLD
+    fun setTheCompanyNameListUploadedENFFlagMLD(input: Boolean) {
+        companyNameListUploadedENFFlagMLD.value = input
+    }
+
+    //MLD Flag to ensure CompanyNameList has been uploaded.
+    // True stands for completion False means that it is not yet complete
+    private var parentFolderURIUploadedENFFlagMLD = MutableLiveData(false)
+    val parentFolderURIUploadedENFFlagLD: LiveData<Boolean?>
+        get() = parentFolderURIUploadedENFFlagMLD
+    fun setTheparentFolderURIUploadedENFFlagMLD(input: Boolean) {
+        parentFolderURIUploadedENFFlagMLD.value = input
+    }
+
+    val allConditionsMetEnterNameLD = MediatorLiveData<Boolean>().apply {
+        val observer = Observer<Boolean?> {
+            val companyNameListUploadedFlag = companyNameListUploadedENFFlagLD.value?: false
+            val parentFolderURIUploadedFlag = parentFolderURIUploadedENFFlagLD.value?: false
+
+            // Set true only if all are true
+            this.value = companyNameListUploadedFlag && parentFolderURIUploadedFlag
+        }
+        addSource(companyNameListUploadedENFFlagLD, observer)
+        addSource(parentFolderUploadedMAFlagLD, observer)
+
+    }
+
+    //MLD Flag to ensure PresentCompanyName has been uploaded.
+    // True stands for completion False means that it is not yet complete
+    private var companyNameUploadedIFFlagMLD = MutableLiveData(false)
+    val companyNameUploadedIFFlagLD: LiveData<Boolean?>
+        get() = companyNameUploadedIFFlagMLD
+    fun setTheCompanyNameUploadedIFFlagMLD(input: Boolean) {
+        companyNameUploadedIFFlagMLD.value = input
+    }
+
+    //MLD Flag to ensure CompanyIntroduction has been uploaded.
+    // True stands for completion False means that it is not yet complete
+    private var companyIntroductionUploadedIFFlagMLD = MutableLiveData(false)
+    val companyIntroductionUploadedIFFlagLD: LiveData<Boolean?>
+        get() = companyIntroductionUploadedIFFlagMLD
+    fun setThecompanyIntroductionUploadedIFFlagMLD(input: Boolean) {
+        companyIntroductionUploadedIFFlagMLD.value = input
+    }
+
+    //MLD Flag to ensure PresentSectionName has been uploaded.
+    // True stands for completion False means that it is not yet complete
+    private var sectionNameUploadedIFFlagMLD = MutableLiveData(false)
+    val sectionNameUploadedIFFlagLD: LiveData<Boolean?>
+        get() = sectionNameUploadedIFFlagMLD
+    fun setTheSectionNameUploadedIFFlagMLD(input: Boolean) {
+        sectionNameUploadedIFFlagMLD.value = input
+    }
+
+
+    val allConditionsMetIntroductionsFLD = MediatorLiveData<Boolean>().apply {
+        val observer = Observer<Boolean?> {
+            val companyNameUploadedFlag = companyNameUploadedIFFlagLD.value?: false
+            val companyIntroUploadedFlag = companyIntroductionUploadedIFFlagLD.value?:false
+            val sectionNameUploadedFlag = sectionNameUploadedIFFlagLD.value?: false
+            val sectionIntroUploadedFlag = sectionAllDataLoadedFlagLD.value?: false
+
+            // Set true only if all are true
+            this.value = companyNameUploadedFlag
+                        && companyIntroUploadedFlag
+                        && sectionNameUploadedFlag
+                        && sectionIntroUploadedFlag
+        }
+        addSource(companyNameUploadedIFFlagLD, observer)
+        addSource(companyIntroductionUploadedIFFlagLD, observer)
+        addSource(sectionNameUploadedIFFlagLD, observer)
+        addSource(sectionAllDataLoadedFlagLD, observer)
+    }
+
+
+    //MLD Flag to ensure parent folder has been uploaded. True stands for completion
+    //False means that it is not yet complete
+    private var parentFolderUploadedSLRVFlagMLD = MutableLiveData(false)
+    val parentFolderUploadedSLRVFlagLD: LiveData<Boolean?>
+        get() = parentFolderUploadedSLRVFlagMLD
+    fun setTheParentFolderUploadedSLRVFlagMLD(input: Boolean) {
+        parentFolderUploadedSLRVFlagMLD.value = input
+    }
+
+    //MLD Flag to ensure companySectionList has been uploaded. True stands for completion
+    //False means that it is not yet complete
+    private var companySectionCDListUploadedSLRVFlagMLD = MutableLiveData(true)
+    val companySectionCDListUploadedSLRVFlagLD: LiveData<Boolean?>
+        get() = companySectionCDListUploadedSLRVFlagMLD
+
+    fun setTheCompanySectionCDListUploadedSLRVFlagMLD(input: Boolean) {
+        companySectionCDListUploadedSLRVFlagMLD.value = input
+    }
+
+    val allConditionsMetSLRVFLD = MediatorLiveData<Boolean>().apply {
+        val observer = Observer<Boolean?> {
+            val parentFolderUploadedFlag = parentFolderUploadedSLRVFlagLD.value?: false
+            val companySectionCDListUPloadedFlag = companySectionCDListUploadedSLRVFlagLD.value?: false
+
+            // Set true only if all are true
+            this.value = parentFolderUploadedFlag && companySectionCDListUPloadedFlag
+
+        }
+        addSource(parentFolderUploadedSLRVFlagLD, observer)
+        addSource(companySectionCDListUploadedSLRVFlagLD, observer)
+    }
+
+
 //Reports Related Variables and Functions for reports of different types
 
     //Company Report Related Data Variables and Functions
@@ -3348,35 +4769,72 @@ class AInfo5ViewModel(
         return companyReport
     }
 
+    //Company Intro Report
+    private var companyIntroReport = CompanyIntroReportDC()
+
+    fun setTheCompanyIntroReport(input: CompanyIntroReportDC) {
+        companyIntroReport = input
+    }
+
+    fun getTheCompanyIntroReport(): CompanyIntroReportDC {
+        return companyIntroReport
+    }
+
     fun uploadTheCompanyReportIntoViewModel(companyReportString: String) {
         viewModelScope.launch(Dispatchers.Default) {
             var companyReport = CompanyReportDC()
             if (companyReportString != "") {
                 companyReport = stringToCompanyReport(companyReportString)
-            } else {
+                if (companyReport.companyCode == ""){
+                    companyReport.companyCode = getPresentCompanyCode()
+                    companyReport.companyName = getPresentCompanyName()
+                    saveTheCompanyReportToDB(companyReport)
+                }
+            }
+            else {
                 companyReport.companyCode = getPresentCompanyCode()
                 companyReport.companyName = getPresentCompanyName()
-                companyReport.companyAuditDate = ""
+                saveTheCompanyReportToDB(companyReport)
+            }
+            withContext(Dispatchers.Main) {
+                setTheCompanyReport(companyReport)
+                setTheCompanyReportUploadedFlagMLD(true)
+            }
+        }
+    }
+
+    fun uploadTheCompanyIntroReportIntoViewModel(companyIntroReportString: String) {
+        viewModelScope.launch(Dispatchers.Default) {
+            var companyIntroReport = CompanyIntroReportDC()
+            if (companyIntroReportString != "") {
+                companyIntroReport = stringToCompanyIntroReport(companyIntroReportString)
+            }
+            else {
+                companyIntroReport.companyCode = getPresentCompanyCode()
+                companyIntroReport.companyName = getPresentCompanyName()
+                companyIntroReport.companyAuditDate = getTheCompanyAuditDate()
+                companyIntroReport.companyIntroduction = ""
             }
 
             withContext(Dispatchers.Main) {
-                setTheCompanyReport(companyReport)
-                setTheCompanyReportUploadedFlag(true)
+                setTheCompanyIntroReport(companyIntroReport)
+                setTheCompanyReportUploadedFlagMLD(true)
+                setTheCompanyIntroReportUploadedFlag(true)
             }
         }
     }
 
     fun updateTheCompanyNameAuditDateAndIntroInCompanyReportAndSave(
         companyCode: String,
-        companyName: String = "",
-        companyAuditDate: String = "",
-        companyIntroduction: String = ""
+        companyName: String,
+        companyAuditDate: String,
+        companyIntroduction: String
     ) {
         if (companyReport.companyCode == companyCode) {
-            if (companyName != "") {
+            if (companyName != ""){
                 companyReport.companyName = companyName
             }
-            if (companyAuditDate != "") {
+            if (companyAuditDate != ""){
                 companyReport.companyAuditDate = companyAuditDate
             }
             if (companyIntroduction != "") {
@@ -3388,7 +4846,7 @@ class AInfo5ViewModel(
         val companyReportString = companyReportToString(companyReport)
         val aInfo5 = AInfo5(companyReportID, companyReportString)
         insertAInfo5(aInfo5)
-        setTheCompanyReportUploadedFlag(false)
+        setTheCompanyIntroUpdatedInReportSIFFlagMLD(true)
     }
 
     //The below function ensures that the reports are ordered in the Company Report
@@ -3411,7 +4869,7 @@ class AInfo5ViewModel(
             withContext(Dispatchers.Main) {
                 companyReport.sectionReportList = reorderedSectionReportList
                 //Save the companyReport to DB
-                saveTheCompanyReportToDB(getTheCompanyReport())
+                //saveTheCompanyReportToDB(getTheCompanyReport())
             }
         }
     }
@@ -3447,7 +4905,7 @@ class AInfo5ViewModel(
         sectionAllData: SectionAllDataDC
     ) {
         viewModelScope.launch(Dispatchers.Default) {
-            val sectionAllData = getThePresentSectionAllData()
+            //val sectionAllData = getThePresentSectionAllData()
             var sectionReportPresentFlag = false
             var sectionReportIndex = 0
             val sectionReportNew = SectionReportDC()
@@ -3476,35 +4934,69 @@ class AInfo5ViewModel(
                         break
                     }
                 }
-            } else {
+            }
+            else {
                 sectionReportPresentFlag = false
             }
             withContext(Dispatchers.Main) {
                 if (sectionReportPresentFlag) {
                     companyReport.sectionReportList[sectionReportIndex] = sectionReportNew
-                } else {
+                }
+                else {
                     companyReport.sectionReportList.add(sectionReportNew)
                 }
                 //Save the companyReport to DB
                 saveTheCompanyReportToDB(getTheCompanyReport())
+                setTheSectionPagesUpdatedInReportSIFFlagMLD(true)
             }
         }
     }
 
-    fun deleteSectionReportInCompanyReportAndSave(
+    fun setSectionReportInCompanyReportToNilAndSave(
         sectionCode: String
-    ){
-        if (companyReport.sectionReportList.isNotEmpty()){
-            for (sectionIndex in 0 until companyReport.sectionReportList.size){
+    ) {
+        if (companyReport.sectionReportList.isNotEmpty()) {
+            for (sectionIndex in 0 until companyReport.sectionReportList.size) {
                 val sectionReport = companyReport.sectionReportList[sectionIndex]
-                if (sectionReport.sectionCode == sectionCode){
-                    companyReport.sectionReportList.removeAt(sectionIndex)
+                if (sectionReport.sectionCode == sectionCode) {
+                    companyReport.sectionReportList[sectionIndex].threeColumnTableWord = ""
+                    companyReport.sectionReportList[sectionIndex].threeColumnTableExcel = ""
+                    companyReport.sectionReportList[sectionIndex].sixColumnTableWord = ""
+                    companyReport.sectionReportList[sectionIndex].sixColumnTableExcel = ""
+                    companyReport.sectionReportList[sectionIndex].checkListTableWord = ""
+                    companyReport.sectionReportList[sectionIndex].checkListTableExcel = ""
+                    companyReport.sectionReportList[sectionIndex].executiveSummaryTwoColumn = ""
+                    companyReport.sectionReportList[sectionIndex].executiveSummaryFourColumn = ""
                 }
             }
         }
         //Save the companyReport to DB
         saveTheCompanyReportToDB(getTheCompanyReport())
     }
+
+    fun deleteSectionReportInCompanyReportAndSave(sectionCode: String) {
+        viewModelScope.launch(Dispatchers.Default) {
+            val newCompanyReport = CompanyReportDC()
+            if (companyReport.sectionReportList.isNotEmpty()) {
+                newCompanyReport.companyCode = companyReport.companyCode
+                newCompanyReport.companyName = companyReport.companyName
+                newCompanyReport.companyAuditDate = companyReport.companyAuditDate
+                newCompanyReport.companyIntroduction = companyReport.companyIntroduction
+                for (index in 0 until companyReport.sectionReportList.size) {
+                    if (companyReport.sectionReportList[index].sectionCode != sectionCode) {
+                        newCompanyReport.sectionReportList.add(companyReport.sectionReportList[index])
+                    }
+                }
+                withContext(Dispatchers.Main) {
+                    setTheCompanyReport(newCompanyReport)
+                    saveTheCompanyReportToDB(newCompanyReport)
+                }
+            }
+        }
+
+
+    }
+
 
     fun saveTheCompanyReportToDB(companyReport: CompanyReportDC) {
         viewModelScope.launch(Dispatchers.IO) {
@@ -3693,8 +5185,7 @@ class AInfo5ViewModel(
                         if (pageCode == "PC_General_Entry_01_PC") {
                             checklistWordTable =
                                 checklistWordTable + questionsFrameworkList[frameworkIndex].questionsFrameworkTitle + "$" + "$" + "$" + "$" + "\n"
-                        }
-                        else {
+                        } else {
                             if (isItemPresentInPageTemplateList(pageCode) == true) {
                                 val itemQuestionsList =
                                     getItemFromPageTemplateList(pageCode).questionsList
@@ -3706,18 +5197,16 @@ class AInfo5ViewModel(
                                     for (questionsListIndex in 0 until itemQuestionsList.size) {
                                         checklistWordTable =
                                             checklistWordTable + itemQuestionsList[questionsListIndex].question + "$"
-                                        if (questionsListIndex <  itemDataList.size) {
+                                        if (questionsListIndex < itemDataList.size) {
                                             checklistWordTable =
                                                 checklistWordTable + itemDataList[questionsListIndex].data1Value + "$" + itemDataList[questionsListIndex].data2Value + "$" + itemDataList[questionsListIndex].data3Value + "$" + itemDataList[questionsListIndex].buttonOptionChosen + "\n"
-                                        }
-                                        else {
+                                        } else {
                                             checklistWordTable =
                                                 checklistWordTable + "$" + "$" + "$" + "\n"
                                         }
                                     }
                                 }
-                            }
-                            else {
+                            } else {
                                 checklistWordTable =
                                     checklistWordTable + questionsFrameworkList[frameworkIndex].questionsFrameworkTitle + "$" + "$" + "$" + "$" + "\n"
                             }
@@ -3757,7 +5246,7 @@ class AInfo5ViewModel(
                                     for (questionsListIndex in 0 until itemQuestionsList.size) {
                                         checklistExcelTable =
                                             checklistExcelTable + itemQuestionsList[questionsListIndex].question + "$"
-                                        if (questionsListIndex  < itemDataList.size) {
+                                        if (questionsListIndex < itemDataList.size) {
                                             checklistExcelTable =
                                                 checklistExcelTable + itemDataList[questionsListIndex].data1Value + "$" + itemDataList[questionsListIndex].data2Value + "$" + itemDataList[questionsListIndex].data3Value + "$" + itemDataList[questionsListIndex].buttonOptionChosen + "\n"
                                         } else {
@@ -3798,7 +5287,8 @@ class AInfo5ViewModel(
                         break
                     }
                 }
-            } else {
+            }
+            else {
                 sectionReportPresentFlag = false
                 sectionReportNew.sectionCode = sectionCode
                 sectionReportNew.sectionName = sectionName
@@ -3814,7 +5304,8 @@ class AInfo5ViewModel(
                         companyReport.sectionReportList[sectionReportIndex].sectionIntroduction =
                             sectionIntroduction
                     }
-                } else {
+                }
+                else {
                     companyReport.sectionReportList.add(sectionReportNew)
                 }
                 //Save the companyReport to DB
@@ -3822,6 +5313,7 @@ class AInfo5ViewModel(
                 val companyReportString = companyReportToString(companyReport)
                 val aInfo5 = AInfo5(companyReportID, companyReportString)
                 insertAInfo5(aInfo5)
+                setTheSectionIntroUpdatedInReportSIFFlagMLD(true)
             }
         }
     }
@@ -4080,6 +5572,80 @@ class AInfo5ViewModel(
         return sectionReportList
     }
 
+    fun companyIntroReportToML(input: CompanyIntroReportDC): MutableList<String> {
+        val result = mutableListOf<String>()
+        result.add(input.companyCode)
+        result.add(input.companyName)
+        result.add(input.companyAuditDate)
+        result.add(input.companyIntroduction)
+        return result
+    }
+
+    fun companyIntroReportToString(input: CompanyIntroReportDC): String {
+        var result = ""
+        val resultML = companyIntroReportToML(input)
+        result = mlToStringUsingDelimiter1(resultML)
+        return result
+    }
+
+    fun stringToCompanyIntroReport(input: String): CompanyIntroReportDC {
+        val companyIntroReport = CompanyIntroReportDC()
+        if (input != "") {
+            if (input.contains(delimiterLevel1)) {
+                val stringList = input.split(delimiterLevel1)
+                when (stringList.size) {
+                    0 -> {
+                        companyIntroReport.companyCode = ""
+                        companyIntroReport.companyName = ""
+                        companyIntroReport.companyAuditDate = ""
+                        companyIntroReport.companyIntroduction = ""
+                    }
+                    1 -> {
+                        companyIntroReport.companyCode = stringList[0]
+                        companyIntroReport.companyName = ""
+                        companyIntroReport.companyAuditDate = ""
+                        companyIntroReport.companyIntroduction = ""
+                    }
+                    2 -> {
+                        companyIntroReport.companyCode = stringList[0]
+                        companyIntroReport.companyName = stringList[1]
+                        companyIntroReport.companyAuditDate = ""
+                        companyIntroReport.companyIntroduction = ""
+                    }
+                    3 -> {
+                        companyIntroReport.companyCode = stringList[0]
+                        companyIntroReport.companyName = stringList[1]
+                        companyIntroReport.companyAuditDate = stringList[2]
+                        companyIntroReport.companyIntroduction = ""
+                    }
+                    4 -> {
+                        companyIntroReport.companyCode = stringList[0]
+                        companyIntroReport.companyName = stringList[1]
+                        companyIntroReport.companyAuditDate = stringList[2]
+                        companyIntroReport.companyIntroduction = stringList[3]
+                    }
+                    else -> {
+                        companyIntroReport.companyCode = stringList[0]
+                        companyIntroReport.companyName = stringList[1]
+                        companyIntroReport.companyAuditDate = stringList[2]
+                        companyIntroReport.companyIntroduction = stringList[3]
+                    }
+                }
+            } else {
+                companyIntroReport.companyCode = input
+                companyIntroReport.companyName = ""
+                companyIntroReport.companyAuditDate = ""
+                companyIntroReport.companyIntroduction = ""
+            }
+        } else {
+            companyIntroReport.companyCode = ""
+            companyIntroReport.companyName = ""
+            companyIntroReport.companyAuditDate = ""
+            companyIntroReport.companyIntroduction = ""
+        }
+        return companyIntroReport
+    }
+
     fun companyReportToML(input: CompanyReportDC): MutableList<String> {
         val result = mutableListOf<String>()
         result.add(input.companyCode)
@@ -4164,6 +5730,16 @@ class AInfo5ViewModel(
     fun getTheCompanyReportUploadedFlag(): Boolean {
         return companyReportUploadedFlag
     }
+
+    var companyIntroReportUploadedFlag = false
+    fun setTheCompanyIntroReportUploadedFlag(input: Boolean) {
+        companyIntroReportUploadedFlag = input
+    }
+
+    fun getTheCompanyIntroReportUploadedFlag(): Boolean {
+        return companyIntroReportUploadedFlag
+    }
+
     //var companyReportUploadedFlag = MutableLiveData<Boolean>()
 
     private var reportsToBeGeneratedList = mutableListOf<String>()
@@ -4192,15 +5768,20 @@ class AInfo5ViewModel(
                     if (reportsList.contains(inputList[index])) {
                         if (reportsList.indexOf(inputList[index]) == 0) {
                             generateThreeColumnWordReport()
-                        } else if (reportsList.indexOf(inputList[index]) == 1) {
+                        }
+                        else if (reportsList.indexOf(inputList[index]) == 1) {
                             generateThreeColumnExcelReport()
-                        } else if (reportsList.indexOf(inputList[index]) == 2) {
+                        }
+                        else if (reportsList.indexOf(inputList[index]) == 2) {
                             generateSixColumnWordReport()
-                        } else if (reportsList.indexOf(inputList[index]) == 3) {
+                        }
+                        else if (reportsList.indexOf(inputList[index]) == 3) {
                             generateSixColumnExcelReport()
-                        } else if (reportsList.indexOf(inputList[index]) == 4) {
+                        }
+                        else if (reportsList.indexOf(inputList[index]) == 4) {
                             generateChecklistWordReport()
-                        } else if (reportsList.indexOf(inputList[index]) == 5) {
+                        }
+                        else if (reportsList.indexOf(inputList[index]) == 5) {
                             generateChecklistExcelReport()
                         }
                     }
@@ -4237,7 +5818,8 @@ class AInfo5ViewModel(
             val fileExistsFlag = fileExists(fileNameWithExtension, dirUri)
             if (fileExistsFlag == true) {
                 writeToTextFile(dirUri, fileNameWithExtension, threeColumnReport)
-            } else {
+            }
+            else {
                 createTextFileWithExtension(
                     fileNameWithoutExtension,
                     dirUri,
@@ -4471,7 +6053,6 @@ class AInfo5ViewModel(
 
 //Photos and Camera related Variable and Functions
 
-
     private var presentPhotoName: String = ""
     fun setPresentPhotoName(input: String) {
         presentPhotoName = input
@@ -4481,18 +6062,22 @@ class AInfo5ViewModel(
         return presentPhotoName
     }
 
-    fun makePresentPhotoName(location: String, count: Int): String {
+    fun makePresentPhotoName(location: String, count: Int, sectionName1: String = ""): String {
         var presentPhotoName = ""
         if (location.contains(getPresentCompanyCode()) == true) {
             presentPhotoName = MainActivity.COMPANY_INTRODUCTION + "_" + count.toString()
         } else if (location.contains(getPresentSectionCode()) == true) {
-            val list = location.split("_")
-            var sectionName = ""
-            if (list.size > 1) {
-                sectionName = list[1]
-            } else {
-                sectionName = location
+
+            var sectionName = sectionName1
+            if (sectionName == "") {
+                val list = location.split("_")
+                if (list.size > 1) {
+                    sectionName = list[1]
+                } else {
+                    sectionName = location
+                }
             }
+
             if (location.contains(MainActivity.INTRODUCTIONS_PAGE)) {
                 presentPhotoName =
                     sectionName + "_" + MainActivity.INTRODUCTIONS_PAGE + "_" + count.toString()
@@ -4551,7 +6136,7 @@ class AInfo5ViewModel(
 
     //This variable stores all the details of the company photos
     private var companyPhotosList: MutableList<PhotoDetailsDC> = mutableListOf()
-    fun setPhotosListInCompany(input: MutableList<PhotoDetailsDC>) {
+    fun setTheCompanyPhotosList(input: MutableList<PhotoDetailsDC>) {
         companyPhotosList = input
     }
 
@@ -4603,6 +6188,18 @@ class AInfo5ViewModel(
             } else {
                 photosList.add(modifiedPhoto)
             }
+        }
+    }
+
+    fun deleteSectionPhotosInCompanyPhotosListAndSaveToDb(sectionCode: String) {
+        viewModelScope.launch(Dispatchers.Default) {
+            val newCompanyPhotosList = mutableListOf<PhotoDetailsDC>()
+            for (item in companyPhotosList) {
+                if (!item.location.contains(sectionCode)) {
+                    newCompanyPhotosList.add(item)
+                }
+            }
+            setTheCompanyPhotosList(newCompanyPhotosList)
         }
     }
 
@@ -4707,6 +6304,24 @@ class AInfo5ViewModel(
             }
         }
         return photoDetailsList
+    }
+
+    fun stringToPhotoDetailsListAndSetInViewModel(input: String) {
+        viewModelScope.launch(Dispatchers.Default) {
+            val photoDetailsList = mutableListOf<PhotoDetailsDC>()
+            if (input != "") {
+                val inputML = stringToMLUsingDelimiter2(input)
+                for (index in 0 until inputML.size) {
+                    val photoDetails = stringToPhotoDetails(inputML[index])
+                    photoDetailsList.add(photoDetails)
+                }
+            }
+            withContext(Dispatchers.Main) {
+                setTheCompanyPhotosList(photoDetailsList)
+                setTheCompanyPhotosUploadedFlagMLD(true)
+
+            }
+        }
     }
 
     fun saveCompanyPhotoDetailsListToDB() {
@@ -5607,6 +7222,7 @@ class AInfo5ViewModel(
                 val contentResolver = context.contentResolver
                 val dirUriString = getTheCompanyDirectoryURIString()
                 var photoFullName = fileNameFromURI(photoUri)
+
                 if (photoFullName == "") {
                     photoFullName = "Default_Photo.jpg"
                 }
@@ -5615,15 +7231,18 @@ class AInfo5ViewModel(
                     val dir = dirUri.let { DocumentFile.fromTreeUri(context, it) }
                     if (dir != null) {
                         val file = dir.createFile("image/*", photoFullName)
-                        //Log.d(MainActivity.TESTING_TAG, "writeToImageFile: 2 ${file.toString()} ")
+
                         if (file != null && file.canWrite()) {
                             val stream = ByteArrayOutputStream()
                             val bitmap = photoUri?.let { uriToBitmap(it) }
                             if (bitmap != null) {
-                                val bitmapRotated = bitmap.let { rotateBitmap(it, 90.00) }
+                                val bitmapRotated = bitmap.let { rotateBitmap(it, 00.00) }
                                 bitmapRotated?.compress(Bitmap.CompressFormat.JPEG, 100, stream)
                                 val bitmapdata: ByteArray = stream.toByteArray()
                                 alterDocument(file.uri, bitmapdata)
+
+                                //Delete the photo in the Pictures Folder
+                                //deleteAFileOrADirectory()
 
                                 //Add picture path into tvPhotoIntroductions and save into database
                                 withContext(Dispatchers.Main) {
@@ -5711,13 +7330,11 @@ class AInfo5ViewModel(
                                     //Update the count number in ViewModel and present PhotoName
                                     setThePhotoCount(getThePhotoCount().plus(1))
                                 }
-
-
                             }
                         } else {
                             //Error Message
                             withContext(Dispatchers.Main) {
-                                statusMessage.value = Event("Error: File Write Failed!")
+                                //statusMessage.value = Event("Error: File Write Failed!")
                             }
                         }
                     }
@@ -6400,6 +8017,7 @@ class AInfo5ViewModel(
         companyDirectoryURIString = input
     }
 
+
     //Flag is meant for choosing between directory choosing and
     //template document uploading
     private var fileFlag: String? = null
@@ -6411,20 +8029,254 @@ class AInfo5ViewModel(
         return fileFlag
     }
 
+//    //MLD Flag to ensure that the edit has been completed. True stands for completion
+//    //False means that it is not yet complete
+//    private var editCompletedFlagMLD = MutableLiveData<Boolean?>()
+//    val editCompletedFlagLD: LiveData<Boolean?>
+//        get() = editCompletedFlagMLD
+//    fun setTheEditCompletedFlagMLD(input: Boolean){
+//        editCompletedFlagMLD.value = input
+//    }
 
-    fun makeAChildDirectory(companyName: String, companyCode: String = "", dirUri: Uri) {
+
+    fun editCompanyNameFunction(newCompanyName: String) {
+        viewModelScope.launch(Dispatchers.IO) {
+            var oldCompanyName = ""
+            val presentCompanyCodeAndDisplay =
+                getThePresentCompanyCodeAndDisplayName()
+            oldCompanyName = presentCompanyCodeAndDisplay.displayName
+            presentCompanyCodeAndDisplay.displayName = newCompanyName
+            setThePresentCompanyCodeAndDisplayName(
+                presentCompanyCodeAndDisplay
+            )
+
+            val presentCompanyID =
+                presentCompanyCodeAndDisplay.uniqueCodeName + MainActivity.PRESENT_COMPANY_ID
+            val aInfo5NewCompanyName = AInfo5(presentCompanyID, newCompanyName)
+            insertAInfo5(aInfo5NewCompanyName)
+
+            setTheCompanyNameToBeUpdatedFlag(true)
+            //update the Company related ML
+            modifyDisplayNameOfSpecificCompanyInML(
+                newCompanyName,
+                presentCompanyCodeAndDisplay.uniqueCodeName
+            )
+            //Save the above in the DB
+            val companyCodeAndDisplayNameMLString =
+                codeAndDisplayNameListToString(getTheCompanyCodeAndDisplayNameML())
+            val aInfo5 = AInfo5(
+                MainActivity.COMPANY_CODES_NAMES_ID,
+                companyCodeAndDisplayNameMLString
+            )
+            insertAInfo5(aInfo5)
+
+            val oldCompanyDirectoryUri =
+                getTheCompanyDirectoryURIString().toUri()
+
+            //Renaming the document files inside the old Company Directory
+            //Three column File
+            val old3ColumnWordFileNameWithoutExtension = oldCompanyName + "_Word"
+            val old3ColumnWordFileNameWithExtension =
+                old3ColumnWordFileNameWithoutExtension + MainActivity.DOC_FILE_3COLUMN_WORD_EXTENSION
+
+            val new3ColumnWordFileNameWithoutExtension = newCompanyName + "_Word"
+            val new3ColumnWordFileNameWithExtension =
+                new3ColumnWordFileNameWithoutExtension + MainActivity.DOC_FILE_3COLUMN_WORD_EXTENSION
+
+            renameDocument(
+                oldCompanyDirectoryUri,
+                old3ColumnWordFileNameWithExtension,
+                new3ColumnWordFileNameWithExtension
+            )
+
+            //Six Column File
+            val old6ColumnWordFileNameWithoutExtension = oldCompanyName + "_Word"
+            val old6ColumnWordFileNameWithExtension =
+                old6ColumnWordFileNameWithoutExtension + MainActivity.DOC_FILE_6COLUMN_WORD_EXTENSION
+
+            val new6ColumnWordFileNameWithoutExtension = newCompanyName + "_Word"
+            val new6ColumnWordFileNameWithExtension =
+                new6ColumnWordFileNameWithoutExtension + MainActivity.DOC_FILE_6COLUMN_WORD_EXTENSION
+
+            renameDocument(
+                oldCompanyDirectoryUri,
+                old6ColumnWordFileNameWithExtension,
+                new6ColumnWordFileNameWithExtension
+            )
+
+            //Renaming the old Company Directory suitably and saving the new company directory uri into the db
+            val newCompanyDirUri =
+                renameDocument(parentFolderURIString.toUri(), oldCompanyName, newCompanyName)
+
+            val companyDirectoryUriId =
+                getPresentCompanyCode() + MainActivity.COMPANY_DIRECTORY_URI_ID
+            val aInfo5Dir =
+                AInfo5(companyDirectoryUriId, newCompanyDirUri.toString())
+            insertAInfo5(aInfo5Dir)
+            val companyIntroAndPhotoPathsData =
+                "${etIntroductionsMLD.value.toString()} \n\n ${tvPhotoPathsInIntroductionsFragmentMLD.value.toString()}"
+
+
+            withContext(Dispatchers.Main) {
+                setTheCompanyDirectoryURIString(newCompanyDirUri.toString())
+                //Updating the company name in the company report
+                updateTheCompanyNameAuditDateAndIntroInCompanyReportAndSave(
+                    getPresentCompanyCode(),
+                    newCompanyName,
+                    "",
+                    ""
+                )
+                setTheEditCompletedFlagMLD(true)
+            }
+        }
+    }
+
+    fun editSectionNameFunction(newSectionName: String) {
+        viewModelScope.launch(Dispatchers.IO) {
+            val presentSectionCodeAndDisplay = getThePresentSectionCodeAndDisplayName()
+            val oldSectionName = presentSectionCodeAndDisplay.displayName
+
+            presentSectionCodeAndDisplay.displayName = newSectionName
+            setThePresentSectionCodeAndDisplayName(presentSectionCodeAndDisplay)
+
+            //Update the present section display Name
+            val presentSectionNameID =
+                getPresentCompanyCode() + getPresentSectionCode() + MainActivity.PRESENT_SECTION_ID
+            val aInfo5SectionName = AInfo5(presentSectionNameID, newSectionName)
+            insertAInfo5(aInfo5SectionName)
+
+            setFlagForSectionNameToBeUpdated(true)
+
+            //update the Section related ML
+            modifyDisplayNameOfSpecificSectionInSectionCDML(
+                newSectionName,
+                presentSectionCodeAndDisplay.uniqueCodeName
+            )
+            //Save the above in the DB
+            val sectionCodeAndDisplayNameMLString =
+                codeAndDisplayNameListToString(getTheCompanySectionCodeAndDisplayNameML())
+            val companySectionsCDListID =
+                getPresentCompanyCode() + MainActivity.COMPANY_SECTION_LIST_ID
+            val aInfo5 = AInfo5(
+                companySectionsCDListID,
+                sectionCodeAndDisplayNameMLString
+            )
+            insertAInfo5(aInfo5)
+
+            //Renaming the photos to reflect the new section name
+            val companyDirectoryUri = getTheCompanyDirectoryURIString().toUri()
+            val photosList = getTheCompanyPhotosList()
+            val newPhotosList = mutableListOf<PhotoDetailsDC>()
+            for (photoIndex in 0 until photosList.size) {
+                val list = photosList[photoIndex].fullPhotoName.split("_")
+                var photoDetailsItem = PhotoDetailsDC()
+                photoDetailsItem.location = photosList[photoIndex].location
+                if (list[0] == oldSectionName) {
+                    val newFullPhotoName = newSectionName + "_" + list[1] + "_" + list[2]
+                    photoDetailsItem.location = photosList[photoIndex].location
+                    photoDetailsItem.photoCaption = photosList[photoIndex].photoCaption
+                    photoDetailsItem.fullPhotoName = newFullPhotoName
+                    val newPhotoUri = renameDocument(
+                        companyDirectoryUri,
+                        photosList[photoIndex].fullPhotoName,
+                        newFullPhotoName
+                    )
+                    photoDetailsItem.photoUriString = newPhotoUri.toString()
+                    newPhotosList.add(photoDetailsItem)
+                } else {
+                    photoDetailsItem = photosList[photoIndex]
+                    newPhotosList.add(photoDetailsItem)
+                    continue
+                }
+            }
+
+            setTheCompanyPhotosList(newPhotosList)
+            val newPhotosListString = photoDetailsListToString(newPhotosList)
+            val photoID = getPresentCompanyCode() + MainActivity.PHOTOS_LIST_ID
+            val aInfo5Photos = AInfo5(photoID, newPhotosListString)
+            insertAInfo5(aInfo5Photos)
+
+            //Update the section data suitably
+            val presentSectionAllData = getThePresentSectionAllData()
+            val presentSectionAllPagesData = presentSectionAllData.sectionAllPagesData
+
+            if (presentSectionAllPagesData.sectionPageDataList.isNotEmpty()) {
+                for (pageIndex in 0 until presentSectionAllPagesData.sectionPageDataList.size) {
+                    val oldPhotoPaths =
+                        presentSectionAllPagesData.sectionPageDataList[pageIndex].photoPaths
+                    var newPhotoPaths = ""
+                    if (oldPhotoPaths.contains(oldSectionName)) {
+                        newPhotoPaths = oldPhotoPaths.replace(oldSectionName, newSectionName)
+                        updatePicturePathsInObsForThePresentSectionAllData(newPhotoPaths, pageIndex)
+                    } else {
+                        continue
+                    }
+                }
+                val sectionPagesFrameworkAndDataID =
+                    getPresentCompanyCode() + getPresentSectionCode() + MainActivity.SECTION_PAGES_FRAMEWORK_AND_DATA_ID
+                saveThePresentSectionAllPagesFrameworkAndAllDataToDB(
+                    getThePresentSectionAllPagesFramework(),
+                    getThePresentSectionAllData(),
+                    sectionPagesFrameworkAndDataID
+                )
+
+            }
+
+            if (presentSectionAllData.picturePathsInIntroductions != "") {
+                val oldPhotoPathsInSectionIntroduction =
+                    presentSectionAllData.picturePathsInIntroductions
+                var newPhotoPathsInSectionIntroduction = ""
+                if (oldPhotoPathsInSectionIntroduction.contains(oldSectionName)) {
+                    newPhotoPathsInSectionIntroduction =
+                        oldPhotoPathsInSectionIntroduction.replace(oldSectionName, newSectionName)
+                    updatePicturePathsInSectionIntroForThePresentSectionAllData(
+                        newPhotoPathsInSectionIntroduction
+                    )
+                }
+//                //Save the updated sectionPages into the DB
+                val sectionPagesFrameworkAndDataID =
+                    getPresentCompanyCode() + getPresentSectionCode() + MainActivity.SECTION_PAGES_FRAMEWORK_AND_DATA_ID
+                saveThePresentSectionAllPagesFrameworkAndAllDataToDB(
+                    getThePresentSectionAllPagesFramework(),
+                    getThePresentSectionAllData(),
+                    sectionPagesFrameworkAndDataID
+                )
+            }
+
+            //Update the Company Report and save
+            updateSectionDetailsInCompanyReportAndSave(
+                getPresentSectionCode(),
+                newSectionName,
+                getThePresentSectionAllData()
+            )
+
+            withContext(Dispatchers.Main) {
+                //Ensure that the new company section list string is uploaded
+                companySectionCDMLToBeUpdatedFlagMLD.value = true
+                setTheEditCompletedFlagMLD(true)
+            }
+        }
+    }
+
+    fun makeAChildDirectory(
+        companyName: String,
+        companyCode: String = "",
+        parentFolderDirUri: Uri,
+        oldCompanyUriString: String = ""
+    ) {
+        var companyDirectoryUri: Uri?
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
                 val context = getApplication<Application>().applicationContext
                 val companyDirectory =
-                    DocumentFile.fromTreeUri(context, dirUri)?.createDirectory(companyName)
-                val companyUri = companyDirectory?.uri
+                    DocumentFile.fromTreeUri(context, parentFolderDirUri)
+                        ?.createDirectory(companyName)
+                companyDirectoryUri = companyDirectory?.uri
                 val companyDirectoryUriId = companyCode + MainActivity.COMPANY_DIRECTORY_URI_ID
                 val aInfo5 =
-                    AInfo5(companyDirectoryUriId, companyUri.toString())
+                    AInfo5(companyDirectoryUriId, companyDirectoryUri.toString())
                 insertAInfo5(aInfo5)
-                setTheCompanyDirectoryURIString(companyUri.toString())
-                addUniqueItemToPresentCompanyAllIds(companyDirectoryUriId)
+                setTheCompanyDirectoryURIString(companyDirectoryUri.toString())
             }
         }
     }
@@ -6440,6 +8292,33 @@ class AInfo5ViewModel(
         }
     }
 
+    fun gettingCompanyDirectoryUriAndSavingIntoDB(companyName: String, parentDirUri: Uri?) {
+        viewModelScope.launch(Dispatchers.IO) {
+            val context = getApplication<Application>().applicationContext
+            var companyDirectoryUri: Uri? = null
+            companyDirectoryUri =
+                context?.let { it1 ->
+                    DocumentFile.fromTreeUri(
+                        it1,
+                        parentDirUri!!
+                    )?.findFile(companyName)?.uri
+                }
+            if (companyDirectoryUri != null) {
+                val companyDirectoryUriId =
+                    getPresentCompanyCode() + MainActivity.COMPANY_DIRECTORY_URI_ID
+                val companyDirectoryAInfo5 =
+                    AInfo5(companyDirectoryUriId, companyDirectoryUri.toString())
+                insertAInfo5(companyDirectoryAInfo5)
+                withContext(Dispatchers.Main) {
+                    Toast.makeText(
+                        context,
+                        "This $companyName company directory already exists.",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+            }
+        }
+    }
 
     fun renamingFilesAfterSectionNameChange(newSectionName: String) {
         viewModelScope.launch(Dispatchers.IO) {
@@ -6447,11 +8326,14 @@ class AInfo5ViewModel(
         }
     }
 
-    fun remakeCompanyDirectoryAndMovingFiles(dirUri: Uri, newCompanyName: String) {
+    fun movingFilesToNewDirectory(oldCompanyDirUri: Uri, newCompanyName: String) {
         viewModelScope.launch(Dispatchers.IO) {
-            TODO("to be developed yet")
-        }
+            val context = getApplication<Application>().applicationContext
 
+
+            //Move the old files to the new directory
+
+        }
     }
 
     fun fileExists(name: String, dirUri: Uri?): Boolean? {
@@ -6491,12 +8373,10 @@ class AInfo5ViewModel(
                     } else {
                         Log.d("LOGTAG", "Cannot write into file")
                         //consider showing some more appropriate error message
-                        //statusMessage.value = Event("Error: Cannot write into file")
                     }
                 } else {
                     val file = dir?.createFile("*/txt", fullFileName)
                     if (file != null && file.canWrite()) {
-                        Log.d("LOGTAG", "file.uri = ${file.uri.toString()}")
                         alterDocument(
                             file.uri, content
                                 .toByteArray()
@@ -6504,7 +8384,6 @@ class AInfo5ViewModel(
 
                     } else {
                         Log.d("LOGTAG", "no file or cannot write")
-                        //statusMessage.value = Event("Error: No file present or cannot write")
                     }
                 }
             }
@@ -6526,10 +8405,26 @@ class AInfo5ViewModel(
         return fileName!!
     }
 
+    fun directoryNameFromURI(uri: Uri?): String {
+        var directoryURIString = ""
+        val context = getApplication<Application>().applicationContext
+        val contentResolver = context.contentResolver
+        val returnCursor = uri?.let { contentResolver.query(it, null, null, null, null) }
+        val nameIndex = returnCursor?.getColumnIndex(OpenableColumns.DISPLAY_NAME)
+        if (returnCursor != null) {
+            returnCursor.moveToFirst()
+        }
+//        val fileName = nameIndex?.let { returnCursor.getString(it) }
+//        if (returnCursor != null) {
+//            returnCursor.close()
+//        }
+//        return fileName!!
+        return directoryURIString
+    }
+
     private suspend fun alterDocument(uri: Uri, data: ByteArray) {
         val context = getApplication<Application>().applicationContext
         try {
-            //Log.d(MainActivity.TESTING_TAG, "alterDocument: URI: ${uri.toString()} ")
             val contentResolver = context.contentResolver
             if (contentResolver != null) {
                 contentResolver.openFileDescriptor(uri, "w")?.use { parcelFileDescriptor ->
@@ -6538,23 +8433,52 @@ class AInfo5ViewModel(
                             data
                         )
                         withContext(Dispatchers.Main) {
-                            statusMessage.value = Event("File Write is Successful!")
+                            Toast.makeText(context, "File Write is Successful!", Toast.LENGTH_SHORT)
+                                .show()
+                            //statusMessage.value = Event("File Write is Successful!")
                         }
                     }
                 }
             }
         } catch (e: FileNotFoundException) {
             withContext(Dispatchers.Main) {
-                statusMessage.value = Event("Error: File not found!")
+                Toast.makeText(context, "File not found", Toast.LENGTH_SHORT).show()
             }
             e.printStackTrace()
         } catch (e: IOException) {
             withContext(Dispatchers.Main) {
-                statusMessage.value = Event("Error: File Write Failed!")
+                Toast.makeText(context, "Error: File Write Failed!", Toast.LENGTH_SHORT).show()
             }
             e.printStackTrace()
         }
     }
 
+    fun deleteAFileOrADirectory(dirUri: Uri?, fullFileName: String) {
+        val context = getApplication<Application>().applicationContext
+        val dir = DocumentFile.fromTreeUri(context, dirUri!!)
+        val fileExists = dir?.findFile(fullFileName)
+        if (fileExists != null) {
+            try {
+                fileExists.delete()
+            } catch (e: FileNotFoundException) {
+                Toast.makeText(context, "File not found", Toast.LENGTH_SHORT).show()
+            }
+        } else {
+            Toast.makeText(context, "File does not exist in this directory", Toast.LENGTH_SHORT)
+                .show()
+        }
+    }
+
+    fun renameDocument(dirUri: Uri?, fullOldFileName: String, fullNewFileName: String): Uri? {
+        var renamedFileUri: Uri? = null
+        val context = getApplication<Application>().applicationContext
+        val dir = DocumentFile.fromTreeUri(context, dirUri!!)
+        val oldFileExists = dir?.findFile(fullOldFileName)
+        if (oldFileExists != null) {
+            oldFileExists.renameTo(fullNewFileName)
+            renamedFileUri = dir.findFile(fullNewFileName)!!.uri
+        }
+        return renamedFileUri
+    }
 
 }

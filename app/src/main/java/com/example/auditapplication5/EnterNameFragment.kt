@@ -12,8 +12,7 @@ import androidx.core.net.toUri
 import androidx.databinding.DataBindingUtil
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.findNavController
-import com.example.auditapplication5.data.model.AInfo5
-import com.example.auditapplication5.data.model.CodeNameAndDisplayNameDC
+import com.example.auditapplication5.data.model.*
 import com.example.auditapplication5.databinding.FragmentEnterNameBinding
 import com.example.auditapplication5.presentation.viewmodel.AInfo5ViewModel
 import java.text.SimpleDateFormat
@@ -47,6 +46,8 @@ class EnterNameFragment : Fragment() {
 
         aInfo5ViewModel = (activity as MainActivity).aInfo5ViewModel
 
+        val TAG = MainActivity.TESTING_TAG
+
         activity?.onBackPressedDispatcher?.addCallback(
             viewLifecycleOwner,
             object : OnBackPressedCallback(true) {
@@ -56,20 +57,20 @@ class EnterNameFragment : Fragment() {
                     } else if (aInfo5ViewModel.getThePreviousScreenVariable() == MainActivity.SECTION_FRAGMENT) {
                         aInfo5ViewModel.setThePreviousScreenVariable(MainActivity.NOT_RELEVANT)
                         findNavController().navigate(R.id.action_enterNameFragment_to_sectionAndIntrosFragment)
-                    } else if (aInfo5ViewModel.getThePreviousScreenVariable() == MainActivity.SIMPLE_LIST_RV_FRAGMENT){
-                        if (aInfo5ViewModel.getThePreviousScreen2Variable() ==  MainActivity.SECTION_FRAGMENT_EDIT_1){
+                    } else if (aInfo5ViewModel.getThePreviousScreenVariable() == MainActivity.SIMPLE_LIST_RV_FRAGMENT) {
+                        if (aInfo5ViewModel.getThePreviousScreen2Variable() == MainActivity.SECTION_FRAGMENT_EDIT_1) {
                             aInfo5ViewModel.setTheScreenVariable(MainActivity.SECTION_FRAGMENT)
                             aInfo5ViewModel.setThePreviousScreenVariable(MainActivity.NOT_RELEVANT)
                             aInfo5ViewModel.setThePreviousScreen2Variable(MainActivity.NOT_RELEVANT)
-                        } else if (aInfo5ViewModel.getThePreviousScreen2Variable() == MainActivity.SECTION_FRAGMENT_EDIT_2){
+                        } else if (aInfo5ViewModel.getThePreviousScreen2Variable() == MainActivity.SECTION_FRAGMENT_EDIT_2) {
                             aInfo5ViewModel.setTheScreenVariable(MainActivity.SECTION_FRAGMENT_SECTION_CHOICE)
                             aInfo5ViewModel.setThePreviousScreenVariable(MainActivity.NOT_RELEVANT)
                             aInfo5ViewModel.setThePreviousScreen2Variable(MainActivity.NOT_RELEVANT)
-                        } else if (aInfo5ViewModel.getThePreviousScreen2Variable()== MainActivity.SECTION_FRAGMENT_DELETE_1){
+                        } else if (aInfo5ViewModel.getThePreviousScreen2Variable() == MainActivity.SECTION_FRAGMENT_DELETE_1) {
                             aInfo5ViewModel.setTheScreenVariable(MainActivity.SECTION_FRAGMENT)
                             aInfo5ViewModel.setThePreviousScreenVariable(MainActivity.NOT_RELEVANT)
                             aInfo5ViewModel.setThePreviousScreen2Variable(MainActivity.NOT_RELEVANT)
-                        } else if (aInfo5ViewModel.getThePreviousScreen2Variable() == MainActivity.SECTION_FRAGMENT_DELETE_2){
+                        } else if (aInfo5ViewModel.getThePreviousScreen2Variable() == MainActivity.SECTION_FRAGMENT_DELETE_2) {
                             aInfo5ViewModel.setTheScreenVariable(MainActivity.SECTION_FRAGMENT_SECTION_CHOICE)
                             aInfo5ViewModel.setThePreviousScreenVariable(MainActivity.NOT_RELEVANT)
                             aInfo5ViewModel.setThePreviousScreen2Variable(MainActivity.NOT_RELEVANT)
@@ -83,47 +84,90 @@ class EnterNameFragment : Fragment() {
         val actionBar = (activity as MainActivity).supportActionBar
         actionBar?.hide()
 
-        //Getting the list of companies from the db and storing in ViewModel
-        aInfo5ViewModel.getMLOfCompanyCodesAndNamesLD.observe(viewLifecycleOwner) { list ->
-            var companyCodesAndNamesListString = ""
-            if (list.isEmpty()) {
-                aInfo5ViewModel.setTheCompanyCodeAndDisplayNameML(mutableListOf())
+        aInfo5ViewModel.allConditionsMetEnterNameLD.observe(viewLifecycleOwner){allMet ->
+            if (allMet == true){
+                binding.pbEnterNameFragment.visibility = View.GONE
+                binding.llLayoutContainerEnterNameFragment.isEnabled = true
             } else {
-                companyCodesAndNamesListString = ""
-                for (item in list) {
-                    companyCodesAndNamesListString += item.framework
-                }
-                val companyCodesAndNamesML = aInfo5ViewModel.stringToCodeAndDisplayNameList(
-                    companyCodesAndNamesListString
-                )
-                aInfo5ViewModel.setTheCompanyCodeAndDisplayNameML(companyCodesAndNamesML)
+                binding.pbEnterNameFragment.visibility = View.VISIBLE
+                binding.llLayoutContainerEnterNameFragment.isEnabled = false
             }
         }
+
+        //Getting the list of companies from the db and storing in ViewModel
+        if (aInfo5ViewModel.companyNameListUploadedENFFlagLD.value == false){
+            aInfo5ViewModel.getMLOfCompanyCodesAndNamesLD.observe(viewLifecycleOwner) { list ->
+                var companyCodesAndNamesListString = ""
+                if (list.isEmpty()) {
+                    aInfo5ViewModel.setTheCompanyCodeAndDisplayNameML(mutableListOf())
+                } else {
+                    companyCodesAndNamesListString = ""
+                    for (item in list) {
+                        companyCodesAndNamesListString += item.framework
+                    }
+                    val companyCodesAndNamesML = aInfo5ViewModel.stringToCodeAndDisplayNameList(
+                        companyCodesAndNamesListString
+                    )
+                    aInfo5ViewModel.setTheCompanyCodeAndDisplayNameML(companyCodesAndNamesML)
+                }
+                aInfo5ViewModel.setTheCompanyNameListUploadedENFFlagMLD(true)
+            }
+        }
+
 
         //Getting the Parent Folder for saving Audits from DB
-        if (aInfo5ViewModel.getTheParentFolderURIString() == "") {
-            aInfo5ViewModel.getParentFolderURIStringLD.observe(viewLifecycleOwner) { list ->
-                if (list.isEmpty()) {
-                    aInfo5ViewModel.setTheParentFolderURIString("")
-                } else {
-                    var parentFolderURIString = ""
-                    for (item in list) {
-                        parentFolderURIString += item.framework.toString()
+        var parentFolderURIString = aInfo5ViewModel.getTheParentFolderURIString()
+        if (parentFolderURIString == ""){
+            if (aInfo5ViewModel.parentFolderURIUploadedENFFlagLD.value == false){
+                aInfo5ViewModel.getParentFolderURIStringLD.observe(viewLifecycleOwner) { list ->
+                    if (list.isEmpty()) {
+                        aInfo5ViewModel.setTheParentFolderURIString("")
+                        aInfo5ViewModel.setTheparentFolderURIUploadedENFFlagMLD(true)
                     }
-                    aInfo5ViewModel.setTheParentFolderURIString(parentFolderURIString)
-                    val result =
-                        (activity as MainActivity).areUriPermissionsGranted(parentFolderURIString)
-                    if (!result) {
-                        (activity as MainActivity).takePersistableURIPermissions(
-                            parentFolderURIString.toUri()
-                        )
+                    else {
+                        parentFolderURIString = ""
+                        for (item in list) {
+                            parentFolderURIString += item.framework.toString()
+                        }
+                        aInfo5ViewModel.setTheParentFolderURIString(parentFolderURIString)
+                        val result =
+                            (activity as MainActivity).areUriPermissionsGranted(parentFolderURIString)
+                        if (!result) {
+                            (activity as MainActivity).takePersistableURIPermissions(
+                                parentFolderURIString.toUri()
+                            )
+                        }
+                        aInfo5ViewModel.setTheparentFolderURIUploadedENFFlagMLD(true)
                     }
                 }
             }
         }
+        else {
+            aInfo5ViewModel.setTheparentFolderURIUploadedENFFlagMLD(true)
+        }
 
 
-        //Setting the edit functionality for Company and Section
+        //Getting the company directory uri string
+//        var companyDirectoryUriString = ""
+//        companyDirectoryUriString = aInfo5ViewModel.getTheCompanyDirectoryURIString()
+//        if (companyDirectoryUriString == ""){
+//            val companyDirectoryUriId =
+//                aInfo5ViewModel.getPresentCompanyCode() + MainActivity.COMPANY_DIRECTORY_URI_ID
+//            aInfo5ViewModel.getAInfo5ByIds(mutableListOf(companyDirectoryUriId))
+//                .observe(viewLifecycleOwner) { list ->
+//                    if (list.isEmpty()) {
+//                        companyDirectoryUriString = ""
+//                    } else {
+//                        companyDirectoryUriString = ""
+//                        for (item in list) {
+//                            companyDirectoryUriString += item.framework.toString()
+//                        }
+//                        aInfo5ViewModel.setTheCompanyDirectoryURIString(companyDirectoryUriString)
+//                    }
+//                }
+//        }
+
+        //Putting the name of Company or Section in the Edit Text
         if (aInfo5ViewModel.getThePreviousScreenVariable() == MainActivity.SIMPLE_LIST_RV_FRAGMENT) {
             if (aInfo5ViewModel.getTheCompanyNameToBeUpdatedFlag() == true) {
                 val presentCompanyNameID =
@@ -138,8 +182,9 @@ class EnterNameFragment : Fragment() {
                             binding.etEnterName.setText(presentCompanyName)
                         }
                     }
-                aInfo5ViewModel.addUniqueItemToPresentCompanyAllIds(presentCompanyNameID)
-            } else if (aInfo5ViewModel.getFlagForSectionNameToBeUpdated() == true) {
+
+            }
+            else if (aInfo5ViewModel.getFlagForSectionNameToBeUpdated() == true) {
                 val presentSectionNameID =
                     aInfo5ViewModel.getPresentCompanyCode() + aInfo5ViewModel.getPresentSectionCode() + MainActivity.PRESENT_SECTION_ID
                 aInfo5ViewModel.getAInfo5ByIds(mutableListOf(presentSectionNameID))
@@ -152,7 +197,6 @@ class EnterNameFragment : Fragment() {
                             binding.etEnterName.setText(presentSectionName)
                         }
                     }
-                aInfo5ViewModel.addUniqueItemToPresentCompanyAllIds(presentSectionNameID)
             }
         }
 
@@ -173,18 +217,12 @@ class EnterNameFragment : Fragment() {
                             presentCompanyCodeAndDisplay
                         )
 
-                        //Setting up the Present Company All Ids first term in the ViewModel
-                        val presentCompanyAllIdsId = aInfo5ViewModel.getPresentCompanyCode() + MainActivity.PRESENT_COMPANY_ALL_IDs_ID
-                        aInfo5ViewModel.addUniqueItemToPresentCompanyAllIds(presentCompanyAllIdsId)
-
-
                         //Putting only the present company display name into the db
-                        val presentCompanyID =
+                        val presentCompanyNameID =
                             presentCompanyCodeAndDisplay.uniqueCodeName + MainActivity.PRESENT_COMPANY_ID
-                        val aInfo5PresentCompany = AInfo5(presentCompanyID, companyName)
+                        val aInfo5PresentCompany = AInfo5(presentCompanyNameID, companyName)
                         aInfo5ViewModel.insertAInfo5(aInfo5PresentCompany)
                         aInfo5ViewModel.setTheCompanyNameToBeUpdatedFlag(true)
-                        aInfo5ViewModel.addUniqueItemToPresentCompanyAllIds(presentCompanyID)
 
                         //Putting the ML of CompanyCodeAndDisplay into the db
                         aInfo5ViewModel.addToCompanyCodeAndDisplayNameML(
@@ -207,7 +245,6 @@ class EnterNameFragment : Fragment() {
                         aInfo5ViewModel.insertAInfo5(aInfo5Date)
                         aInfo5ViewModel.setTheCompanyAuditDate(currentDate.toString())
                         aInfo5ViewModel.setTheAuditDateToBeUpdatedFlag(true)
-                        aInfo5ViewModel.addUniqueItemToPresentCompanyAllIds(dateID)
 
                         val dirExists = aInfo5ViewModel.directoryExists(
                             companyName,
@@ -228,12 +265,21 @@ class EnterNameFragment : Fragment() {
                                 ).show()
                             }
                         }
+                        else {
+                            try {
+                                aInfo5ViewModel.gettingCompanyDirectoryUriAndSavingIntoDB(companyName,aInfo5ViewModel.getTheParentFolderURIString().toUri() )
+                            } catch (e: FileSystemException){
+                                Toast.makeText(context, "Getting this $companyName directory Uri has failed. Please note $e", Toast.LENGTH_SHORT).show()
+                            }
+
+                        }
                         aInfo5ViewModel.setThePreviousScreenVariable(MainActivity.NOT_RELEVANT)
                         aInfo5ViewModel.setTheScreenVariable(MainActivity.SECTION_FRAGMENT)
-                        aInfo5ViewModel.savePresentCompanyAllIdsIntoDB(aInfo5ViewModel.getPresentCompanyCode())
+
                         it.findNavController()
                             .navigate(R.id.action_enterNameFragment_to_sectionAndIntrosFragment)
-                    } else {
+                    }
+                    else {
                         if (aInfo5ViewModel.uniquenessCheckInCodesAndNames(
                                 aInfo5ViewModel.getTheCompanyCodeAndDisplayNameML(),
                                 companyName
@@ -255,7 +301,6 @@ class EnterNameFragment : Fragment() {
                             val aInfo5PresentCompany = AInfo5(presentCompanyID, companyName)
                             aInfo5ViewModel.insertAInfo5(aInfo5PresentCompany)
                             aInfo5ViewModel.setTheCompanyNameToBeUpdatedFlag(true)
-                            aInfo5ViewModel.addUniqueItemToPresentCompanyAllIds(presentCompanyID)
 
                             aInfo5ViewModel.addToCompanyCodeAndDisplayNameML(
                                 presentCompanyCodeAndDisplay
@@ -275,7 +320,6 @@ class EnterNameFragment : Fragment() {
                             val aInfo5Date = AInfo5(dateID, currentDate.toString())
                             aInfo5ViewModel.insertAInfo5(aInfo5Date)
                             aInfo5ViewModel.setTheAuditDateToBeUpdatedFlag(true)
-                            aInfo5ViewModel.addUniqueItemToPresentCompanyAllIds(dateID)
 
                             val dirExists = aInfo5ViewModel.directoryExists(
                                 companyName,
@@ -291,18 +335,28 @@ class EnterNameFragment : Fragment() {
                                 } catch (e: FileSystemException) {
                                     Toast.makeText(
                                         this.requireContext(),
-                                        "Directory Creation Failed. Please note $e",
+                                        "Directory Creation Has Failed. Please note $e",
                                         Toast.LENGTH_SHORT
                                     ).show()
+                                }
+                            } else {
+                                try {
+                                    aInfo5ViewModel.gettingCompanyDirectoryUriAndSavingIntoDB(companyName,aInfo5ViewModel.getTheParentFolderURIString().toUri() )
+                                } catch (e: FileSystemException){
+                                    Toast.makeText(context, "Getting this $companyName directory Uri has failed. Please note $e", Toast.LENGTH_SHORT).show()
                                 }
                             }
                             aInfo5ViewModel.setThePreviousScreenVariable(MainActivity.NOT_RELEVANT)
                             aInfo5ViewModel.setTheScreenVariable(MainActivity.SECTION_FRAGMENT)
-                            aInfo5ViewModel.savePresentCompanyAllIdsIntoDB(aInfo5ViewModel.getPresentCompanyCode())
+
                             it.findNavController()
                                 .navigate(R.id.action_enterNameFragment_to_sectionAndIntrosFragment)
                         } else {
-                            Toast.makeText(this.requireContext(), "This company name exists. Please enter a unique name.", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(
+                                this.requireContext(),
+                                "This company name exists. Please enter a unique name.",
+                                Toast.LENGTH_SHORT
+                            ).show()
                         }
                     }
                 }
@@ -327,12 +381,13 @@ class EnterNameFragment : Fragment() {
                             aInfo5ViewModel.getPresentCompanyCode() + MainActivity.COMPANY_SECTION_LIST_ID
                         val aInfo5 = AInfo5(companySectionListID, sectionCodeAndDisplayNameMLString)
                         aInfo5ViewModel.insertAInfo5(aInfo5)
-                        aInfo5ViewModel.addUniqueItemToPresentCompanyAllIds(companySectionListID)
+
                         aInfo5ViewModel.setThePreviousScreenVariable(MainActivity.NOT_RELEVANT)
                         aInfo5ViewModel.setTheScreenVariable(MainActivity.SECTION_FRAGMENT)
                         it.findNavController()
                             .navigate(R.id.action_enterNameFragment_to_sectionAndIntrosFragment)
-                    } else {
+                    }
+                    else {
                         if (aInfo5ViewModel.uniquenessCheckInCodesAndNames(
                                 aInfo5ViewModel.getTheCompanySectionCodeAndDisplayNameML(),
                                 sectionName
@@ -357,13 +412,18 @@ class EnterNameFragment : Fragment() {
                             val aInfo5 =
                                 AInfo5(companySectionListID, sectionCodeAndDisplayNameMLString)
                             aInfo5ViewModel.insertAInfo5(aInfo5)
-                            aInfo5ViewModel.addUniqueItemToPresentCompanyAllIds(companySectionListID)
+
                             aInfo5ViewModel.setThePreviousScreenVariable(MainActivity.NOT_RELEVANT)
                             aInfo5ViewModel.setTheScreenVariable(MainActivity.SECTION_FRAGMENT)
                             it.findNavController()
                                 .navigate(R.id.action_enterNameFragment_to_sectionAndIntrosFragment)
-                        } else {
-                            Toast.makeText(this.requireContext(), "This section exists", Toast.LENGTH_SHORT).show()
+                        }
+                        else {
+                            Toast.makeText(
+                                this.requireContext(),
+                                "This section exists",
+                                Toast.LENGTH_SHORT
+                            ).show()
                         }
                     }
                 }
@@ -376,39 +436,8 @@ class EnterNameFragment : Fragment() {
                                 newCompanyName
                             )
                         ) {
-                            val presentCompanyCodeAndDisplay =
-                                aInfo5ViewModel.getThePresentCompanyCodeAndDisplayName()
-                            presentCompanyCodeAndDisplay.displayName = newCompanyName
-                            aInfo5ViewModel.setThePresentCompanyCodeAndDisplayName(
-                                presentCompanyCodeAndDisplay
-                            )
-                            //Putting only the present company display name into the db
-                            val presentCompanyID =
-                                presentCompanyCodeAndDisplay.uniqueCodeName + MainActivity.PRESENT_COMPANY_ID
-                            val aInfo5NewCompanyName = AInfo5(presentCompanyID, newCompanyName)
-                            aInfo5ViewModel.insertAInfo5(aInfo5NewCompanyName)
-                            aInfo5ViewModel.addUniqueItemToPresentCompanyAllIds(presentCompanyID)
-                            aInfo5ViewModel.setTheCompanyNameToBeUpdatedFlag(true)
-                            //update the Company related ML
-                            aInfo5ViewModel.modifyDisplayNameOfSpecificCompanyInML(
-                                newCompanyName,
-                                presentCompanyCodeAndDisplay.uniqueCodeName
-                            )
-                            //Save the above in the DB
-                            val companyCodeAndDisplayNameMLString =
-                                aInfo5ViewModel.codeAndDisplayNameListToString(aInfo5ViewModel.getTheCompanyCodeAndDisplayNameML())
-                            val aInfo5 = AInfo5(
-                                MainActivity.COMPANY_CODES_NAMES_ID,
-                                companyCodeAndDisplayNameMLString
-                            )
-                            aInfo5ViewModel.insertAInfo5(aInfo5)
-                            //Reconstructing the company directory and moving files
-//                            aInfo5ViewModel.remakeCompanyDirectoryAndMovingFiles(
-//                                aInfo5ViewModel.getCompanyDirectoryURIString_A().toUri(),
-//                                newCompanyName
-//                            )
-                            //Updating the company name in the company report
-                            aInfo5ViewModel.updateTheCompanyNameAuditDateAndIntroInCompanyReportAndSave(aInfo5ViewModel.getPresentCompanyCode(),newCompanyName)
+                            aInfo5ViewModel.editCompanyNameFunction(newCompanyName)
+
                             //Move to the SectionAndIntrosFragment
                             if (aInfo5ViewModel.getThePreviousScreen2Variable() == MainActivity.SECTION_FRAGMENT_EDIT_1) {
                                 aInfo5ViewModel.setTheScreenVariable(MainActivity.SECTION_FRAGMENT)
@@ -420,66 +449,42 @@ class EnterNameFragment : Fragment() {
                                 aInfo5ViewModel.setThePreviousScreen2Variable(MainActivity.NOT_RELEVANT)
                             }
                             findNavController().navigate(R.id.action_enterNameFragment_to_sectionAndIntrosFragment)
-                        } else {
-                            Toast.makeText(this.requireContext(), "This company name exists. Please enter a unique name.", Toast.LENGTH_SHORT).show()
+                        }
+                        else {
+                            Toast.makeText(
+                                this.requireContext(),
+                                "This company name exists. Please enter a unique name.",
+                                Toast.LENGTH_SHORT
+                            ).show()
                         }
                     }
                     else if (aInfo5ViewModel.getFlagForSectionNameToBeUpdated() == true) {
                         val newSectionName = binding.etEnterName.text.toString().trim()
+
                         //Checking to see if this section name is unique
                         if (aInfo5ViewModel.uniquenessCheckInCodesAndNames(
                                 aInfo5ViewModel.getTheCompanySectionCodeAndDisplayNameML(),
                                 newSectionName
                             )
                         ) {
-                            //Update the present section codeAndDisplay in ViewModel
-                            val presentSectionCodeAndDisplay =
-                                aInfo5ViewModel.getThePresentSectionCodeAndDisplayName()
-                            presentSectionCodeAndDisplay.displayName = newSectionName
-                            aInfo5ViewModel.setThePresentSectionCodeAndDisplayName(
-                                presentSectionCodeAndDisplay
-                            )
-                            //Saving only the section display Name into the db
-                            val presentSectionNameID =
-                                aInfo5ViewModel.getPresentCompanyCode() + aInfo5ViewModel.getPresentSectionCode() + MainActivity.PRESENT_SECTION_ID
-                            val aInfo5SectionName = AInfo5(presentSectionNameID, newSectionName)
-                            aInfo5ViewModel.insertAInfo5(aInfo5SectionName)
-                            aInfo5ViewModel.addUniqueItemToPresentCompanyAllIds(presentSectionNameID)
-                            aInfo5ViewModel.setFlagForSectionNameToBeUpdated(true)
-                            //update the Section related ML
-                            aInfo5ViewModel.modifyDisplayNameOfSpecificSectionInSectionCDML(
-                                newSectionName,
-                                presentSectionCodeAndDisplay.uniqueCodeName
-                            )
-                            //Save the above in the DB
-                            val sectionCodeAndDisplayNameMLString =
-                                aInfo5ViewModel.codeAndDisplayNameListToString(aInfo5ViewModel.getTheCompanySectionCodeAndDisplayNameML())
-                            val companySectionsCDListID =
-                                aInfo5ViewModel.getPresentCompanyCode() + MainActivity.COMPANY_SECTION_LIST_ID
-                            val aInfo5 = AInfo5(
-                                companySectionsCDListID,
-                                sectionCodeAndDisplayNameMLString
-                            )
-                            aInfo5ViewModel.insertAInfo5(aInfo5)
-                            aInfo5ViewModel.addUniqueItemToPresentCompanyAllIds(companySectionsCDListID)
-                            //Reconstructing the company directory and moving files
-//                            aInfo5ViewModel.renamingFilesAfterSectionNameChange(
-//                                newSectionName
-//                            )
-                            //Update the section name in the Company Report
-                            aInfo5ViewModel.updateSectionDetailsInCompanyReportAndSave(aInfo5ViewModel.getPresentSectionCode(),newSectionName,aInfo5ViewModel.getThePresentSectionAllData())
+                            aInfo5ViewModel.editSectionNameFunction(newSectionName)
                             //Move to the Section Fragment
                             aInfo5ViewModel.setTheScreenVariable(MainActivity.SECTION_FRAGMENT_SECTION_CHOICE)
                             aInfo5ViewModel.setThePreviousScreenVariable(MainActivity.NOT_RELEVANT)
                             aInfo5ViewModel.setThePreviousScreen2Variable(MainActivity.NOT_RELEVANT)
                             findNavController().navigate(R.id.action_enterNameFragment_to_sectionAndIntrosFragment)
                         } else {
-                            Toast.makeText(this.requireContext(), "This section exists. Please enter a unique name.", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(
+                                this.requireContext(),
+                                "This section exists. Please enter a unique name.",
+                                Toast.LENGTH_SHORT
+                            ).show()
                         }
 
                     }
                 }
-            } else {
+            }
+            else {
                 showDialogForEmptyEditText()
             }
         }

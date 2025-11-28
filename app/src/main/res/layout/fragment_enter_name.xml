@@ -2,78 +2,95 @@
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <LinearLayout
+    <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:id="@+id/ll_layout_container_enter_name_fragment"
-        android:orientation="horizontal"
-        android:baselineAligned="false">
-        <RelativeLayout
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="0.15">
+        android:id="@+id/fl_enter_name_fragment">
 
-        </RelativeLayout>
-        <RelativeLayout
-            android:layout_width="0dp"
+        <!-- Linear Layout for Entering Values and Continuing-->
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_weight="0.7">
-            <LinearLayout
-                android:layout_width="match_parent"
+            android:id="@+id/ll_layout_container_enter_name_fragment"
+            android:orientation="horizontal"
+            android:baselineAligned="false">
+            <RelativeLayout
+                android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:id="@+id/ll_enter_name"
-                tools:context=".EnterNameFragment"
-                android:orientation="vertical"
-                android:gravity="center">
+                android:layout_weight="0.15">
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/string_enter_the_company_name"
-                    android:textSize="23sp"
-                    android:id="@+id/tv_enter_name"
-                    android:textStyle="bold"
-                    android:tooltipText="@string/string_textview_with_the_label_enter_the_company_name"
-                    android:contentDescription="@string/string_textview_with_the_label_enter_the_company_name"/>
-
-                <EditText
+            </RelativeLayout>
+            <RelativeLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="0.7">
+                <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:id="@+id/et_enter_name"
-                    android:inputType="textPersonName"
-                    android:textSize="22sp"
-                    android:layout_marginTop="20dp"
-                    android:labelFor="@+id/tv_enter_name"
-                    android:hint="@string/string_enter_only_text_and_underscore_here"
-                    android:textColorHint="@color/light_grey"
-                    android:tooltipText="@string/string_edit_text_for_entering_names"
-                    android:importantForAutofill="no"
-                    android:digits="abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_0123456789 "/>
+                    android:layout_height="match_parent"
+                    android:id="@+id/ll_enter_name"
+                    tools:context=".EnterNameFragment"
+                    android:orientation="vertical"
+                    android:gravity="center">
 
-                <Button
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:id="@+id/button_continue"
-                    android:text="@string/string_continue"
-                    android:textSize="20sp"
-                    android:layout_marginTop="20dp"
-                    android:backgroundTint="@color/black"
-                    android:textStyle="bold"
-                    android:layout_gravity="end"
-                    android:contentDescription="@string/string_button_for_the_continue_option_click_to_continue_after_entering_the_name"
-                    android:tooltipText="@string/string_continue"/>
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/string_enter_the_company_name"
+                        android:textSize="23sp"
+                        android:id="@+id/tv_enter_name"
+                        android:textStyle="bold"
+                        android:tooltipText="@string/string_textview_with_the_label_enter_the_company_name"
+                        android:contentDescription="@string/string_textview_with_the_label_enter_the_company_name"/>
+
+                    <EditText
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/et_enter_name"
+                        android:inputType="textPersonName"
+                        android:textSize="22sp"
+                        android:layout_marginTop="20dp"
+                        android:labelFor="@+id/tv_enter_name"
+                        android:hint="@string/string_enter_only_text_and_numbers_here"
+                        android:textColorHint="@color/light_grey"
+                        android:tooltipText="@string/string_edit_text_for_entering_names"
+                        android:importantForAutofill="no"
+                        android:digits="abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 "/>
+
+                    <Button
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/button_continue"
+                        android:text="@string/string_continue"
+                        android:textSize="20sp"
+                        android:layout_marginTop="20dp"
+                        android:backgroundTint="@color/black"
+                        android:textStyle="bold"
+                        android:layout_gravity="end"
+                        android:contentDescription="@string/string_button_for_the_continue_option_click_to_continue_after_entering_the_name"
+                        android:tooltipText="@string/string_continue"/>
 
 
-            </LinearLayout>
+                </LinearLayout>
 
 
-        </RelativeLayout>
-        <RelativeLayout
-            android:layout_width="0dp"
+            </RelativeLayout>
+            <RelativeLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="0.15">
+
+            </RelativeLayout>
+        </LinearLayout>
+
+        <!-- Progess bar shows when database items are being uploaded-->
+        <ProgressBar
+            android:id="@+id/pb_enter_name_fragment"
+            android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_weight="0.15">
+            android:visibility="gone"
+            android:contentDescription="@string/string_this_is_a_progress_bar"
+            android:tooltipText="@string/string_this_is_a_progress_bar"/>
+    </FrameLayout>
 
-        </RelativeLayout>
-    </LinearLayout>
 
 </layout>

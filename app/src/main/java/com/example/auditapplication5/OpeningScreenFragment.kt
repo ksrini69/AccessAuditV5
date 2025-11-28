@@ -3,14 +3,12 @@ package com.example.auditapplication5
 import android.app.AlertDialog
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
-import androidx.core.net.toUri
 import androidx.databinding.DataBindingUtil
 import androidx.navigation.findNavController
 import com.example.auditapplication5.data.model.*
@@ -47,6 +45,7 @@ class OpeningScreenFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         aInfo5ViewModel = (activity as MainActivity).aInfo5ViewModel
 
+        val TAG = MainActivity.TESTING_TAG
 
         activity?.onBackPressedDispatcher?.addCallback(
             viewLifecycleOwner,
@@ -81,76 +80,11 @@ class OpeningScreenFragment : Fragment() {
         //Initialise some variables from the ViewModel
         initialiseSomeViewModelVariablesHere()
 
-        //For Checking
-        //Log.d(MainActivity.TESTING_TAG, "onViewCreated: ${aInfo5ViewModel.getTheCompanyReport().sectionReportList} ")
-        //Getting the Parent Folder for saving Audits from DB
-        aInfo5ViewModel.getParentFolderURIStringLD.observe(viewLifecycleOwner) { list ->
-            if (list.isEmpty()) {
-                aInfo5ViewModel.setTheParentFolderURIString("")
-            } else {
-                var parentFolderURIString = ""
-                for (item in list) {
-                    parentFolderURIString += item.framework.toString()
-                }
-                aInfo5ViewModel.setTheParentFolderURIString(parentFolderURIString)
-                val result =
-                    (activity as MainActivity).areUriPermissionsGranted(parentFolderURIString)
-                if (!result) {
-                    (activity as MainActivity).takePersistableURIPermissions(parentFolderURIString.toUri())
-                }
-            }
-        }
 
-        //Getting the TemplateIDs List and PageGroupIDs List from the db
-        if (aInfo5ViewModel.getTheTemplateIDList().isEmpty()){
-            aInfo5ViewModel.getTemplateIdsListStringFromTemplateDB.observe(viewLifecycleOwner) { list ->
-                var templateIDsListString = ""
-                if (list.isEmpty()) {
-                    templateIDsListString = ""
-                }
-                else {
-                    templateIDsListString = ""
-                    for (item in list) {
-                        templateIDsListString += item.template_string
-                    }
-                }
-                aInfo5ViewModel.tasksToDoWithTemplateIDsListString(templateIDsListString)
-                if (!aInfo5ViewModel.getTheObserveAndActOnceForTemplatesIDsListFlag()){
-
-                    aInfo5ViewModel.setTheObserveAndActOnceForTemplatesIDsListFlag(true)
-                }
-            }
-        }
-
-        //Getting the template elements for Add A Page in Observations Fragment
-        if (aInfo5ViewModel.getTheParentChildParentItemML().isEmpty()){
-            aInfo5ViewModel.pageGroupIDsUploadingCompletedMLD.observe(viewLifecycleOwner){value ->
-                if (value == true){
-                    val iDsListForPageGroup = aInfo5ViewModel.getThePageGroupIDsList()
-                    if (iDsListForPageGroup.isNotEmpty()){
-                        for (index in 0 until iDsListForPageGroup.size){
-                            val itemIDNeededML = mutableListOf<String>(iDsListForPageGroup[index])
-                            aInfo5ViewModel.getAInfo5TemplatesByIds(itemIDNeededML).observe(viewLifecycleOwner){list ->
-                                var pageGroupItemString = ""
-                                if (list.isEmpty()){
-                                    pageGroupItemString = ""
-                                } else {
-                                    for (item in list){
-                                        pageGroupItemString += item.template_string
-                                    }
-                                }
-                                aInfo5ViewModel.tasksToDoWithPageGroupIDs(pageGroupItemString, iDsListForPageGroup, index)
-                            }
-                        }
-                    } else {
-                        aInfo5ViewModel.setTheParentChildParentItemML(mutableListOf(aInfo5ViewModel.defaultRVParentChildParentItem))
-                    }
-                }
-
-            }
-        }
-
-
+//    //Ensuring that the list of templates loaded contains the Default template
+//        if (!aInfo5ViewModel.isItemPresentInPageTemplateList(aInfo5ViewModel.getTheDefaultPageTemplate().pageCode)){
+//            aInfo5ViewModel.addUniquePageToPageTemplateList(aInfo5ViewModel.getTheDefaultPageTemplate())
+//        }
 
 
         //On Click Listeners Below
@@ -160,7 +94,8 @@ class OpeningScreenFragment : Fragment() {
             if (aInfo5ViewModel.getTheParentFolderURIString() == "") {
                 val intent = Intent(Intent.ACTION_OPEN_DOCUMENT_TREE)
                 (activity as MainActivity).openDocumentTree(intent)
-            } else {
+            }
+            else {
                 val title = resources.getString(R.string.string_new_parent_folder)
                 val message = resources.getString(R.string.string_message_for_new_parent_folder)
                 showDialog(title, message)
@@ -234,9 +169,28 @@ class OpeningScreenFragment : Fragment() {
     //Functions below
 
     fun initialiseSomeViewModelVariablesHere(){
-        aInfo5ViewModel.clearPresentCompanyAllIds()
-        aInfo5ViewModel.sectionAllDataLoadedFlagMLD.value = false
+
+        aInfo5ViewModel.clearTheCompanySectionCodeAndDisplayML()
+        aInfo5ViewModel.setTheSectionAllDataLoadedFlagMLD(false)
         aInfo5ViewModel.setTheSectionAllPagesFrameworkLoadedFlagMLD(false)
+
+        aInfo5ViewModel.setTheCompanyReportUploadedFlagMLD(false)
+        aInfo5ViewModel.setTheCompanyPhotosUploadedFlagMLD(false)
+        aInfo5ViewModel.setTheCompanyDirectoryURIUploadedFlagMLD(false)
+        aInfo5ViewModel.setTheCompanySectionListUploadedFlagMLD(false)
+        aInfo5ViewModel.setTheCompanyNameUploadedFlagMLD(false)
+        aInfo5ViewModel.setTheCompanyAuditDateUploadedFlagMLD(false)
+
+        aInfo5ViewModel.setTheCompanyNameListUploadedENFFlagMLD(false)
+        aInfo5ViewModel.setTheparentFolderURIUploadedENFFlagMLD(false)
+
+        aInfo5ViewModel.setTheCompanyNameUploadedIFFlagMLD(false)
+        aInfo5ViewModel.setThecompanyIntroductionUploadedIFFlagMLD(false)
+        aInfo5ViewModel.setTheSectionNameUploadedIFFlagMLD(false)
+
+        aInfo5ViewModel.setTheCompanyIntroUpdatedInReportSIFFlagMLD(true)
+        aInfo5ViewModel.setTheSectionIntroUpdatedInReportSIFFlagMLD(true)
+        aInfo5ViewModel.setTheSectionPagesUpdatedInReportSIFFlagMLD(true)
 
         //Generate and load the Default Reports List
         val reportsList = resources.getStringArray(R.array.Report_Choices).toMutableList()
@@ -248,7 +202,6 @@ class OpeningScreenFragment : Fragment() {
         }
         aInfo5ViewModel.setTheReportsToBeGeneratedList(defaultReportsList)
 
-        aInfo5ViewModel.setTheCompanyPhotosUploadedFlag(false)
     }
 
     private fun showDialog(title: String, message: String) {
@@ -274,6 +227,7 @@ class OpeningScreenFragment : Fragment() {
                 .setMessage(message)
                 .setPositiveButton("Yes") { dialog, _ ->
                     aInfo5ViewModel.deleteAllAInfo5()
+                    aInfo5ViewModel.areAllAuditsDeletedMLD.value = true
                     Toast.makeText(this.requireContext(), "Deletion of Audit Records is Complete", Toast.LENGTH_LONG).show()
                     aInfo5ViewModel.setTheFileFlag(MainActivity.TEMPLATE_DATABASE_DELETE)
                     dialog.dismiss()

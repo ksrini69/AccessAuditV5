@@ -9,9 +9,11 @@ import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.provider.OpenableColumns
+import android.view.View
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
+import androidx.core.net.toUri
 import androidx.lifecycle.ViewModelProvider
 import com.example.auditapplication5.data.model.AInfo5
 import com.example.auditapplication5.data.model.AInfo5Templates
@@ -77,32 +79,124 @@ class MainActivity : AppCompatActivity() {
         aInfo5ViewModel = ViewModelProvider(this, aInfo5ViewModelFactory)[AInfo5ViewModel::class.java]
         lifecycle.addObserver(aInfo5ViewModel)
 
-        aInfo5ViewModel.message.observe(this) {
-            it.getContentIfNotHandled().let {
-                Toast.makeText(this, it, Toast.LENGTH_SHORT).show()
+//        aInfo5ViewModel.message.observe(this) {
+//            it.getContentIfNotHandled().let {
+//                Toast.makeText(this, it, Toast.LENGTH_SHORT).show()
+//            }
+//        }
+
+        init()
+
+        aInfo5ViewModel.allConditionsMetMainActivityLD.observe(this){
+            if (it == true){
+                binding.pbMainActivity.visibility = View.GONE
+            } else {
+                binding.pbMainActivity.visibility = View.VISIBLE
             }
+        }
+
+        //Getting the Parent Folder for saving Audits from DB
+        if (aInfo5ViewModel.parentFolderUploadedMAFlagLD.value == false){
+            aInfo5ViewModel.getParentFolderURIStringLD.observe(this) { list ->
+                if (list.isEmpty()) {
+                    aInfo5ViewModel.setTheParentFolderURIString("")
+                } else {
+                    var parentFolderURIString = ""
+                    for (item in list) {
+                        parentFolderURIString += item.framework.toString()
+                    }
+                    aInfo5ViewModel.setTheParentFolderURIString(parentFolderURIString)
+                    val result =
+                        areUriPermissionsGranted(parentFolderURIString)
+                    if (!result) {
+                        takePersistableURIPermissions(parentFolderURIString.toUri())
+                    }
+                }
+                aInfo5ViewModel.setTheParentFolderUploadedMAFlagMLD(true)
+            }
+
         }
 
         //Getting the templateLoadedIntoDatabase flag from db only when the app is started
         //This flag is necessary so that we know that the templates have been loaded into the db
-        val templateLoadedIntoDBFlagID = TEMPLATES_LOADED_INTO_DB_ID
-        val templateLoadedIntoDBFlagIDML = mutableListOf<String>(templateLoadedIntoDBFlagID)
-        aInfo5ViewModel.getAInfo5TemplatesByIds(templateLoadedIntoDBFlagIDML).observe(this){ list ->
-            if (!aInfo5ViewModel.getTheObserveAndActOnceForTemplatesLoadedFlag()){
+        if (aInfo5ViewModel.templatesUploadedMAFlagLD.value == false){
+            val templateLoadedIntoDBFlagID = TEMPLATES_LOADED_INTO_DB_ID
+            val templateLoadedIntoDBFlagIDML = mutableListOf<String>(templateLoadedIntoDBFlagID)
+            aInfo5ViewModel.getAInfo5TemplatesByIds(templateLoadedIntoDBFlagIDML).observe(this){ list ->
                 if (list.isEmpty()){
                     aInfo5ViewModel.setTheTemplatesHaveBeenLoadedIntoDBFlag(false)
-                } else {
+                }
+                else {
                     var templateLoadedIntoDBFlagString = ""
                     for (item in list){
                         templateLoadedIntoDBFlagString += item.template_string
                     }
                     aInfo5ViewModel.setTheTemplatesHaveBeenLoadedIntoDBFlag(templateLoadedIntoDBFlagString.toBoolean())
-                    aInfo5ViewModel.setTheObserveAndActOnceForTemplatesLoadedFlag(true)
+                }
+                aInfo5ViewModel.setTheTemplatesUploadedMAFlagMLD(true)
+            }
+        }
+
+        //Getting the TemplateIDs List and PageGroupIDs List from the db
+        if (aInfo5ViewModel.templateStringUploadedMAFlagLD.value == false){
+            if (aInfo5ViewModel.getTheTemplateIDList().isEmpty()){
+                aInfo5ViewModel.getTemplateIdsListStringFromTemplateDB.observe(this) { list ->
+                    var templateIDsListString = ""
+                    if (list.isEmpty()) {
+                        templateIDsListString = ""
+                    }
+                    else {
+                        templateIDsListString = ""
+                        for (item in list) {
+                            templateIDsListString += item.template_string
+                        }
+                    }
+                    aInfo5ViewModel.tasksToDoWithTemplateIDsListString(templateIDsListString)
+                }
+            }
+            else {
+                aInfo5ViewModel.setTheTemplateStringUploadedMAFlagMLD(true)
+            }
+        }
+
+        //Getting the elements for Add A Page in Observations Fragment
+        if (aInfo5ViewModel.parentChildParentListUploadedMAFlagLD.value == false){
+            if (aInfo5ViewModel.getTheParentChildParentItemML().isEmpty()){
+                aInfo5ViewModel.pageGroupIDsUploadingCompletedMLD.observe(this){value ->
+                    if (value == true){
+                        val iDsListForPageGroup = aInfo5ViewModel.getThePageGroupIDsList()
+                        if (iDsListForPageGroup.isNotEmpty()){
+                            for (index in 0 until iDsListForPageGroup.size){
+                                val itemIDNeededML = mutableListOf<String>(iDsListForPageGroup[index])
+                                aInfo5ViewModel.getAInfo5TemplatesByIds(itemIDNeededML).observe(this){list ->
+                                    var pageGroupItemString = ""
+                                    if (list.isEmpty()){
+                                        pageGroupItemString = ""
+                                    } else {
+                                        for (item in list){
+                                            pageGroupItemString += item.template_string
+                                        }
+                                    }
+                                    aInfo5ViewModel.tasksToDoWithPageGroupIDs(pageGroupItemString, iDsListForPageGroup, index)
+                                }
+                            }
+                        }
+                        else {
+                            aInfo5ViewModel.setTheParentChildParentItemML(mutableListOf(aInfo5ViewModel.defaultRVParentChildParentItem))
+                            aInfo5ViewModel.setTheParentChildParentListUploadedMAFlagMLD(true)
+                        }
+                        aInfo5ViewModel.parentChildParentItemMLUploadedMLD.value = true
+                    }
                 }
             }
         }
 
-        initialiseValues()
+        //Ensuring that the list of templates loaded contains the Default template
+        if (!aInfo5ViewModel.isItemPresentInPageTemplateList(aInfo5ViewModel.getTheDefaultPageTemplate().pageCode)){
+            aInfo5ViewModel.addUniquePageToPageTemplateList(aInfo5ViewModel.getTheDefaultPageTemplate())
+        }
+
+
     }
 
     override fun onPause() {
@@ -200,7 +294,7 @@ class MainActivity : AppCompatActivity() {
 
         const val CAMERA_FRAGMENT = "Camera Fragment"
         const val PHOTO_MODIFICATION_FRAGMENT = "Photo Modification Fragment"
-        const val TAG = "CameraXFragment"
+        const val TAG = MainActivity.TESTING_TAG
         const val PHOTO_MODIFICATION_FRAGMENT_CAPTIONS = "Photo Modification Fragment Captions"
         const val PHOTO_MODIFICATION_FRAGMENT_IMAGE_TEXT = "Photo Modification Fragment Image Text"
 
@@ -257,6 +351,7 @@ class MainActivity : AppCompatActivity() {
         const val COMPANY_SECTION_LIST_ID = "_Company_Section_List_ID"
 
         const val COMPANY_REPORT_ID = "_Company_Report_ID"
+        const val COMPANY_SECTION_REPORT_ID = "_Company_Section_Report_ID"
 
         const val COMPANY_DIRECTORY_URI_ID = "_Directory_URI_ID"
         const val TXT_FILE_3COLUMN_URI_ID = "_ThreeColumn_URI_ID"
@@ -281,6 +376,7 @@ class MainActivity : AppCompatActivity() {
         const val AUDIT_DATABASE_DELETE = "Audit Database Delete"
         const val TEMPLATE_DATABASE_DELETE = "Template Database Delete"
         const val TEMPLATE_SECTION_LIST = "Default_Section_List"
+        const val TEMPLATE_NOT_IN_DB = "Template_Not_In_DB"
 
         const val FILE_CONTENT_LIST_ID = "File Content List ID"
         const val FILE_REPORT_ID = "_Report"
@@ -325,12 +421,15 @@ class MainActivity : AppCompatActivity() {
 
     //Functions Below
 
-    private fun initialiseValues() {
-        //aInfo5ViewModel.clearPresentCompanyAllIds()
-        //aInfo5ViewModel.setTheParentChildParentItemML(mutableListOf())
-        //aInfo5ViewModel.clearTheParentChildParentItemML()
+    private fun init(){
+        aInfo5ViewModel.setTheTemplatesUploadedMAFlagMLD(false)
+        aInfo5ViewModel.setTheParentFolderUploadedMAFlagMLD(false)
+        aInfo5ViewModel.setTheTemplateStringUploadedMAFlagMLD(false)
+        aInfo5ViewModel.setTheParentChildParentListUploadedMAFlagMLD(false)
+        aInfo5ViewModel.areAllAuditsDeletedMLD.value = false
 
     }
+
 
     fun openDocumentTree(intent: Intent){
         storageAccessLauncher.launch(intent)

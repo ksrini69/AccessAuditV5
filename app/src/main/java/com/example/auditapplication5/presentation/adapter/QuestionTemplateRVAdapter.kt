@@ -9,6 +9,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.example.auditapplication5.MainActivity
 import com.example.auditapplication5.data.model.QuestionTemplateItemDC
+import com.example.auditapplication5.data.model.SectionAllDataDC
 import com.example.auditapplication5.databinding.QuestionTemplateItemBinding
 import com.example.auditapplication5.presentation.viewmodel.AInfo5ViewModel
 
@@ -17,11 +18,13 @@ class QuestionTemplateRVAdapter(
     private val aInfo5ViewModel: AInfo5ViewModel,
     private val questionsFrameworkIndex: Int,
     private val questionsFrameworkTitle: String = "",
-    private val questionsFrameworkSerialStatus: String = ""
+    private val questionsFrameworkSerialStatus: String = "",
+    private val currentPageIndex: Int,
+    private val presentSectionAllData: SectionAllDataDC
 ) :RecyclerView.Adapter<QuestionTemplateRVAdapter.ViewHolder>() {
 
-    val currentPageIndex = aInfo5ViewModel.getThePresentSectionAllPagesFrameworkIndex()
-    val currentPageData = aInfo5ViewModel.getThePresentSectionAllData().sectionAllPagesData.sectionPageDataList[currentPageIndex]
+    //val currentPageIndex = aInfo5ViewModel.getThePresentSectionAllPagesFrameworkIndex()
+    val sectionPageData = presentSectionAllData.sectionAllPagesData.sectionPageDataList[currentPageIndex]
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val binding = QuestionTemplateItemBinding
@@ -77,7 +80,8 @@ class QuestionTemplateRVAdapter(
             //Data Field 1 Related
             if (questionTemplateItem.data1Visibility == false) {
                 binding.llDataField1.visibility = View.GONE
-            } else {
+            }
+            else {
                 binding.llDataField1.visibility = View.VISIBLE
                 binding.tvDataField1Description.text = questionTemplateItem.data1Label
             }
@@ -86,14 +90,16 @@ class QuestionTemplateRVAdapter(
             }
             if (questionTemplateItem.data1Type == "N") {
                 binding.etDataField1.inputType = InputType.TYPE_CLASS_NUMBER
-            } else {
+            }
+            else {
                 binding.etDataField1.inputType = InputType.TYPE_CLASS_TEXT
             }
             //Getting the Sentences in place for Data Field 1 from the Template
             var s11 = ""
             if (questionsFrameworkSerialStatus == MainActivity.PRIMARY_QUESTION_SET){
                 s11 = questionTemplateItem.data1Sentence1.trim()
-            } else if (questionsFrameworkSerialStatus == MainActivity.OTHER_QUESTION_SET){
+            }
+            else if (questionsFrameworkSerialStatus == MainActivity.OTHER_QUESTION_SET){
                 s11 = questionsFrameworkTitle + ": " + questionTemplateItem.data1Sentence1.trim()
             }
             var s12 = ""
@@ -101,9 +107,9 @@ class QuestionTemplateRVAdapter(
 
             //Getting the field 1 data
             var dataField1Value = ""
-            if (currentPageData.questionsFrameworkDataItemList.size >= questionsFrameworkIndex){
-                if (currentPageData.questionsFrameworkDataItemList[questionsFrameworkIndex].questionDataItemList.size >= templateQuestionPosition){
-                    dataField1Value = currentPageData.questionsFrameworkDataItemList[questionsFrameworkIndex].questionDataItemList[templateQuestionPosition].data1Value
+            if (sectionPageData.questionsFrameworkDataItemList.size >= questionsFrameworkIndex){
+                if (sectionPageData.questionsFrameworkDataItemList[questionsFrameworkIndex].questionDataItemList.size >= templateQuestionPosition){
+                    dataField1Value = sectionPageData.questionsFrameworkDataItemList[questionsFrameworkIndex].questionDataItemList[templateQuestionPosition].data1Value
                 }
             }
             if (dataField1Value != ""){
@@ -172,9 +178,9 @@ class QuestionTemplateRVAdapter(
 
             //Getting the field 2 data
             var dataField2Value = ""
-            if (currentPageData.questionsFrameworkDataItemList.size >= questionsFrameworkIndex){
-                if (currentPageData.questionsFrameworkDataItemList[questionsFrameworkIndex].questionDataItemList.size >= templateQuestionPosition){
-                    dataField2Value = currentPageData.questionsFrameworkDataItemList[questionsFrameworkIndex].questionDataItemList[templateQuestionPosition].data2Value
+            if (sectionPageData.questionsFrameworkDataItemList.size >= questionsFrameworkIndex){
+                if (sectionPageData.questionsFrameworkDataItemList[questionsFrameworkIndex].questionDataItemList.size >= templateQuestionPosition){
+                    dataField2Value = sectionPageData.questionsFrameworkDataItemList[questionsFrameworkIndex].questionDataItemList[templateQuestionPosition].data2Value
                 }
             }
             if (dataField2Value != ""){
@@ -244,9 +250,9 @@ class QuestionTemplateRVAdapter(
 
             //Getting the field 2 data
             var dataField3Value = ""
-            if (currentPageData.questionsFrameworkDataItemList.size >= questionsFrameworkIndex){
-                if (currentPageData.questionsFrameworkDataItemList[questionsFrameworkIndex].questionDataItemList.size >= templateQuestionPosition){
-                    dataField3Value = currentPageData.questionsFrameworkDataItemList[questionsFrameworkIndex].questionDataItemList[templateQuestionPosition].data3Value
+            if (sectionPageData.questionsFrameworkDataItemList.size >= questionsFrameworkIndex){
+                if (sectionPageData.questionsFrameworkDataItemList[questionsFrameworkIndex].questionDataItemList.size >= templateQuestionPosition){
+                    dataField3Value = sectionPageData.questionsFrameworkDataItemList[questionsFrameworkIndex].questionDataItemList[templateQuestionPosition].data3Value
                 }
             }
             if (dataField3Value != ""){
@@ -292,9 +298,9 @@ class QuestionTemplateRVAdapter(
             }
             //buttonDataText should be filled by the data
             var buttonDataText = ""
-            if (currentPageData.questionsFrameworkDataItemList.size >= questionsFrameworkIndex){
-                if (currentPageData.questionsFrameworkDataItemList[questionsFrameworkIndex].questionDataItemList.size >= templateQuestionPosition){
-                    buttonDataText = currentPageData.questionsFrameworkDataItemList[questionsFrameworkIndex].questionDataItemList[templateQuestionPosition].buttonOptionChosen
+            if (sectionPageData.questionsFrameworkDataItemList.size >= questionsFrameworkIndex){
+                if (sectionPageData.questionsFrameworkDataItemList[questionsFrameworkIndex].questionDataItemList.size >= templateQuestionPosition){
+                    buttonDataText = sectionPageData.questionsFrameworkDataItemList[questionsFrameworkIndex].questionDataItemList[templateQuestionPosition].buttonOptionChosen
                 }
             }
 
@@ -329,13 +335,14 @@ class QuestionTemplateRVAdapter(
                                 binding.buttonChoose.text = questionTemplateItem.buttonOptionsList[oldButtonChoiceIndex]
                                 aInfo5ViewModel.updateButtonChoiceInThePresentSectionAllData(
                                     binding.buttonChoose.text.toString(),currentPageIndex,questionsFrameworkIndex,templateQuestionPosition)
-                                aInfo5ViewModel.updateButtonChoiceTextInObservations(oldButtonChoiceTextValue + "\n",questionTemplateItem.buttonOptionsList[oldButtonChoiceIndex + 1].replace("<>", "") ,currentPageIndex)
-                            } else {
+                                aInfo5ViewModel.updateButtonChoiceTextInObservations(oldButtonChoiceTextValue + "\n", "\n" + questionTemplateItem.buttonOptionsList[oldButtonChoiceIndex + 1].replace("<>", ""),currentPageIndex)
+                            }
+                            else {
                                 binding.buttonChoose.text =
                                     questionTemplateItem.buttonOptionsList[oldButtonChoiceIndex + 2]
                                 aInfo5ViewModel.updateButtonChoiceInThePresentSectionAllData(
                                     binding.buttonChoose.text.toString(), currentPageIndex,questionsFrameworkIndex,templateQuestionPosition)
-                                aInfo5ViewModel.updateButtonChoiceTextInObservations(oldButtonChoiceTextValue + "\n",questionTemplateItem.buttonOptionsList[oldButtonChoiceIndex + 3] + "\n" ,currentPageIndex)
+                                aInfo5ViewModel.updateButtonChoiceTextInObservations("\n" + oldButtonChoiceTextValue + "\n","\n" + questionTemplateItem.buttonOptionsList[oldButtonChoiceIndex + 3] + "\n" ,currentPageIndex)
                             }
 
                         } else if (oldButtonChoiceIndex + 2 == indexTotal) {
@@ -343,28 +350,37 @@ class QuestionTemplateRVAdapter(
                             binding.buttonChoose.text = questionTemplateItem.buttonOptionsList[oldButtonChoiceIndex]
                             aInfo5ViewModel.updateButtonChoiceInThePresentSectionAllData(
                                 binding.buttonChoose.text.toString(),currentPageIndex,questionsFrameworkIndex,templateQuestionPosition)
-                            aInfo5ViewModel.updateButtonChoiceTextInObservations(oldButtonChoiceTextValue + "\n",questionTemplateItem.buttonOptionsList[oldButtonChoiceIndex + 1].replace("<>", "") ,currentPageIndex)
+                            aInfo5ViewModel.updateButtonChoiceTextInObservations("\n" + oldButtonChoiceTextValue + "\n",questionTemplateItem.buttonOptionsList[oldButtonChoiceIndex + 1].replace("<>", "") ,currentPageIndex)
                         }
                     }
                 }
                 else if (questionsFrameworkSerialStatus == MainActivity.OTHER_QUESTION_SET){
                     var oldButtonChoiceIndex =
                         questionTemplateItem.buttonOptionsList.indexOf(binding.buttonChoose.text.toString())
-                    val oldButtonChoiceTextValue = questionsFrameworkTitle + ": " +questionTemplateItem.buttonOptionsList[oldButtonChoiceIndex + 1] + "\n"
+                    val oldButtonChoiceTextValue = questionsFrameworkTitle + ": " +questionTemplateItem.buttonOptionsList[oldButtonChoiceIndex + 1]
                     val indexTotal = questionTemplateItem.buttonOptionsList.size
                     if (indexTotal % 2 == 0) {
                         if (oldButtonChoiceIndex + 2 < indexTotal) {
-                            binding.buttonChoose.text =
-                                questionTemplateItem.buttonOptionsList[oldButtonChoiceIndex + 2]
-                            aInfo5ViewModel.updateButtonChoiceInThePresentSectionAllData(
-                                binding.buttonChoose.text.toString(), currentPageIndex,questionsFrameworkIndex,templateQuestionPosition)
-                            aInfo5ViewModel.updateButtonChoiceTextInObservations(oldButtonChoiceTextValue,questionsFrameworkTitle+ ": " + questionTemplateItem.buttonOptionsList[oldButtonChoiceIndex + 3] + "\n" ,currentPageIndex)
+                            if (questionTemplateItem.buttonOptionsList[oldButtonChoiceIndex + 2].contains("<>")){
+                                oldButtonChoiceIndex = 0
+                                binding.buttonChoose.text =
+                                    questionTemplateItem.buttonOptionsList[oldButtonChoiceIndex]
+                                aInfo5ViewModel.updateButtonChoiceInThePresentSectionAllData(
+                                    binding.buttonChoose.text.toString(), currentPageIndex,questionsFrameworkIndex,templateQuestionPosition)
+                                aInfo5ViewModel.updateButtonChoiceTextInObservations(oldButtonChoiceTextValue + "\n","\n" + questionsFrameworkTitle+ ": " + questionTemplateItem.buttonOptionsList[oldButtonChoiceIndex + 1].replace("<>", "") ,currentPageIndex)
+                            } else {
+                                binding.buttonChoose.text =
+                                    questionTemplateItem.buttonOptionsList[oldButtonChoiceIndex + 2]
+                                aInfo5ViewModel.updateButtonChoiceInThePresentSectionAllData(
+                                    binding.buttonChoose.text.toString(), currentPageIndex,questionsFrameworkIndex,templateQuestionPosition)
+                                aInfo5ViewModel.updateButtonChoiceTextInObservations("\n" + oldButtonChoiceTextValue + "\n","\n" + questionsFrameworkTitle+ ": " + questionTemplateItem.buttonOptionsList[oldButtonChoiceIndex + 3] + "\n" ,currentPageIndex)
+                            }
                         } else if (oldButtonChoiceIndex + 2 == indexTotal) {
                             oldButtonChoiceIndex = 0
                             binding.buttonChoose.text = questionTemplateItem.buttonOptionsList[oldButtonChoiceIndex]
                             aInfo5ViewModel.updateButtonChoiceInThePresentSectionAllData(
                                 binding.buttonChoose.text.toString(), currentPageIndex,questionsFrameworkIndex,templateQuestionPosition)
-                            aInfo5ViewModel.updateButtonChoiceTextInObservations(oldButtonChoiceTextValue, questionTemplateItem.buttonOptionsList[oldButtonChoiceIndex + 1].replace("<>", ""),currentPageIndex )
+                            aInfo5ViewModel.updateButtonChoiceTextInObservations("\n" + oldButtonChoiceTextValue + "\n", questionTemplateItem.buttonOptionsList[oldButtonChoiceIndex + 1].replace("<>", "") ,currentPageIndex )
                         }
                     }
                 }

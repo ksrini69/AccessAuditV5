@@ -11,6 +11,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:id="@+id/fl_section_and_intros">
+
         <LinearLayout
             android:id="@+id/ll_section_intros"
             android:layout_width="match_parent"
@@ -292,6 +293,17 @@
             app:maxImageSize="50dp"
             android:contentDescription="@string/string_floating_action_button_for_choosing_reports"
             android:tooltipText="@string/string_choosing_reports"/>
+
+        <!-- Progess bar shows when database items are being uploaded-->
+        <ProgressBar
+            android:id="@+id/pb_edit_delete_mld_related"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="gone"
+            android:contentDescription="@string/string_this_is_a_progress_bar"
+            android:tooltipText="@string/string_this_is_a_progress_bar"/>
+
+
     </FrameLayout>
 
 </layout>

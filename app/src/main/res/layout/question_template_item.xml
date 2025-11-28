@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_margin="2dp"
-    android:background="@drawable/border2dp_color_lemonyellow_with_no_arrow"
+    android:background="@drawable/border2dp_color_creamyellow_with_no_arrow"
     android:orientation="vertical">
 
     <LinearLayout

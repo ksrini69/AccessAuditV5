@@ -289,7 +289,7 @@ class PhotoModificationFragment : Fragment() {
             binding.llActionButtons1InPhotoModification.visibility = View.INVISIBLE
             binding.llActionButtons2InPhotoModification.visibility = View.INVISIBLE
             binding.llPaintColors.visibility = View.INVISIBLE
-            binding.drawingView.visibility = View.INVISIBLE
+            //binding.drawingView.visibility = View.INVISIBLE
             binding.tetForCaptions.visibility = View.VISIBLE
             binding.tietForPictureLabelling.visibility = View.GONE
             binding.tetForCaptions.isEnabled = true
@@ -379,13 +379,29 @@ class PhotoModificationFragment : Fragment() {
 
     }
 
-    override fun onPause() {
-        super.onPause()
+    override fun onStop() {
+        super.onStop()
+
+
+        //Update and save the Company Report into db
+        aInfo5ViewModel.updateSectionDetailsInCompanyReportAndSave(
+            aInfo5ViewModel.getPresentSectionCode(),
+            aInfo5ViewModel.getPresentSectionName(),
+            aInfo5ViewModel.getThePresentSectionAllData()
+        )
+
+        //Save the SectionPagesFramework and Data into db before stopping
+        val sectionPagesFrameworkAndDataID =
+            aInfo5ViewModel.getPresentCompanyCode() + aInfo5ViewModel.getPresentSectionCode() + MainActivity.SECTION_PAGES_FRAMEWORK_AND_DATA_ID
+        aInfo5ViewModel.saveThePresentSectionAllPagesFrameworkAndAllDataToDB(
+            aInfo5ViewModel.getThePresentSectionAllPagesFramework(),
+            aInfo5ViewModel.getThePresentSectionAllData(),
+            sectionPagesFrameworkAndDataID
+        )
+
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-    }
+
     //Functions below
 
     private fun brushSelected(view: View){

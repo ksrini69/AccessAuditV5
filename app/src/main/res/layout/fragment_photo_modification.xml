@@ -90,6 +90,7 @@
                         android:textColorHint="@color/light_grey"
                         android:textSize="18sp"
                         android:text="@={aInfo5ViewModel.etTextCaptionsMLD}"
+                        android:inputType="textCapSentences|textAutoCorrect|textAutoComplete|textMultiLine"
                         tools:ignore="TouchTargetSizeCheck,TextContrastCheck,DuplicateClickableBoundsCheck" />
                 </com.google.android.material.textfield.TextInputLayout>
             </androidx.constraintlayout.widget.ConstraintLayout>
@@ -123,6 +124,7 @@
                         android:textColorHint="@color/light_grey"
                         android:textSize="18sp"
                         android:padding="1dp"
+                        android:inputType="textCapSentences|textAutoCorrect|textAutoComplete|textMultiLine"
                         tools:ignore="TouchTargetSizeCheck,TextContrastCheck"/>
                 </com.google.android.material.textfield.TextInputLayout>
             </androidx.constraintlayout.widget.ConstraintLayout>

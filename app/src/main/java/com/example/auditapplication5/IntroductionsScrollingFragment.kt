@@ -36,21 +36,19 @@ class IntroductionsScrollingFragment : Fragment() {
         binding.aInfo5ViewModel = aInfo5ViewModel
         binding.lifecycleOwner=viewLifecycleOwner
 
+        //Checking Things Here
+        val TAG = MainActivity.TESTING_TAG
 
         activity?.onBackPressedDispatcher?.addCallback(viewLifecycleOwner, object : OnBackPressedCallback(true){
             override fun handleOnBackPressed() {
                 if (aInfo5ViewModel.getTheWhichIntroductionsOrObservationsToBeUploadedVariable() == MainActivity.COMPANY_INTRODUCTION){
                     aInfo5ViewModel.setTheScreenVariable(MainActivity.SECTION_FRAGMENT)
                     saveIntroductionsToDB(aInfo5ViewModel.getTheWhichIntroductionsOrObservationsToBeUploadedVariable())
-                    aInfo5ViewModel.etIntroductionsMLD.value = ""
-                    aInfo5ViewModel.tvPhotoPathsInIntroductionsFragmentMLD.value  = ""
-                } else if (aInfo5ViewModel.getTheWhichIntroductionsOrObservationsToBeUploadedVariable() == MainActivity.SECTION_INTRODUCTION){
+                }
+                else if (aInfo5ViewModel.getTheWhichIntroductionsOrObservationsToBeUploadedVariable() == MainActivity.SECTION_INTRODUCTION){
                     aInfo5ViewModel.setTheScreenVariable(MainActivity.SECTION_FRAGMENT_SECTION_CHOICE)
                     saveIntroductionsToDB(aInfo5ViewModel.getTheWhichIntroductionsOrObservationsToBeUploadedVariable())
-                    aInfo5ViewModel.etIntroductionsMLD.value = ""
-                    aInfo5ViewModel.tvPhotoPathsInIntroductionsFragmentMLD.value  = ""
                 }
-
                 findNavController().navigate(R.id.action_introductionsScrollingFragment_to_sectionAndIntrosFragment)
             }
 
@@ -66,82 +64,126 @@ class IntroductionsScrollingFragment : Fragment() {
         //Scrolling for Textviews
         binding.tvPhotoPathsInIntroductionsPage.movementMethod = ScrollingMovementMethod()
 
+        //Check to see if the companyIntro or SectionIntro MLDs are both true
+        aInfo5ViewModel.allConditionsMetIntroductionsFLD.observe(viewLifecycleOwner){
+            if (it == true){
+                binding.pbUploadingFormDbInIntroductions.visibility = View.GONE
+                binding.llIntroductionsPage.isEnabled = true
+            }
+            else {
+                binding.pbUploadingFormDbInIntroductions.visibility = View.VISIBLE
+                binding.llIntroductionsPage.isEnabled = false
+            }
+        }
+
         //Get the Introductions Info from DB to load
         if (aInfo5ViewModel.getTheWhichIntroductionsOrObservationsToBeUploadedVariable()== MainActivity.COMPANY_INTRODUCTION){
-            //Get the action bar title
-            val presentCompanyNameID =
-                aInfo5ViewModel.getPresentCompanyCode() + MainActivity.PRESENT_COMPANY_ID
-            aInfo5ViewModel.getAInfo5ByIds(mutableListOf(presentCompanyNameID))
-                .observe(viewLifecycleOwner) { companyList ->
-                    var presentCompanyName = ""
-                    if (companyList.isNotEmpty()) {
-                        for (item in companyList) {
-                            presentCompanyName += item.framework
-                        }
-                        if (actionBar?.title?.contains(presentCompanyName) == false) {
-                            actionBar.title = "Company Name: " + presentCompanyName
-                        }
-                        actionBar?.subtitle = "Company Introduction"
+            aInfo5ViewModel.setTheSectionNameUploadedIFFlagMLD(true)
+            aInfo5ViewModel.setTheSectionAllDataLoadedFlagMLD(true)
+            //Get the company related action bar title
+            var presentCompanyName = aInfo5ViewModel.getThePresentCompanyCodeAndDisplayName().displayName
+            if (presentCompanyName == ""){
+                aInfo5ViewModel.companyNameUploadedIFFlagLD.observe(viewLifecycleOwner){ companyNameFlag ->
+                    if (companyNameFlag == false){
+                        val presentCompanyNameID =
+                            aInfo5ViewModel.getPresentCompanyCode() + MainActivity.PRESENT_COMPANY_ID
+                        aInfo5ViewModel.getAInfo5ByIds(mutableListOf(presentCompanyNameID))
+                            .observe(viewLifecycleOwner) { companyList ->
+                                if (companyList.isNotEmpty()) {
+                                    for (item in companyList) {
+                                        presentCompanyName += item.framework
+                                    }
+                                    if (actionBar?.title?.contains(presentCompanyName) == false) {
+                                        actionBar.title = "Company Name: " + presentCompanyName
+                                    }
+                                    actionBar?.subtitle = "Company Introduction"
+                                }
+                                aInfo5ViewModel.setTheCompanyNameUploadedIFFlagMLD(true)
+                            }
                     }
                 }
-            aInfo5ViewModel.addUniqueItemToPresentCompanyAllIds(presentCompanyNameID)
+            }
+            else {
+                if (actionBar?.title?.contains(presentCompanyName) == false) {
+                    actionBar.title = "Company Name: " + presentCompanyName
+                }
+                actionBar?.subtitle = "Company Introduction"
+                aInfo5ViewModel.setTheCompanyNameUploadedIFFlagMLD(true)
+            }
+
             //Get the Company Introductions to load
-            val companyIntroID =
-                aInfo5ViewModel.getPresentCompanyCode() + MainActivity.COMPANY_INTRO_ID
-            aInfo5ViewModel.addUniqueItemToPresentCompanyAllIds(companyIntroID)
-            aInfo5ViewModel.getAInfo5ByIds(mutableListOf(companyIntroID)).observe(viewLifecycleOwner){list ->
-                var companyIntroAndPhotoPaths = ""
-                if (list.isEmpty()){
-                    companyIntroAndPhotoPaths = ""
-                    aInfo5ViewModel.etIntroductionsMLD.value = ""
-                    aInfo5ViewModel.tvPhotoPathsInIntroductionsFragmentMLD.value  = ""
-                }else {
-                    companyIntroAndPhotoPaths = ""
-                    for (item in list){
-                        companyIntroAndPhotoPaths += item.framework
+            aInfo5ViewModel.companyIntroductionUploadedIFFlagLD.observe(viewLifecycleOwner){companyIntroFlag ->
+                if (companyIntroFlag == false){
+                    val companyIntroID =
+                        aInfo5ViewModel.getPresentCompanyCode() + MainActivity.COMPANY_INTRO_ID
+                    aInfo5ViewModel.getAInfo5ByIds(mutableListOf(companyIntroID)).observe(viewLifecycleOwner){list ->
+                        var companyIntroAndPhotoPaths = ""
+                        if (list.isEmpty()){
+                            companyIntroAndPhotoPaths = ""
+                            aInfo5ViewModel.etIntroductionsMLD.value = ""
+                            aInfo5ViewModel.tvPhotoPathsInIntroductionsFragmentMLD.value  = ""
+                        }else {
+                            companyIntroAndPhotoPaths = ""
+                            for (item in list){
+                                companyIntroAndPhotoPaths += item.framework
+                            }
+                        }
+                        val companyIntroData = aInfo5ViewModel.stringToCompanyIntroData(companyIntroAndPhotoPaths)
+                        aInfo5ViewModel.setTheCompanyIntroData(companyIntroData)
+                        aInfo5ViewModel.etIntroductionsMLD.value = companyIntroData.introduction
+                        aInfo5ViewModel.tvPhotoPathsInIntroductionsFragmentMLD.value = companyIntroData.picturePathsInIntroductions
+                        aInfo5ViewModel.setThecompanyIntroductionUploadedIFFlagMLD(true)
                     }
                 }
-                val companyIntroData = aInfo5ViewModel.stringToCompanyIntroData(companyIntroAndPhotoPaths)
-                aInfo5ViewModel.setTheCompanyIntroData(companyIntroData)
-                aInfo5ViewModel.etIntroductionsMLD.value = companyIntroData.introduction
-                aInfo5ViewModel.tvPhotoPathsInIntroductionsFragmentMLD.value = companyIntroData.picturePathsInIntroductions
             }
 
         }
         else if (aInfo5ViewModel.getTheWhichIntroductionsOrObservationsToBeUploadedVariable() == MainActivity.SECTION_INTRODUCTION){
-            //Get the action bar title
-            val presentSectionNameID =
-                aInfo5ViewModel.getPresentCompanyCode() + aInfo5ViewModel.getPresentSectionCode() + MainActivity.PRESENT_SECTION_ID
-            aInfo5ViewModel.getAInfo5ByIds(mutableListOf(presentSectionNameID)).observe(viewLifecycleOwner){sectionList ->
-                var presentSectionName = ""
-                if (sectionList.isNotEmpty()){
-                    for (item in sectionList){
-                        presentSectionName += item.framework
+            aInfo5ViewModel.setTheCompanyNameUploadedIFFlagMLD(true)
+            aInfo5ViewModel.setThecompanyIntroductionUploadedIFFlagMLD(true)
+            //Get the section related action bar title
+            var presentSectionName = aInfo5ViewModel.getThePresentSectionCodeAndDisplayName().displayName
+            if (presentSectionName == ""){
+                aInfo5ViewModel.sectionNameUploadedIFFlagLD.observe(viewLifecycleOwner){ sectionNameFlag ->
+                    if (sectionNameFlag == false){
+                        val presentSectionNameID =
+                            aInfo5ViewModel.getPresentCompanyCode() + aInfo5ViewModel.getPresentSectionCode() + MainActivity.PRESENT_SECTION_ID
+                        aInfo5ViewModel.getAInfo5ByIds(mutableListOf(presentSectionNameID)).observe(viewLifecycleOwner){sectionList ->
+                            if (sectionList.isNotEmpty()){
+                                for (item in sectionList){
+                                    presentSectionName += item.framework
+                                }
+                                if (actionBar?.title?.contains(presentSectionName) == false) {
+                                    actionBar.title = "Section Name: " + presentSectionName
+                                }
+                                actionBar?.subtitle = "Section Introduction"
+                            }
+                            aInfo5ViewModel.setTheSectionNameUploadedIFFlagMLD(true)
+                        }
                     }
-                    if (actionBar?.title?.contains(presentSectionName) == false) {
-                        actionBar.title = "Section Name: " + presentSectionName
-                    }
-                    actionBar?.subtitle = "Section Introduction"
                 }
             }
-            aInfo5ViewModel.addUniqueItemToPresentCompanyAllIds(presentSectionNameID)
-            //Get the section introduction to load
-            aInfo5ViewModel.sectionAllDataLoadedFlagMLD.observe(viewLifecycleOwner){ dataFlag ->
-                if (dataFlag == true){
-                    binding.pbUploadingFormDbInIntroductions.visibility = View.GONE
-                    binding.llIntroductionsPage.isEnabled = true
-                    aInfo5ViewModel.etIntroductionsMLD.value = aInfo5ViewModel.getThePresentSectionAllData().introduction
-                    aInfo5ViewModel.tvPhotoPathsInIntroductionsFragmentMLD.value = aInfo5ViewModel.getThePresentSectionAllData().picturePathsInIntroductions
-                } else {
-                    binding.pbUploadingFormDbInIntroductions.visibility = View.VISIBLE
-                    binding.llIntroductionsPage.isEnabled = false
+            else {
+                if (actionBar?.title?.contains(presentSectionName) == false) {
+                    actionBar.title = "Section Name: " + presentSectionName
                 }
+                actionBar?.subtitle = "Section Introduction"
+                aInfo5ViewModel.setTheSectionNameUploadedIFFlagMLD(true)
             }
 
+
+            //Get the section introduction to load
+            aInfo5ViewModel.sectionAllDataLoadedFlagLD.observe(viewLifecycleOwner){ dataFlag ->
+                if (dataFlag == true){
+
+                    aInfo5ViewModel.etIntroductionsMLD.value = aInfo5ViewModel.getThePresentSectionAllData().introduction
+                    aInfo5ViewModel.tvPhotoPathsInIntroductionsFragmentMLD.value = aInfo5ViewModel.getThePresentSectionAllData().picturePathsInIntroductions
+                }
+            }
         }
 
 
-        //Onclick Listeners below
+        //OnClick Listeners below
 
         binding.ibCameraXInIntroductionPage.setOnClickListener {
             //Create the location, count and photograph name (without extension)
@@ -162,38 +204,38 @@ class IntroductionsScrollingFragment : Fragment() {
             showDialogForPhotoModification()
         }
 
-        binding.ibUndoInIntroductionsPage.setOnClickListener {
-            var newValue = ""
-            var newValuePhotos = ""
-            if (aInfo5ViewModel.getTheHoldingVariableInIntroductions() != ""){
-                if (binding.etIntroductionRemarks.text.toString() != ""){
-                    newValue = aInfo5ViewModel.getTheHoldingVariableInIntroductions() + "\n" + binding.etIntroductionRemarks.text.toString()
-                } else {
-                    newValue = aInfo5ViewModel.getTheHoldingVariableInIntroductions()
-                }
-                binding.etIntroductionRemarks.setText(newValue)
-                aInfo5ViewModel.setTheHoldingVariableInIntroductions("")
-            }
-            if (aInfo5ViewModel.getTheHoldingVariableForPhotoPathsInIntroductions() != ""){
-                if (binding.tvPhotoPathsInIntroductionsPage.text.toString() != ""){
-                    newValuePhotos = aInfo5ViewModel.getTheHoldingVariableForPhotoPathsInIntroductions() + "\n" + binding.tvPhotoPathsInIntroductionsPage.text.toString()
-                } else {
-                    newValuePhotos = aInfo5ViewModel.getTheHoldingVariableForPhotoPathsInIntroductions()
-                }
-                binding.tvPhotoPathsInIntroductionsPage.setText(newValuePhotos)
-                aInfo5ViewModel.setTheHoldingVariableForPhotoPathsInIntroductions("")
-            }
-        }
+//        binding.ibUndoInIntroductionsPage.setOnClickListener {
+//            var newValue = ""
+//            var newValuePhotos = ""
+//            if (aInfo5ViewModel.getTheHoldingVariableInIntroductions() != ""){
+//                if (binding.etIntroductionRemarks.text.toString() != ""){
+//                    newValue = aInfo5ViewModel.getTheHoldingVariableInIntroductions() + "\n" + binding.etIntroductionRemarks.text.toString()
+//                } else {
+//                    newValue = aInfo5ViewModel.getTheHoldingVariableInIntroductions()
+//                }
+//                binding.etIntroductionRemarks.setText(newValue)
+//                aInfo5ViewModel.setTheHoldingVariableInIntroductions("")
+//            }
+//            if (aInfo5ViewModel.getTheHoldingVariableForPhotoPathsInIntroductions() != ""){
+//                if (binding.tvPhotoPathsInIntroductionsPage.text.toString() != ""){
+//                    newValuePhotos = aInfo5ViewModel.getTheHoldingVariableForPhotoPathsInIntroductions() + "\n" + binding.tvPhotoPathsInIntroductionsPage.text.toString()
+//                } else {
+//                    newValuePhotos = aInfo5ViewModel.getTheHoldingVariableForPhotoPathsInIntroductions()
+//                }
+//                binding.tvPhotoPathsInIntroductionsPage.setText(newValuePhotos)
+//                aInfo5ViewModel.setTheHoldingVariableForPhotoPathsInIntroductions("")
+//            }
+//        }
 
-        binding.ibDeleteInIntroductionPage.setOnClickListener {
-            showDialogForDeletion()
-        }
+//        binding.ibDeleteInIntroductionPage.setOnClickListener {
+//            showDialogForDeletion()
+//        }
 
     }
 
 
-    override fun onSaveInstanceState(outState: Bundle) {
-        super.onSaveInstanceState(outState)
+    override fun onStop() {
+        super.onStop()
         saveIntroductionsToDB(aInfo5ViewModel.getTheWhichIntroductionsOrObservationsToBeUploadedVariable())
     }
 
@@ -223,31 +265,31 @@ class IntroductionsScrollingFragment : Fragment() {
         builder.create().show()
     }
 
-    private fun showDialogForDeletion(){
-        val builder : AlertDialog.Builder = AlertDialog.Builder(this.requireContext())
-        builder.setTitle("Delete the Introduction")
-            .setMessage("Press \" Yes\" to Delete ")
-            .setPositiveButton("Yes") { dialog, _ ->
-                if (aInfo5ViewModel.getTheHoldingVariableInIntroductions() != ""){
-                    aInfo5ViewModel.setTheHoldingVariableInIntroductions(aInfo5ViewModel.getTheHoldingVariableInIntroductions() + "\n" + binding.etIntroductionRemarks.text.toString())
-                } else {
-                    aInfo5ViewModel.setTheHoldingVariableInIntroductions(binding.etIntroductionRemarks.text.toString())
-                }
-                if (aInfo5ViewModel.getTheHoldingVariableForPhotoPathsInIntroductions() != ""){
-                    aInfo5ViewModel.setTheHoldingVariableForPhotoPathsInIntroductions(aInfo5ViewModel.getTheHoldingVariableForPhotoPathsInIntroductions() + "\n" + binding.tvPhotoPathsInIntroductionsPage.text.toString())
-                } else {
-                    aInfo5ViewModel.setTheHoldingVariableForPhotoPathsInIntroductions(binding.tvPhotoPathsInIntroductionsPage.text.toString())
-                }
-                binding.etIntroductionRemarks.setText("")
-                binding.tvPhotoPathsInIntroductionsPage.text = ""
-                dialog.dismiss()
-            }
-            .setNeutralButton("Cancel") { dialog, _ ->
-                dialog.dismiss()
-            }
-
-        builder.create().show()
-    }
+//    private fun showDialogForDeletion(){
+//        val builder : AlertDialog.Builder = AlertDialog.Builder(this.requireContext())
+//        builder.setTitle("Delete the Introduction")
+//            .setMessage("Press \" Yes\" to Delete ")
+//            .setPositiveButton("Yes") { dialog, _ ->
+//                if (aInfo5ViewModel.getTheHoldingVariableInIntroductions() != ""){
+//                    aInfo5ViewModel.setTheHoldingVariableInIntroductions(aInfo5ViewModel.getTheHoldingVariableInIntroductions() + "\n" + binding.etIntroductionRemarks.text.toString())
+//                } else {
+//                    aInfo5ViewModel.setTheHoldingVariableInIntroductions(binding.etIntroductionRemarks.text.toString())
+//                }
+//                if (aInfo5ViewModel.getTheHoldingVariableForPhotoPathsInIntroductions() != ""){
+//                    aInfo5ViewModel.setTheHoldingVariableForPhotoPathsInIntroductions(aInfo5ViewModel.getTheHoldingVariableForPhotoPathsInIntroductions() + "\n" + binding.tvPhotoPathsInIntroductionsPage.text.toString())
+//                } else {
+//                    aInfo5ViewModel.setTheHoldingVariableForPhotoPathsInIntroductions(binding.tvPhotoPathsInIntroductionsPage.text.toString())
+//                }
+//                binding.etIntroductionRemarks.setText("")
+//                binding.tvPhotoPathsInIntroductionsPage.text = ""
+//                dialog.dismiss()
+//            }
+//            .setNeutralButton("Cancel") { dialog, _ ->
+//                dialog.dismiss()
+//            }
+//
+//        builder.create().show()
+//    }
 
 
     private fun saveIntroductionsToDB(companyOrSection: String = ""){
@@ -256,15 +298,18 @@ class IntroductionsScrollingFragment : Fragment() {
             aInfo5ViewModel.updateThePhotoPathsInCompanyIntroData(aInfo5ViewModel.tvPhotoPathsInIntroductionsFragmentMLD.value.toString())
             aInfo5ViewModel.saveTheCompanyIntroDataIntoDB()
             val companyIntroAndPhotoPathsData = "${aInfo5ViewModel.etIntroductionsMLD.value.toString()} \n\n ${aInfo5ViewModel.tvPhotoPathsInIntroductionsFragmentMLD.value.toString()}"
-            aInfo5ViewModel.updateTheCompanyNameAuditDateAndIntroInCompanyReportAndSave(aInfo5ViewModel.getPresentCompanyCode(), aInfo5ViewModel.getPresentCompanyName(), aInfo5ViewModel.getTheCompanyAuditDate(), companyIntroAndPhotoPathsData)
-        } else if (companyOrSection == MainActivity.SECTION_INTRODUCTION){
+            aInfo5ViewModel.setTheCompanyIntroUpdatedInReportSIFFlagMLD(false)
+            aInfo5ViewModel.updateTheCompanyNameAuditDateAndIntroInCompanyReportAndSave(aInfo5ViewModel.getPresentCompanyCode(), "", "", companyIntroAndPhotoPathsData)
+        }
+        else if (companyOrSection == MainActivity.SECTION_INTRODUCTION){
             val sectionPagesFrameworkAndDataID =
                 aInfo5ViewModel.getPresentCompanyCode() + aInfo5ViewModel.getPresentSectionCode() + MainActivity.SECTION_PAGES_FRAMEWORK_AND_DATA_ID
             aInfo5ViewModel.updateIntroInThePresentSectionAllData(aInfo5ViewModel.etIntroductionsMLD.value.toString())
             aInfo5ViewModel.updatePicturePathsInIntroForThePresentSectionAllData(aInfo5ViewModel.tvPhotoPathsInIntroductionsFragmentMLD.value.toString())
             aInfo5ViewModel.saveThePresentSectionAllPagesFrameworkAndAllDataToDB(aInfo5ViewModel.getThePresentSectionAllPagesFramework(),aInfo5ViewModel.getThePresentSectionAllData(),sectionPagesFrameworkAndDataID)
             val sectionIntroAndPhotoPathsData = "${aInfo5ViewModel.etIntroductionsMLD.value.toString()} \n\n ${aInfo5ViewModel.tvPhotoPathsInIntroductionsFragmentMLD.value.toString()}"
-            aInfo5ViewModel.updateSectionNameAndIntroInCompanyReportAndSave(aInfo5ViewModel.getPresentSectionCode(), aInfo5ViewModel.getPresentSectionName(), sectionIntroAndPhotoPathsData)
+            aInfo5ViewModel.setTheSectionIntroUpdatedInReportSIFFlagMLD(false)
+            aInfo5ViewModel.updateSectionNameAndIntroInCompanyReportAndSave(aInfo5ViewModel.getPresentSectionCode(), "", sectionIntroAndPhotoPathsData)
         }
     }
 }

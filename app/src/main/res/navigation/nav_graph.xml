@@ -61,6 +61,9 @@
         <action
             android:id="@+id/action_sectionAndIntrosFragment_to_simpleListRecyclerViewFragment"
             app:destination="@id/simpleListRecyclerViewFragment" />
+        <action
+            android:id="@+id/action_sectionAndIntrosFragment_to_enterNameFragment"
+            app:destination="@id/enterNameFragment" />
     </fragment>
     <fragment
         android:id="@+id/introductionsScrollingFragment"

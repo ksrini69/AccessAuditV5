@@ -35,233 +35,271 @@
                 android:text="@{String.valueOf(aInfo5ViewModel.sectionNameFormatForDisplay(aInfo5ViewModel.sectionNameMLD)) + String.valueOf(aInfo5ViewModel.pageCountFormatForDisplay(aInfo5ViewModel.pageCountMLD))+ String.valueOf(aInfo5ViewModel.etPageNameMLD)}"
                 android:tooltipText="@string/string_textview_that_displays_the_page_name_and_number"/>
 
+            <!--Action Buttons 1 -->
 
-            <LinearLayout
-                android:id="@+id/ll_action_buttons_1"
-                android:layout_width="match_parent"
-                android:layout_height="48dp"
-                android:layout_marginTop="5dp"
-                android:background="@drawable/border_1dp"
-                android:orientation="horizontal"
-                android:paddingTop="2dp"
-                android:paddingBottom="2dp">
+            <HorizontalScrollView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/hsv_action_buttons_1">
 
-                <Space
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1">
-
-                </Space>
-
-                <ImageButton
-                    android:id="@+id/ib_back"
+                <LinearLayout
+                    android:id="@+id/ll_action_buttons_1"
                     android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:background="@color/white"
-                    android:contentDescription="@string/string_image_button_showing_the_page_back_icon"
-                    android:src="@drawable/ic_back_50"
-                    android:tooltipText="@string/string_image_button_showing_the_page_back_icon"/>
+                    android:layout_height="52dp"
+                    android:layout_marginTop="5dp"
+                    android:background="@drawable/border_1dp"
+                    android:orientation="horizontal"
+                    android:paddingTop="2dp"
+                    android:paddingBottom="2dp">
 
-                <Space
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1">
+                    <Space
+                        android:layout_width="10dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1">
 
-                </Space>
+                    </Space>
 
-                <ImageButton
-                    android:id="@+id/ib_forward"
+                    <ImageButton
+                        android:id="@+id/ib_back"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:background="@color/white"
+                        android:contentDescription="@string/string_image_button_showing_the_page_back_icon"
+                        android:src="@drawable/ic_back_50"
+                        android:tooltipText="@string/string_image_button_showing_the_page_back_icon"/>
+
+                    <Space
+                        android:layout_width="5dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1">
+
+                    </Space>
+
+                    <ImageButton
+                        android:id="@+id/ib_forward"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:background="@color/white"
+                        android:contentDescription="@string/string_image_button_showing_the_page_forward_icon"
+                        android:src="@drawable/ic_forward_50"
+                        android:tooltipText="@string/string_image_button_showing_the_page_forward_icon"/>
+
+                    <Space
+                        android:layout_width="5dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1">
+
+                    </Space>
+
+                    <Button
+                        android:id="@+id/button_goto"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:backgroundTint="@color/black"
+                        android:minWidth="48dp"
+                        android:padding="1dp"
+                        android:contentDescription="@string/string_button_for_moving_to_a_specific_page"
+                        android:text="@string/string_goto"
+                        android:textStyle="bold"
+                        android:tooltipText="@string/string_button_for_moving_to_a_specific_page"/>
+
+                    <Space
+                        android:layout_width="20dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1">
+
+                    </Space>
+
+                    <ImageButton
+                        android:id="@+id/ib_camera_in_observations_page"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:background="@color/white"
+                        android:contentDescription="@string/string_image_button_showing_the_camera_icon"
+                        android:src="@drawable/ic_camera_50"
+                        android:tooltipText="@string/string_image_button_showing_the_camera_icon"/>
+
+                    <Space
+                        android:layout_width="20dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1">
+
+                    </Space>
+
+                    <ImageButton
+                        android:id="@+id/ib_edit_photo_in_observations_page"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:background="@color/white"
+                        android:contentDescription="@string/string_image_button_showing_the_edit_photos_icon"
+                        android:src="@drawable/ic_edit_calendar_50"
+                        android:tooltipText="@string/string_image_button_showing_the_edit_photos_icon"/>
+
+                    <Space
+                        android:layout_width="20dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1">
+
+                    </Space>
+
+                    <ImageButton
+                        android:id="@+id/ib_add_a_page"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:background="@color/white"
+                        android:contentDescription="@string/string_image_button_showing_add_a_page_icon"
+                        android:src="@drawable/ic_note_add_50"
+                        android:tooltipText="@string/string_image_button_showing_add_a_page_icon"/>
+
+                    <Space
+                        android:layout_width="20dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1">
+
+                    </Space>
+
+                    <ImageButton
+                        android:id="@+id/ib_delete_in_observations_page"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:background="@color/white"
+                        android:contentDescription="@string/string_image_button_showing_the_delete_icon"
+                        android:src="@drawable/ic_delete_50_black"
+                        android:tooltipText="@string/string_image_button_showing_the_delete_icon"/>
+
+                    <Space
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1">
+
+                    </Space>
+
+
+                </LinearLayout>
+
+            </HorizontalScrollView>
+
+            <!--Action Buttons 2 -->
+
+            <HorizontalScrollView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/hsv_action_buttons_2">
+
+                <LinearLayout
                     android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:background="@color/white"
-                    android:contentDescription="@string/string_image_button_showing_the_page_forward_icon"
-                    android:src="@drawable/ic_forward_50"
-                    android:tooltipText="@string/string_image_button_showing_the_page_forward_icon"/>
+                    android:layout_height="52dp"
+                    android:id="@+id/ll_action_buttons_2"
+                    android:orientation="horizontal"
+                    android:background="@drawable/border_1dp"
+                    android:layout_marginTop="5dp"
+                    android:paddingTop="2dp"
+                    android:paddingBottom="2dp">
 
-                <Space
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1">
+                    <Space
+                        android:layout_width="10dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1">
 
-                </Space>
+                    </Space>
 
-                <Button
-                    android:id="@+id/button_goto"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:backgroundTint="@color/black"
-                    android:minWidth="48dp"
-                    android:padding="1dp"
-                    android:contentDescription="@string/string_button_for_moving_to_a_specific_page"
-                    android:text="@string/string_goto"
-                    android:textStyle="bold"
-                    android:tooltipText="@string/string_button_for_moving_to_a_specific_page"/>
+                    <Button
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:id="@+id/button_questions_view"
+                        android:backgroundTint="@color/black"
+                        android:text="@string/string_questions_view"
+                        android:textStyle="bold"
+                        android:textColor="@color/white"
+                        android:minWidth="48dp"
+                        android:contentDescription="@string/string_button_to_go_to_the_questions_view"
+                        android:tooltipText="@string/string_button_to_go_to_the_questions_view"/>
 
-                <Space
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1">
+                    <Space
+                        android:layout_width="20dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1">
 
-                </Space>
+                    </Space>
+                    <Button
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:id="@+id/button_recommendations_view"
+                        android:backgroundTint="@color/black"
+                        android:text="@string/string_recommendations_view"
+                        android:textColor="@color/white"
+                        android:textStyle="bold"
+                        android:minWidth="48dp"
+                        android:contentDescription="@string/string_button_to_go_to_the_recommendations_view"
+                        android:tooltipText="@string/string_button_to_go_to_the_recommendations_view"/>
 
-                <ImageButton
-                    android:id="@+id/ib_camera_in_observations_page"
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:background="@color/white"
-                    android:contentDescription="@string/string_image_button_showing_the_camera_icon"
-                    android:src="@drawable/ic_camera_50"
-                    android:tooltipText="@string/string_image_button_showing_the_camera_icon"/>
+                    <Space
+                        android:layout_width="20dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1">
 
-                <Space
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1">
+                    </Space>
 
-                </Space>
+                    <Button
+                        android:id="@+id/button_standards_view"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:backgroundTint="@color/black"
+                        android:contentDescription="@string/string_button_to_go_to_the_standards_view"
+                        android:minWidth="48dp"
+                        android:text="@string/string_standards_view"
+                        android:textColor="@color/white"
+                        android:textStyle="bold"
+                        android:tooltipText="@string/string_button_to_go_to_the_standards_view"
+                        tools:ignore="TouchTargetSizeCheck" />
 
-                <ImageButton
-                    android:id="@+id/ib_add_a_page"
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:background="@color/white"
-                    android:contentDescription="@string/string_image_button_showing_add_a_page_icon"
-                    android:src="@drawable/ic_note_add_50"
-                    android:tooltipText="@string/string_image_button_showing_add_a_page_icon"/>
+                    <Space
+                        android:layout_width="20dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1">
 
-                <Space
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1">
+                    </Space>
+                    <Button
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:id="@+id/button_observations_view"
+                        android:backgroundTint="@color/black"
+                        android:text="@string/string_observations_view"
+                        android:textColor="@color/white"
+                        android:textStyle="bold"
+                        android:minWidth="48dp"
+                        android:contentDescription="@string/string_button_to_go_to_the_observations_view"
+                        android:tooltipText="@string/string_button_to_go_to_the_observations_view"/>
 
-                </Space>
+                    <Space
+                        android:layout_width="20dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1">
 
-                <ImageButton
-                    android:id="@+id/ib_edit_photo_in_observations_page"
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:background="@color/white"
-                    android:contentDescription="@string/string_image_button_showing_the_edit_photos_icon"
-                    android:src="@drawable/ic_edit_calendar_50"
-                    android:tooltipText="@string/string_image_button_showing_the_edit_photos_icon"/>
+                    </Space>
 
-                <Space
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1">
+                    <Button
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:id="@+id/button_score"
+                        android:backgroundTint="@color/black"
+                        android:text="@string/string_score"
+                        android:textColor="@color/white"
+                        android:textStyle="bold"
+                        android:minWidth="48dp"
+                        android:contentDescription="@string/string_button_score_view"
+                        android:tooltipText="@string/string_button_score_view"/>
 
-                </Space>
+                    <Space
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1">
 
-                <ImageButton
-                    android:id="@+id/ib_delete_in_observations_page"
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:background="@color/white"
-                    android:contentDescription="@string/string_image_button_showing_the_delete_icon"
-                    android:src="@drawable/ic_delete_50_black"
-                    android:tooltipText="@string/string_image_button_showing_the_delete_icon"/>
+                    </Space>
 
-                <Space
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1">
+                </LinearLayout>
+            </HorizontalScrollView>
 
-                </Space>
-
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="48dp"
-                android:id="@+id/ll_action_buttons_2"
-                android:orientation="horizontal"
-                android:background="@drawable/border_1dp"
-                android:layout_marginTop="5dp"
-                android:paddingTop="2dp"
-                android:paddingBottom="2dp">
-
-                <Space
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1">
-
-                </Space>
-
-                <Button
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:id="@+id/button_questions_view"
-                    android:backgroundTint="@color/black"
-                    android:text="@string/string_questions_view"
-                    android:textStyle="bold"
-                    android:textColor="@color/white"
-                    android:minWidth="48dp"
-                    android:contentDescription="@string/string_button_to_go_to_the_questions_view"
-                    android:tooltipText="@string/string_button_to_go_to_the_questions_view"/>
-
-                <Space
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1">
-
-                </Space>
-                <Button
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:id="@+id/button_recommendations_view"
-                    android:backgroundTint="@color/black"
-                    android:text="@string/string_recommendations_view"
-                    android:textColor="@color/white"
-                    android:textStyle="bold"
-                    android:minWidth="48dp"
-                    android:contentDescription="@string/string_button_to_go_to_the_recommendations_view"
-                    android:tooltipText="@string/string_button_to_go_to_the_recommendations_view"/>
-
-                <Space
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1">
-
-                </Space>
-                <Button
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:id="@+id/button_standards_view"
-                    android:backgroundTint="@color/black"
-                    android:text="@string/string_standards_view"
-                    android:textStyle="bold"
-                    android:textColor="@color/white"
-                    android:minWidth="48dp"
-                    android:contentDescription="@string/string_button_to_go_to_the_standards_view"
-                    android:tooltipText="@string/string_button_to_go_to_the_standards_view"/>
-
-                <Space
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1">
-
-                </Space>
-                <Button
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:id="@+id/button_observations_view"
-                    android:backgroundTint="@color/black"
-                    android:text="@string/string_observations_view"
-                    android:textColor="@color/white"
-                    android:textStyle="bold"
-                    android:minWidth="48dp"
-                    android:contentDescription="@string/string_button_to_go_to_the_observations_view"
-                    android:tooltipText="@string/string_button_to_go_to_the_observations_view"/>
-
-                <Space
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1">
-
-                </Space>
-
-            </LinearLayout>
 
             <!--Edit Text for Changing the Page Name -->
             <EditText
@@ -272,7 +310,7 @@
                 android:hint="@string/string_modify_page_name_here"
                 android:tooltipText="@string/string_modify_page_name_here"
                 android:textColorHint="@color/light_grey"
-                android:inputType="text"
+                android:inputType="text|textMultiLine|textAutoComplete|textAutoCorrect|textCapSentences"
                 android:background="@drawable/border_1dp"
                 android:layout_marginBottom="5dp"
                 android:layout_marginTop="5dp"
