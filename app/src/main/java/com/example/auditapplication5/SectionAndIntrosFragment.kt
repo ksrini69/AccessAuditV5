@@ -11,17 +11,23 @@ import androidx.activity.OnBackPressedCallback
 import androidx.core.net.toUri
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.findNavController
 import com.example.auditapplication5.data.model.AInfo5
 import com.example.auditapplication5.databinding.FragmentSectionAndIntrosBinding
 import com.example.auditapplication5.presentation.viewmodel.AInfo5ViewModel
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import java.util.*
 
 
 class SectionAndIntrosFragment : Fragment() {
     private lateinit var binding: FragmentSectionAndIntrosBinding
     private lateinit var aInfo5ViewModel: AInfo5ViewModel
+    private var autoMinimizeJob: Job? = null
+    private val TEN_SECONDS = 10_000L // 2 minutes in ms
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -57,17 +63,16 @@ class SectionAndIntrosFragment : Fragment() {
                 override fun handleOnBackPressed() {
                     if (aInfo5ViewModel.getTheScreenVariable() == MainActivity.SECTION_FRAGMENT) {
                         if (aInfo5ViewModel.getTheReportsToBeGeneratedList().size > 0) {
-
                             showDialogToGenerateReports()
-                        } else {
+                        }
+                        else {
                             findNavController().navigate(R.id.action_sectionAndIntrosFragment_to_openingScreenFragment)
                         }
                     }
                     else if (aInfo5ViewModel.getTheScreenVariable() == MainActivity.SECTION_FRAGMENT_SECTION_CHOICE) {
                         aInfo5ViewModel.setTheScreenVariable(MainActivity.SECTION_FRAGMENT)
                         aInfo5ViewModel.setThePreviousScreenVariable(MainActivity.NOT_RELEVANT)
-                        binding.buttonChooseSection.text =
-                            resources.getString(R.string.string_choose_a_section)
+                        binding.buttonChooseSection.text = resources.getString(R.string.string_choose_a_section)
                         binding.buttonNewSection.visibility = View.VISIBLE
                         binding.llSectionIntroAndObservationsScreen.visibility = View.GONE
                         if (aInfo5ViewModel.editCompletedFlagLD.value == false){
@@ -102,18 +107,11 @@ class SectionAndIntrosFragment : Fragment() {
 //                )
                 binding.pbEditDeleteMldRelated.visibility = View.GONE
                 binding.llSectionIntros.isEnabled = true
-                binding.fabChoosingReports.isEnabled = true
+
             } else {
                 binding.pbEditDeleteMldRelated.visibility = View.VISIBLE
                 binding.llSectionIntros.isEnabled = false
-                binding.fabChoosingReports.isEnabled = false
 
-//                Log.d(TAG, "onViewCreated: Flags Values: CompanyIntroReportLoadedLD: ${aInfo5ViewModel.companyIntroReportUploadedFlagLD.value.toString()}\n" +
-//                        "PhotosUploadedFlagLD: ${aInfo5ViewModel.companyPhotosUploadedFlagLD.value.toString()} \n" +
-//                        "CompanyDirectoryURIUploadedFlagLD: ${aInfo5ViewModel.companyDirectoryURIUploadedFlagLD.value.toString()}\n" +
-//                        "CompanySectionListUploadedFlagLD: ${aInfo5ViewModel.companySectionListUploadedFlagLD.value.toString()} \n" +
-//                        "CompanyNameUploadedFlagLD: ${aInfo5ViewModel.companyNameUploadedFlagLD.value.toString()}\n" +
-//                        "CompanyAuditDateUploadedFlagLD: ${aInfo5ViewModel.companyAuditDateUploadedFlagLD.value.toString()}")
             }
         }
 
@@ -365,7 +363,11 @@ class SectionAndIntrosFragment : Fragment() {
                             for (item in sectionList) {
                                 presentSectionName += item.framework
                             }
-                            binding.buttonChooseSection.setText(presentSectionName)
+                            if (aInfo5ViewModel.getTheScreenVariable() == MainActivity.SECTION_FRAGMENT_SECTION_CHOICE){
+                                binding.buttonChooseSection.setText(presentSectionName)
+                            } else {
+                                binding.buttonChooseSection.text = resources.getString(R.string.string_choose_a_section)
+                            }
                             aInfo5ViewModel.sectionNameMLD.value = presentSectionName
                             aInfo5ViewModel.setSectionNameMLD(presentSectionName)
                         }
@@ -456,13 +458,14 @@ class SectionAndIntrosFragment : Fragment() {
         }
 
         binding.ibDelete.setOnClickListener {
-
+            aInfo5ViewModel.setTheDeleteCompletedFlagMLD(false)
             if (aInfo5ViewModel.getTheScreenVariable() == MainActivity.SECTION_FRAGMENT) {
                 aInfo5ViewModel.setTheDeleteML(
                     resources.getStringArray(R.array.Delete_Choices_1).toMutableList()
                 )
                 aInfo5ViewModel.setThePreviousScreenVariable(MainActivity.SECTION_FRAGMENT_DELETE_1)
-            } else if (aInfo5ViewModel.getTheScreenVariable() == MainActivity.SECTION_FRAGMENT_SECTION_CHOICE) {
+            }
+            else if (aInfo5ViewModel.getTheScreenVariable() == MainActivity.SECTION_FRAGMENT_SECTION_CHOICE) {
                 aInfo5ViewModel.setTheDeleteML(
                     resources.getStringArray(R.array.Delete_Choices_2).toMutableList()
                 )
@@ -485,6 +488,23 @@ class SectionAndIntrosFragment : Fragment() {
                 .navigate(R.id.action_sectionAndIntrosFragment_to_introductionsScrollingFragment)
         }
 
+
+        var isSectionButtonsViewExpanded = false
+
+        binding.ibToCollapseAndExpandLlSectionButtons.setOnClickListener {
+            isSectionButtonsViewExpanded = !isSectionButtonsViewExpanded
+            if (isSectionButtonsViewExpanded){
+                expandScrollView()
+                binding.hsvSectionButtons.visibility = View.VISIBLE
+                binding.ibToCollapseAndExpandLlSectionButtons.setImageResource(R.drawable.ic_back_50_white)
+            }
+            else {
+                binding.hsvSectionButtons.visibility = View.GONE
+                minimizeScrollView()
+                binding.ibToCollapseAndExpandLlSectionButtons.setImageResource(R.drawable.ic_forward_50_white)
+            }
+        }
+
         binding.buttonSectionIntro.setOnClickListener {
             aInfo5ViewModel.setThePreviousScreenVariable(MainActivity.SECTION_FRAGMENT_SECTION_CHOICE)
             aInfo5ViewModel.setTheWhichIntroductionsOrObservationsToBeUploadedVariable(MainActivity.SECTION_INTRODUCTION)
@@ -501,7 +521,7 @@ class SectionAndIntrosFragment : Fragment() {
             findNavController().navigate(R.id.action_sectionAndIntrosFragment_to_observationsFragment)
         }
 
-        binding.fabChoosingReports.setOnClickListener {
+        binding.buttonReports.setOnClickListener {
             val reportChoicesML = resources.getStringArray(R.array.Report_Choices).toMutableList()
             val linkedHashMap = aInfo5ViewModel.makeLinkedHashMapFromML(
                 reportChoicesML,
@@ -525,6 +545,27 @@ class SectionAndIntrosFragment : Fragment() {
     }
 
     //Functions below
+    // When expanding the ScrollView (in your existing click handler)
+    private fun expandScrollView() {
+        binding.hsvSectionButtons.visibility = View.VISIBLE
+        binding.ibToCollapseAndExpandLlSectionButtons.setImageResource(R.drawable.ic_back_50_white)
+        // Cancel any existing timer
+        autoMinimizeJob?.cancel()
+        // Start new 2-minute timer
+        autoMinimizeJob = lifecycleScope.launch {
+            delay(TEN_SECONDS)
+            if (binding.hsvSectionButtons.visibility == View.VISIBLE) {
+                minimizeScrollView() // Your existing minimize function
+            }
+        }
+    }
+
+    // When manually minimizing (in your existing click handler)
+    private fun minimizeScrollView() {
+        binding.hsvSectionButtons.visibility = View.GONE
+        binding.ibToCollapseAndExpandLlSectionButtons.setImageResource(R.drawable.ic_forward_50_white)
+        autoMinimizeJob?.cancel() // Stop timer
+    }
 
     private fun initialiseMLDsForIntroductionsFragment(){
         aInfo5ViewModel.setTheCompanyNameUploadedIFFlagMLD(false)

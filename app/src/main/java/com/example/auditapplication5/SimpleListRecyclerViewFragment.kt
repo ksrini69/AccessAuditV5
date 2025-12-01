@@ -520,12 +520,14 @@ class SimpleListRecyclerViewFragment : Fragment() {
 
                 aInfo5ViewModel.setTheScreenVariable(MainActivity.SECTION_FRAGMENT)
                 aInfo5ViewModel.setThePreviousScreenVariable(MainActivity.NOT_RELEVANT)
+                aInfo5ViewModel.setTheDeleteCompletedFlagMLD(true)
                 findNavController().navigate(R.id.action_simpleListRecyclerViewFragment_to_sectionAndIntrosFragment)
                 dialog.dismiss()
             }
             .setNeutralButton("No") { dialog, _ ->
                 aInfo5ViewModel.setTheScreenVariable(MainActivity.SECTION_FRAGMENT)
                 aInfo5ViewModel.setThePreviousScreenVariable(MainActivity.NOT_RELEVANT)
+                aInfo5ViewModel.setTheDeleteCompletedFlagMLD(true)
                 findNavController().navigate(R.id.action_simpleListRecyclerViewFragment_to_sectionAndIntrosFragment)
                 dialog.dismiss()
             }
@@ -546,6 +548,7 @@ class SimpleListRecyclerViewFragment : Fragment() {
 
                 //presentCompanyDeletion()
                 aInfo5ViewModel.deletePresentCompany(aInfo5ViewModel.getPresentCompanyName())
+                aInfo5ViewModel.setTheDeleteCompletedFlagMLD(true)
                 dialog.dismiss()
                 findNavController().navigate(R.id.action_simpleListRecyclerViewFragment_to_openingScreenFragment)
 
@@ -558,6 +561,7 @@ class SimpleListRecyclerViewFragment : Fragment() {
                     aInfo5ViewModel.setTheScreenVariable(MainActivity.SECTION_FRAGMENT_SECTION_CHOICE)
                     aInfo5ViewModel.setThePreviousScreenVariable(MainActivity.NOT_RELEVANT)
                 }
+                aInfo5ViewModel.setTheDeleteCompletedFlagMLD(true)
 
                 findNavController().navigate(R.id.action_simpleListRecyclerViewFragment_to_sectionAndIntrosFragment)
                 dialog.dismiss()

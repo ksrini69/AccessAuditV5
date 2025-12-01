@@ -64,6 +64,8 @@ class ParentChildRecyclerviewFragment : Fragment() {
                 }
             })
 
+        val TAG = MainActivity.TESTING_TAG
+
         //Set Screen for Introductions?
         aInfo5ViewModel.setTheScreenVariable(MainActivity.RV_PARENT_CHILD_FRAGMENT)
 
@@ -74,7 +76,28 @@ class ParentChildRecyclerviewFragment : Fragment() {
         if (aInfo5ViewModel.getTheParentChildParentItemML().isEmpty()) {
             aInfo5ViewModel.setTheParentChildParentItemML(mutableListOf(aInfo5ViewModel.defaultRVParentChildParentItem))
         }
-        loadRecyclerView(aInfo5ViewModel.getTheParentChildParentItemML())
+
+        val currentSectionCode = aInfo5ViewModel.getThePresentSectionCodeAndDisplayName().uniqueCodeName
+
+        val currentPageGroupCode = processSectionCode(currentSectionCode)
+        val priorityPgGroupCodes = listOf(currentPageGroupCode)
+        val originalList = aInfo5ViewModel.getTheParentChildParentItemML()
+        val sortedMutableList: MutableList<RVParentChildParentItemDC> = originalList
+            .sortedWith(compareBy<RVParentChildParentItemDC> { item ->
+                when (item.pageGroupCode.trim()) {
+                    in priorityPgGroupCodes -> 0  // Priority group first
+                    else -> 1               // Rest second
+                }
+            }.thenBy { it.pageGroupCode.trim() })  // Sort within each group by title
+            .toMutableList()
+
+        for (index in 0 until sortedMutableList.size){
+            sortedMutableList[index].isExpandable = index == 0
+        }
+
+
+//aInfo5ViewModel.getTheParentChildParentItemML().sortedBy { it.title.trim() }.toMutableList()
+        loadRecyclerView(sortedMutableList)
     }
 
 
@@ -208,5 +231,20 @@ class ParentChildRecyclerviewFragment : Fragment() {
         findNavController().navigate(R.id.action_parentChildRecyclerviewFragment_to_observationsFragment)
     }
 
+    fun processSectionCode(input: String): String {
+        var resultString = ""
+        if (input == "Section_DropoffandBuildingEntry_0004_Section"){
+            resultString = "PG_Drop_Off_And_Building_Entry_PG"
+        } else {
+            val parts = input.split("_")
+            if (parts.size < 2) return ""
+            val secondTerm = parts[1]  // "Gates" or "MiscellaneousRooms"
+            // Proper camelCase split using regex - keeps capitalization
+            val words = secondTerm.split(Regex("(?<=\\p{Ll})(?=\\p{Lu})")).filter { it.isNotEmpty() }
+            resultString = "PG_${words.joinToString("_")}_PG"
+        }
+
+        return resultString
+    }
 
 }

@@ -46,9 +46,10 @@ class ParentChildParentRVAdapter(
             binding.tvRvParentChildParentItem.text = rvParentChildParentItem.title
             binding.rvParentChildChildRecyclerview.layoutManager = LinearLayoutManager(binding.root.context)
             binding.rvParentChildChildRecyclerview.adapter =
-                ParentChildChildRVAdapter(rvParentChildParentItem.childItemList) { selectedPageCode: String ->
+                ParentChildChildRVAdapter(rvParentChildParentItem.childItemList.map { it.trim() }.sorted().toMutableList() ) { selectedPageCode: String ->
                     clickListener(selectedPageCode)
                 }
+
 
             val isExpandable = rvParentChildParentItem.isExpandable
             binding.rvParentChildChildRecyclerview.visibility = if (isExpandable) View.VISIBLE else View.GONE

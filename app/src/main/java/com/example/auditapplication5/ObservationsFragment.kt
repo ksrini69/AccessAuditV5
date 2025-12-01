@@ -1273,6 +1273,9 @@ class ObservationsFragment : Fragment() {
         for (item in questionsFrameworkList) {
             item.isExpandable = false
         }
+        if (questionsFrameworkList.size == 1){
+            questionsFrameworkList[0].isExpandable = true
+        }
 
         binding.rvQuestionsFramework.layoutManager = LinearLayoutManager(this.requireContext())
         binding.rvQuestionsFramework.adapter =
@@ -1356,6 +1359,9 @@ class ObservationsFragment : Fragment() {
         for (item in observationsFrameworkList) {
             item.isExpandable = false
         }
+        if (observationsFrameworkList.size == 1){
+            observationsFrameworkList[0].isExpandable = true
+        }
         binding.rvCheckboxesFramework.layoutManager = LinearLayoutManager(this.requireContext())
         binding.rvCheckboxesFramework.adapter =
             CheckboxesFrameworkRVAdapter(
@@ -1433,6 +1439,9 @@ class ObservationsFragment : Fragment() {
         for (item in recommendationsFrameworkList) {
             item.isExpandable = false
         }
+        if (recommendationsFrameworkList.size == 1){
+            recommendationsFrameworkList[0].isExpandable = true
+        }
         binding.rvCheckboxesFramework.layoutManager = LinearLayoutManager(this.requireContext())
         binding.rvCheckboxesFramework.adapter =
             CheckboxesFrameworkRVAdapter(
@@ -1508,6 +1517,9 @@ class ObservationsFragment : Fragment() {
             presentSectionAllPagesFramework.sectionPageFrameworkList[currentPageIndex].standardsFrameworkList
         for (item in standardsCheckboxParentTemplateList) {
             item.isExpandable = false
+        }
+        if (standardsCheckboxParentTemplateList.size == 1){
+            standardsCheckboxParentTemplateList[0].isExpandable = true
         }
         binding.rvCheckboxesFramework.layoutManager = LinearLayoutManager(this.requireContext())
         binding.rvCheckboxesFramework.adapter =

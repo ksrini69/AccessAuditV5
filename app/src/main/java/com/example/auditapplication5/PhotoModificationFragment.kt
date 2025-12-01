@@ -215,7 +215,8 @@ class PhotoModificationFragment : Fragment() {
                 binding.ibTextFontForLabels.visibility = View.VISIBLE
                 binding.ibRotateTextForLabels.visibility = View.VISIBLE
                 binding.ibToCollapseAndExpandLl1.setImageResource(R.drawable.ic_back_50)
-            }else {
+            }
+            else {
                 binding.ibUndoInPhotoModification.visibility = View.GONE
                 binding.ibSave.visibility = View.GONE
                 binding.ibBrush.visibility = View.GONE

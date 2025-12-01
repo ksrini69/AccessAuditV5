@@ -56,6 +56,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:text="@string/string_company_intro"
+                            android:textAllCaps="false"
                             android:textSize="18sp"
                             android:textStyle="bold"
                             android:backgroundTint="@color/black"
@@ -119,6 +120,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:text="@string/string_choose_a_section"
+                            android:textAllCaps="false"
                             android:textSize="18sp"
                             android:textStyle="bold"
                             android:textColor="@color/white"
@@ -166,6 +168,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="10dp"
                     android:text="@string/string_section_intro"
+                    android:textAllCaps="false"
                     android:backgroundTint="@color/black"
                     android:textStyle="bold"
                     android:textSize="16sp"
@@ -178,6 +181,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/string_obs_reco_stds"
+                    android:textAllCaps="false"
                     android:backgroundTint="@color/black"
                     android:textColor="@color/white"
                     android:textStyle="bold"
@@ -199,73 +203,122 @@
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="70dp"
                 android:id="@+id/cl_section_buttons">
-                <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:id="@+id/ll_section_buttons"
-                    android:orientation="horizontal"
-                    android:gravity="center_vertical"
+
+                <HorizontalScrollView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:id="@+id/hsv_section_buttons"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
+                    android:visibility="gone"
                     app:layout_constraintBottom_toBottomOf="parent">
-                    <Space
+                    <LinearLayout
                         android:layout_width="0dp"
-                        android:layout_height="match_parent"
-                        android:layout_weight="1">
-
-                    </Space>
-                    <Button
-                        android:layout_width="wrap_content"
-                        android:layout_height="match_parent"
-                        android:id="@+id/button_edit_in_section_and_intros_fragment"
-                        android:text="@string/string_edit"
-                        android:backgroundTint="@color/black"
-                        android:textSize="16sp"
-                        android:textStyle="bold"
-                        android:textColor="@color/white"
-                        android:contentDescription="@string/string_button_to_edit_the_company_name_audit_date_and_section_name"
-                        android:tooltipText="@string/string_button_to_edit_the_company_name_audit_date_and_section_name"/>
-                    <Space
-                        android:layout_width="0dp"
-                        android:layout_height="match_parent"
-                        android:layout_weight="1">
-
-                    </Space>
-                    <ImageButton
-                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:id="@+id/ib_delete"
-                        android:backgroundTint="@color/black"
-                        android:src="@drawable/ic_delete_50_white"
-                        android:contentDescription="@string/string_image_button_showing_the_delete_icon_click_to_delete_the_company_and_any_section"
-                        android:tooltipText="@string/string_image_button_showing_the_delete_icon_click_to_delete_the_company_and_any_section"/>
-                    <Space
-                        android:layout_width="0dp"
-                        android:layout_height="match_parent"
-                        android:layout_weight="1">
+                        android:id="@+id/ll_section_buttons"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical">
 
-                    </Space>
-                    <Button
-                        android:layout_width="wrap_content"
-                        android:layout_height="match_parent"
-                        android:id="@+id/button_new_section"
-                        android:text="@string/string_new_section"
-                        android:backgroundTint="@color/black"
-                        android:textColor="@color/white"
-                        android:textStyle="bold"
-                        android:textSize="16sp"
-                        android:contentDescription="@string/string_button_for_adding_a_new_section"
-                        android:tooltipText="@string/string_button_for_adding_a_new_section"/>
-                    <Space
-                        android:layout_width="0dp"
-                        android:layout_height="match_parent"
-                        android:layout_weight="1">
+                        <Space
+                            android:layout_width="65dp"
+                            android:layout_height="match_parent"
+                            android:layout_weight="1">
+                        </Space>
 
-                    </Space>
-                </LinearLayout>
+                        <!-- New Section Button  -->
+                        <Button
+                            android:layout_width="wrap_content"
+                            android:layout_height="match_parent"
+                            android:id="@+id/button_new_section"
+                            android:text="@string/string_new_section"
+                            android:textAllCaps="false"
+                            android:backgroundTint="@color/black"
+                            android:textColor="@color/white"
+                            android:textStyle="bold"
+                            android:textSize="16sp"
+                            android:contentDescription="@string/string_button_for_adding_a_new_section"
+                            android:tooltipText="@string/string_button_for_adding_a_new_section"/>
+
+                        <Space
+                            android:layout_width="15dp"
+                            android:layout_height="match_parent"
+                            android:layout_weight="1">
+                        </Space>
+
+                        <!-- Reports Button  -->
+                        <Button
+                            android:layout_width="wrap_content"
+                            android:layout_height="match_parent"
+                            android:id="@+id/button_reports"
+                            android:text="@string/string_reports"
+                            android:textAllCaps="false"
+                            android:backgroundTint="@color/black"
+                            android:textColor="@color/white"
+                            android:textStyle="bold"
+                            android:textSize="16sp"
+                            android:contentDescription="@string/string_choosing_reports"
+                            android:tooltipText="@string/string_choosing_reports"/>
+
+                        <Space
+                            android:layout_width="15dp"
+                            android:layout_height="match_parent"
+                            android:layout_weight="1">
+                        </Space>
+
+                        <!-- Edit Button  -->
+                        <Button
+                            android:layout_width="wrap_content"
+                            android:layout_height="match_parent"
+                            android:id="@+id/button_edit_in_section_and_intros_fragment"
+                            android:text="@string/string_edit"
+                            android:textAllCaps="false"
+                            android:backgroundTint="@color/black"
+                            android:textSize="16sp"
+                            android:textStyle="bold"
+                            android:textColor="@color/white"
+                            android:contentDescription="@string/string_button_to_edit_the_company_name_audit_date_and_section_name"
+                            android:tooltipText="@string/string_button_to_edit_the_company_name_audit_date_and_section_name"/>
+
+                        <Space
+                            android:layout_width="15dp"
+                            android:layout_height="match_parent"
+                            android:layout_weight="1">
+                        </Space>
+
+                        <!-- Delete Image Button  -->
+                        <ImageButton
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:id="@+id/ib_delete"
+                            android:backgroundTint="@color/black"
+                            android:src="@drawable/ic_delete_50_white"
+                            android:contentDescription="@string/string_image_button_showing_the_delete_icon_click_to_delete_the_company_and_any_section"
+                            android:tooltipText="@string/string_image_button_showing_the_delete_icon_click_to_delete_the_company_and_any_section"/>
+
+
+                    </LinearLayout>
+                </HorizontalScrollView>
+
+                <!-- Image Button for minimizing and expanding this Linear Layout -->
+
+                <ImageButton
+                    android:layout_width="wrap_content"
+                    android:layout_height="57dp"
+                    android:translationZ="10dp"
+                    android:layout_marginStart="2dp"
+                    android:id="@+id/ib_to_collapse_and_expand_ll_section_buttons"
+                    android:src="@drawable/ic_forward_50_white"
+                    app:layout_constraintVertical_bias="0.5"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="@+id/hsv_section_buttons"
+                    app:layout_constraintBottom_toBottomOf="@+id/hsv_section_buttons"
+                    android:contentDescription="@string/string_image_button_for_collapsing_and_expanding_this_palatte"
+                    android:tooltipText="@string/string_image_button_for_collapsing_and_expanding_this_palatte"
+                    android:background="@color/black"/>
+
+
             </androidx.constraintlayout.widget.ConstraintLayout>
 
 
@@ -280,19 +333,6 @@
 
 
         </LinearLayout>
-
-        <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/fab_choosing_reports"
-            android:clickable="true"
-            android:layout_gravity="center|bottom"
-            android:layout_marginBottom="20dp"
-            android:backgroundTint="@color/white"
-            android:src="@drawable/ic_baseline_library_books_24"
-            app:maxImageSize="50dp"
-            android:contentDescription="@string/string_floating_action_button_for_choosing_reports"
-            android:tooltipText="@string/string_choosing_reports"/>
 
         <!-- Progess bar shows when database items are being uploaded-->
         <ProgressBar
