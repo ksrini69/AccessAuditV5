@@ -50,7 +50,7 @@ class QuestionTemplateRVAdapter(
                     it
                 )
             }
-            if (result == false){
+            if (!result){
                 aInfo5ViewModel.updateQuestionDataItemListUsingTemplateInPresentSectionAllData(currentPageIndex,questionsFrameworkIndex,
                     questionTemplateItemML
                 )
@@ -78,7 +78,7 @@ class QuestionTemplateRVAdapter(
             }
 
             //Data Field 1 Related
-            if (questionTemplateItem.data1Visibility == false) {
+            if (!questionTemplateItem.data1Visibility) {
                 binding.llDataField1.visibility = View.GONE
             }
             else {
@@ -136,7 +136,7 @@ class QuestionTemplateRVAdapter(
                 }
 
                 override fun afterTextChanged(s: Editable?) {
-                    if (isDataField1TextChanged == true){
+                    if (isDataField1TextChanged){
                         isDataField1TextChanged = false
                         dataField1PresentValue = s.toString()
                         //Update ViewModel here
@@ -148,7 +148,7 @@ class QuestionTemplateRVAdapter(
             })
 
             //Data Field 2 Related
-            if (questionTemplateItem.data2Visibility == false) {
+            if (!questionTemplateItem.data2Visibility) {
                 binding.llDataField2.visibility = View.GONE
             }
             else {
@@ -207,7 +207,7 @@ class QuestionTemplateRVAdapter(
                 }
 
                 override fun afterTextChanged(s: Editable?) {
-                    if (isDataField2TextChanged == true){
+                    if (isDataField2TextChanged){
                         isDataField2TextChanged = false
                         dataField2PresentValue = s.toString()
                         //Update ViewModel here
@@ -220,7 +220,7 @@ class QuestionTemplateRVAdapter(
             })
 
             //Data Field 3 Related
-            if (questionTemplateItem.data3Visibility == false) {
+            if (!questionTemplateItem.data3Visibility) {
                 binding.llDataField3.visibility = View.GONE
             }
             else {
@@ -279,7 +279,7 @@ class QuestionTemplateRVAdapter(
                 }
 
                 override fun afterTextChanged(s: Editable?) {
-                    if (isDataField3TextChanged == true){
+                    if (isDataField3TextChanged){
                         isDataField3TextChanged = false
                         dataField3PresentValue = s.toString()
                         //Update ViewModel here
@@ -291,7 +291,7 @@ class QuestionTemplateRVAdapter(
             })
 
             //Button Related
-            if (questionTemplateItem.buttonVisibility == false) {
+            if (!questionTemplateItem.buttonVisibility) {
                 binding.buttonChoose.visibility = View.GONE
             } else {
                 binding.buttonChoose.visibility = View.VISIBLE

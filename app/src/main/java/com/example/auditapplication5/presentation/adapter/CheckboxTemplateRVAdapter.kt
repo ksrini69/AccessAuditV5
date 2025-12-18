@@ -40,67 +40,69 @@ class CheckboxTemplateRVAdapter(
     inner class ViewHolder(val binding: CheckboxTemplateItemBinding) :
         RecyclerView.ViewHolder(binding.root) {
         fun bind(checkboxTemplateItem: CheckboxTemplateItemDC, templateCheckboxPosition: Int) {
-            if (screen == MainActivity.OBSERVATIONS_FRAGMENT_OBSERVATIONS) {
-                binding.buttonPriorityChoices.visibility = View.GONE
-                val observationsTemplateItemML = aInfo5ViewModel.observationsList_LD.value
-//                val result = observationsTemplateItemML?.let {
-//                    aInfo5ViewModel.isObsCheckboxesDataItemListUpdatedInPresentSectionAllData(
-//                        currentPageIndex, checkboxesFrameworkIndex,
-//                        it
-//                    )
-//                }
-//                if (result == false) {
-//                    aInfo5ViewModel.updateObsCheckboxesDataItemListUsingTemplateInPresentSectionAllData(
-//                        currentPageIndex, checkboxesFrameworkIndex,
-//                        observationsTemplateItemML
-//                    )
-//                }
-            }
-            else if (screen == MainActivity.OBSERVATIONS_FRAGMENT_RECOMMENDATIONS){
-                binding.buttonPriorityChoices.visibility = View.VISIBLE
-                val recommendationsTemplateItemML = aInfo5ViewModel.recommendationsList_LD.value
-//                val result = recommendationsTemplateItemML?.let {
-//                    aInfo5ViewModel.isRecoCheckboxesDataItemListUpdatedInPresentSectionAllData(
-//                        currentPageIndex, checkboxesFrameworkIndex,
-//                        it
-//                    )
-//                }
-//                if (result == false) {
-//                    aInfo5ViewModel.updateRecoCheckboxesDataItemListUsingTemplateInPresentSectionAllData(
-//                        currentPageIndex, checkboxesFrameworkIndex,
-//                        recommendationsTemplateItemML
-//                    )
-//                }
-            }
-            else if (screen == MainActivity.OBSERVATIONS_FRAGMENT_STANDARDS){
-                binding.buttonPriorityChoices.visibility = View.GONE
-                val standardsTemplateItemML = aInfo5ViewModel.standardsList_LD.value
-//                val result = standardsTemplateItemML?.let {
-//                    aInfo5ViewModel.isStdsCheckboxesDataItemListUpdatedInPresentSectionAllData(
-//                        currentPageIndex,
-//                        checkboxesFrameworkIndex,
-//                        standardsTemplateItemML
-//                    )
-//                }
-//                if (result == false) {
-//                    aInfo5ViewModel.updateStdsCheckboxesDataItemListUsingTemplateInPresentSectionAllData(
-//                        currentPageIndex,
-//                        checkboxesFrameworkIndex,
-//                        standardsTemplateItemML
-//                    )
-//                }
+            when (screen) {
+                MainActivity.OBSERVATIONS_FRAGMENT_OBSERVATIONS -> {
+                    binding.buttonPriorityChoices.visibility = View.GONE
+                    val observationsTemplateItemML = aInfo5ViewModel.observationsList_LD.value
+        //                val result = observationsTemplateItemML?.let {
+        //                    aInfo5ViewModel.isObsCheckboxesDataItemListUpdatedInPresentSectionAllData(
+        //                        currentPageIndex, checkboxesFrameworkIndex,
+        //                        it
+        //                    )
+        //                }
+        //                if (result == false) {
+        //                    aInfo5ViewModel.updateObsCheckboxesDataItemListUsingTemplateInPresentSectionAllData(
+        //                        currentPageIndex, checkboxesFrameworkIndex,
+        //                        observationsTemplateItemML
+        //                    )
+        //                }
+                }
+                MainActivity.OBSERVATIONS_FRAGMENT_RECOMMENDATIONS -> {
+                    binding.buttonPriorityChoices.visibility = View.VISIBLE
+                    val recommendationsTemplateItemML = aInfo5ViewModel.recommendationsList_LD.value
+        //                val result = recommendationsTemplateItemML?.let {
+        //                    aInfo5ViewModel.isRecoCheckboxesDataItemListUpdatedInPresentSectionAllData(
+        //                        currentPageIndex, checkboxesFrameworkIndex,
+        //                        it
+        //                    )
+        //                }
+        //                if (result == false) {
+        //                    aInfo5ViewModel.updateRecoCheckboxesDataItemListUsingTemplateInPresentSectionAllData(
+        //                        currentPageIndex, checkboxesFrameworkIndex,
+        //                        recommendationsTemplateItemML
+        //                    )
+        //                }
+                }
+                MainActivity.OBSERVATIONS_FRAGMENT_STANDARDS -> {
+                    binding.buttonPriorityChoices.visibility = View.GONE
+                    val standardsTemplateItemML = aInfo5ViewModel.standardsList_LD.value
+        //                val result = standardsTemplateItemML?.let {
+        //                    aInfo5ViewModel.isStdsCheckboxesDataItemListUpdatedInPresentSectionAllData(
+        //                        currentPageIndex,
+        //                        checkboxesFrameworkIndex,
+        //                        standardsTemplateItemML
+        //                    )
+        //                }
+        //                if (result == false) {
+        //                    aInfo5ViewModel.updateStdsCheckboxesDataItemListUsingTemplateInPresentSectionAllData(
+        //                        currentPageIndex,
+        //                        checkboxesFrameworkIndex,
+        //                        standardsTemplateItemML
+        //                    )
+        //                }
+                }
             }
 
             if (!checkboxTemplateItem.checkboxVisibility) {
                 binding.cbCheckboxItem.visibility = View.GONE
             } else {
                 binding.cbCheckboxItem.visibility = View.VISIBLE
-                binding.cbCheckboxItem.setText(checkboxTemplateItem.checkboxLabel.replace("#", ","))
+                binding.cbCheckboxItem.text = checkboxTemplateItem.checkboxLabel.replace("#", ",")
             }
 
 //            val buttonChoicesML =
 //                Resources.getSystem().getStringArray(R.array.Priority_Choices).toMutableList()
-            val buttonChoicesML = mutableListOf<String>("HP", "MP","RA", "PC")
+            val buttonChoicesML = mutableListOf("HP", "MP","RA", "PC")
             //Button priority choice and old checkbox label needs to be set from Data
             var buttonPriorityChoice = ""
             var oldCheckboxTickedValue = false
@@ -166,27 +168,31 @@ class CheckboxTemplateRVAdapter(
             }
 
             binding.cbCheckboxItem.setOnCheckedChangeListener { _, isChecked ->
-                if (screen == MainActivity.OBSERVATIONS_FRAGMENT_RECOMMENDATIONS) {
-                    aInfo5ViewModel.updateRecoCheckboxTickedValueInPresentSectionAllData(isChecked, currentPageIndex, checkboxesFrameworkIndex, templateCheckboxPosition)
-                    var recoCheckboxLabelWithPriorityValue = ""
-                    if (checkboxesFrameworkSerialStatus == MainActivity.PRIMARY_QUESTION_SET){
-                        recoCheckboxLabelWithPriorityValue =  checkboxesFrameworkTitle + ":" +binding.cbCheckboxItem.text.toString().replace("#", ",") + "[" + binding.buttonPriorityChoices.text.toString()+ "]"
-                    } else if (checkboxesFrameworkSerialStatus == MainActivity.OTHER_QUESTION_SET){
-                        recoCheckboxLabelWithPriorityValue = checkboxesFrameworkTitle + ":" + binding.cbCheckboxItem.text.toString().replace("#", ",") + "[" + binding.buttonPriorityChoices.text.toString()+ "]"
+                when (screen) {
+                    MainActivity.OBSERVATIONS_FRAGMENT_RECOMMENDATIONS -> {
+                        aInfo5ViewModel.updateRecoCheckboxTickedValueInPresentSectionAllData(isChecked, currentPageIndex, checkboxesFrameworkIndex, templateCheckboxPosition)
+                        var recoCheckboxLabelWithPriorityValue = ""
+                        if (checkboxesFrameworkSerialStatus == MainActivity.PRIMARY_QUESTION_SET){
+                            recoCheckboxLabelWithPriorityValue =  checkboxesFrameworkTitle + ":" +binding.cbCheckboxItem.text.toString().replace("#", ",") + "[" + binding.buttonPriorityChoices.text.toString()+ "]"
+                        } else if (checkboxesFrameworkSerialStatus == MainActivity.OTHER_QUESTION_SET){
+                            recoCheckboxLabelWithPriorityValue = checkboxesFrameworkTitle + ":" + binding.cbCheckboxItem.text.toString().replace("#", ",") + "[" + binding.buttonPriorityChoices.text.toString()+ "]"
+                        }
+                        aInfo5ViewModel.updateRecoCheckboxValueWithPriorityInRecommendations(recoCheckboxLabelWithPriorityValue,isChecked, currentPageIndex)
                     }
-                    aInfo5ViewModel.updateRecoCheckboxValueWithPriorityInRecommendations(recoCheckboxLabelWithPriorityValue,isChecked, currentPageIndex)
-                } else if (screen == MainActivity.OBSERVATIONS_FRAGMENT_STANDARDS) {
-                    aInfo5ViewModel.updateStdsCheckboxTickedValueInPresentSectionAllData(isChecked, currentPageIndex, checkboxesFrameworkIndex, templateCheckboxPosition)
-                    aInfo5ViewModel.updateStdsCheckboxValueInStandards(binding.cbCheckboxItem.text.toString().replace("#", ","), isChecked, currentPageIndex)
-                } else if (screen == MainActivity.OBSERVATIONS_FRAGMENT_OBSERVATIONS) {
-                    aInfo5ViewModel.updateObsCheckboxTickedValueInPresentSectionAllData(isChecked, currentPageIndex, checkboxesFrameworkIndex, templateCheckboxPosition)
-                    var obsCheckboxLabelValue = ""
-                    if (checkboxesFrameworkSerialStatus == MainActivity.PRIMARY_QUESTION_SET){
-                        obsCheckboxLabelValue = binding.cbCheckboxItem.text.toString().replace("#", ",")
-                    } else if (checkboxesFrameworkSerialStatus == MainActivity.OTHER_QUESTION_SET){
-                        obsCheckboxLabelValue = checkboxesFrameworkTitle + ":" + binding.cbCheckboxItem.text.toString().replace("#", ",")
+                    MainActivity.OBSERVATIONS_FRAGMENT_STANDARDS -> {
+                        aInfo5ViewModel.updateStdsCheckboxTickedValueInPresentSectionAllData(isChecked, currentPageIndex, checkboxesFrameworkIndex, templateCheckboxPosition)
+                        aInfo5ViewModel.updateStdsCheckboxValueInStandards(binding.cbCheckboxItem.text.toString().replace("#", ","), isChecked, currentPageIndex)
                     }
-                    aInfo5ViewModel.updateObsCheckboxValueInObservations(obsCheckboxLabelValue, isChecked, currentPageIndex)
+                    MainActivity.OBSERVATIONS_FRAGMENT_OBSERVATIONS -> {
+                        aInfo5ViewModel.updateObsCheckboxTickedValueInPresentSectionAllData(isChecked, currentPageIndex, checkboxesFrameworkIndex, templateCheckboxPosition)
+                        var obsCheckboxLabelValue = ""
+                        if (checkboxesFrameworkSerialStatus == MainActivity.PRIMARY_QUESTION_SET){
+                            obsCheckboxLabelValue = binding.cbCheckboxItem.text.toString().replace("#", ",")
+                        } else if (checkboxesFrameworkSerialStatus == MainActivity.OTHER_QUESTION_SET){
+                            obsCheckboxLabelValue = checkboxesFrameworkTitle + ":" + binding.cbCheckboxItem.text.toString().replace("#", ",")
+                        }
+                        aInfo5ViewModel.updateObsCheckboxValueInObservations(obsCheckboxLabelValue, isChecked, currentPageIndex)
+                    }
                 }
             }
         }

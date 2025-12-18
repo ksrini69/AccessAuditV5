@@ -3,7 +3,6 @@ package com.example.auditapplication5
 import android.app.AlertDialog
 import android.os.Bundle
 import android.text.method.ScrollingMovementMethod
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -23,7 +22,7 @@ class IntroductionsScrollingFragment : Fragment() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         binding = DataBindingUtil.inflate(layoutInflater,R.layout.fragment_introductions_scrolling, container, false )
         return binding.root
     }
@@ -61,6 +60,9 @@ class IntroductionsScrollingFragment : Fragment() {
         val actionBar = (activity as MainActivity).supportActionBar
         actionBar?.show()
 
+        //Initialise Some LD Flags for CameraX
+        initialiseSomeFlagsLD()
+
         //Scrolling for Textviews
         binding.tvPhotoPathsInIntroductionsPage.movementMethod = ScrollingMovementMethod()
 
@@ -68,10 +70,13 @@ class IntroductionsScrollingFragment : Fragment() {
         aInfo5ViewModel.allConditionsMetIntroductionsFLD.observe(viewLifecycleOwner){
             if (it == true){
                 binding.pbUploadingFormDbInIntroductions.visibility = View.GONE
+                binding.tvPbMessagesIntroductionsFragment.visibility = View.GONE
                 binding.llIntroductionsPage.isEnabled = true
             }
             else {
                 binding.pbUploadingFormDbInIntroductions.visibility = View.VISIBLE
+                binding.tvPbMessagesIntroductionsFragment.visibility = View.VISIBLE
+                binding.tvPbMessagesIntroductionsFragment.text = getString(R.string.string_message_loading_from_db)
                 binding.llIntroductionsPage.isEnabled = false
             }
         }
@@ -94,7 +99,7 @@ class IntroductionsScrollingFragment : Fragment() {
                                         presentCompanyName += item.framework
                                     }
                                     if (actionBar?.title?.contains(presentCompanyName) == false) {
-                                        actionBar.title = "Company Name: " + presentCompanyName
+                                        actionBar.title = "Company Name: $presentCompanyName"
                                     }
                                     actionBar?.subtitle = "Company Introduction"
                                 }
@@ -105,7 +110,7 @@ class IntroductionsScrollingFragment : Fragment() {
             }
             else {
                 if (actionBar?.title?.contains(presentCompanyName) == false) {
-                    actionBar.title = "Company Name: " + presentCompanyName
+                    actionBar.title = "Company Name: $presentCompanyName"
                 }
                 actionBar?.subtitle = "Company Introduction"
                 aInfo5ViewModel.setTheCompanyNameUploadedIFFlagMLD(true)
@@ -154,7 +159,7 @@ class IntroductionsScrollingFragment : Fragment() {
                                     presentSectionName += item.framework
                                 }
                                 if (actionBar?.title?.contains(presentSectionName) == false) {
-                                    actionBar.title = "Section Name: " + presentSectionName
+                                    actionBar.title = "Section Name: $presentSectionName"
                                 }
                                 actionBar?.subtitle = "Section Introduction"
                             }
@@ -165,7 +170,7 @@ class IntroductionsScrollingFragment : Fragment() {
             }
             else {
                 if (actionBar?.title?.contains(presentSectionName) == false) {
-                    actionBar.title = "Section Name: " + presentSectionName
+                    actionBar.title = "Section Name: $presentSectionName"
                 }
                 actionBar?.subtitle = "Section Introduction"
                 aInfo5ViewModel.setTheSectionNameUploadedIFFlagMLD(true)
@@ -242,6 +247,11 @@ class IntroductionsScrollingFragment : Fragment() {
 
     //Functions below
 
+    private fun initialiseSomeFlagsLD(){
+        aInfo5ViewModel.setThePictureUploadedCXFFlagMLD(true)
+        aInfo5ViewModel.setTheVideoUploadedCXFFlagMLD(true)
+    }
+
     private fun showDialogForPhotoModification(){
         val builder : AlertDialog.Builder = AlertDialog.Builder(this.requireContext())
         builder.setTitle("Choose Photos from Present Location/All ")
@@ -309,7 +319,7 @@ class IntroductionsScrollingFragment : Fragment() {
             aInfo5ViewModel.saveThePresentSectionAllPagesFrameworkAndAllDataToDB(aInfo5ViewModel.getThePresentSectionAllPagesFramework(),aInfo5ViewModel.getThePresentSectionAllData(),sectionPagesFrameworkAndDataID)
             val sectionIntroAndPhotoPathsData = "${aInfo5ViewModel.etIntroductionsMLD.value.toString()} \n\n ${aInfo5ViewModel.tvPhotoPathsInIntroductionsFragmentMLD.value.toString()}"
             aInfo5ViewModel.setTheSectionIntroUpdatedInReportSIFFlagMLD(false)
-            aInfo5ViewModel.updateSectionNameAndIntroInCompanyReportAndSave(aInfo5ViewModel.getPresentSectionCode(), "", sectionIntroAndPhotoPathsData)
+            aInfo5ViewModel.updateSectionNameAndIntroInCompanyReportAndSave(aInfo5ViewModel.getPresentSectionCode(), aInfo5ViewModel.getPresentSectionName(), sectionIntroAndPhotoPathsData)
         }
     }
 }

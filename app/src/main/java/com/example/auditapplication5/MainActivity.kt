@@ -6,13 +6,14 @@ import android.graphics.BitmapFactory
 import android.graphics.Matrix
 import android.net.Uri
 import android.os.Build
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.provider.OpenableColumns
 import android.view.View
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
+import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.net.toUri
 import androidx.lifecycle.ViewModelProvider
 import com.example.auditapplication5.data.model.AInfo5
@@ -32,7 +33,7 @@ class MainActivity : AppCompatActivity() {
     lateinit var aInfo5ViewModel: AInfo5ViewModel
 
     private val storageAccessLauncher =  registerForActivityResult(ActivityResultContracts.StartActivityForResult()){ result ->
-        if (result.resultCode == AppCompatActivity.RESULT_OK){
+        if (result.resultCode == RESULT_OK){
             if (result.data != null){
                 val treeURI : Uri? = result.data!!.data
                 if (treeURI != null) {
@@ -72,6 +73,9 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
+
+        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
+        
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
@@ -90,8 +94,14 @@ class MainActivity : AppCompatActivity() {
         aInfo5ViewModel.allConditionsMetMainActivityLD.observe(this){
             if (it == true){
                 binding.pbMainActivity.visibility = View.GONE
-            } else {
+                binding.tvPbMessagesMainActivity.visibility = View.GONE
+                binding.fragmentContainerView.visibility = View.VISIBLE
+            }
+            else {
                 binding.pbMainActivity.visibility = View.VISIBLE
+                binding.tvPbMessagesMainActivity.visibility = View.VISIBLE
+                binding.tvPbMessagesMainActivity.text = getString(R.string.string_message_loading_from_db)
+                binding.fragmentContainerView.visibility = View.GONE
             }
         }
 
@@ -100,14 +110,15 @@ class MainActivity : AppCompatActivity() {
             aInfo5ViewModel.getParentFolderURIStringLD.observe(this) { list ->
                 if (list.isEmpty()) {
                     aInfo5ViewModel.setTheParentFolderURIString("")
-                } else {
+                }
+                else {
                     var parentFolderURIString = ""
                     for (item in list) {
                         parentFolderURIString += item.framework.toString()
                     }
                     aInfo5ViewModel.setTheParentFolderURIString(parentFolderURIString)
                     val result =
-                        areUriPermissionsGranted(parentFolderURIString)
+                        haveAllUriPermissionsBeenGranted(parentFolderURIString)
                     if (!result) {
                         takePersistableURIPermissions(parentFolderURIString.toUri())
                     }
@@ -121,7 +132,7 @@ class MainActivity : AppCompatActivity() {
         //This flag is necessary so that we know that the templates have been loaded into the db
         if (aInfo5ViewModel.templatesUploadedMAFlagLD.value == false){
             val templateLoadedIntoDBFlagID = TEMPLATES_LOADED_INTO_DB_ID
-            val templateLoadedIntoDBFlagIDML = mutableListOf<String>(templateLoadedIntoDBFlagID)
+            val templateLoadedIntoDBFlagIDML = mutableListOf(templateLoadedIntoDBFlagID)
             aInfo5ViewModel.getAInfo5TemplatesByIds(templateLoadedIntoDBFlagIDML).observe(this){ list ->
                 if (list.isEmpty()){
                     aInfo5ViewModel.setTheTemplatesHaveBeenLoadedIntoDBFlag(false)
@@ -167,7 +178,7 @@ class MainActivity : AppCompatActivity() {
                         val iDsListForPageGroup = aInfo5ViewModel.getThePageGroupIDsList()
                         if (iDsListForPageGroup.isNotEmpty()){
                             for (index in 0 until iDsListForPageGroup.size){
-                                val itemIDNeededML = mutableListOf<String>(iDsListForPageGroup[index])
+                                val itemIDNeededML = mutableListOf(iDsListForPageGroup[index])
                                 aInfo5ViewModel.getAInfo5TemplatesByIds(itemIDNeededML).observe(this){list ->
                                     var pageGroupItemString = ""
                                     if (list.isEmpty()){
@@ -189,23 +200,17 @@ class MainActivity : AppCompatActivity() {
                     }
                 }
             }
+            else {
+                aInfo5ViewModel.setTheParentChildParentListUploadedMAFlagMLD(true)
+            }
         }
 
         //Ensuring that the list of templates loaded contains the Default template
         if (!aInfo5ViewModel.isItemPresentInPageTemplateList(aInfo5ViewModel.getTheDefaultPageTemplate().pageCode)){
             aInfo5ViewModel.addUniquePageToPageTemplateList(aInfo5ViewModel.getTheDefaultPageTemplate())
         }
-
-
     }
 
-    override fun onPause() {
-        super.onPause()
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-    }
     //Functions Below
 
     // Image and Photo related functions
@@ -237,13 +242,9 @@ class MainActivity : AppCompatActivity() {
 
         val returnCursor = uri?.let { contentResolver.query(it, null, null, null, null) }
         val nameIndex = returnCursor?.getColumnIndex(OpenableColumns.DISPLAY_NAME)
-        if (returnCursor != null) {
-            returnCursor.moveToFirst()
-        }
+        returnCursor?.moveToFirst()
         val fileName = nameIndex?.let { returnCursor.getString(it) }
-        if (returnCursor != null) {
-            returnCursor.close()
-        }
+        returnCursor?.close()
         //Log.d("photoName", "writeToImageFile: loom  $fileName ")
         return fileName!!
     }
@@ -451,7 +452,7 @@ class MainActivity : AppCompatActivity() {
         return stringBuilder.toString()
     }
 
-    fun areUriPermissionsGranted(uriString: String): Boolean {
+    fun haveAllUriPermissionsBeenGranted(uriString: String): Boolean {
         // list of all persisted permissions for our app
         val list = contentResolver.persistedUriPermissions
         for (i in list.indices) {
@@ -462,6 +463,7 @@ class MainActivity : AppCompatActivity() {
         }
         return false
     }
+
     fun takePersistableURIPermissions(treeURI: Uri){
         if (treeURI != null) {
             // here we ask the content resolver to persist the permission for us

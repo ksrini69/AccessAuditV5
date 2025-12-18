@@ -1,16 +1,12 @@
 package com.example.auditapplication5
 
 import android.content.ContentValues
-import android.content.pm.ActivityInfo
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
 import android.provider.MediaStore
 import android.util.Log
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -27,9 +23,14 @@ import androidx.camera.video.*
 import androidx.core.content.ContextCompat
 import androidx.core.content.PermissionChecker
 import androidx.databinding.DataBindingUtil
+import androidx.fragment.app.Fragment
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import com.example.auditapplication5.databinding.FragmentCameraXBinding
 import com.example.auditapplication5.presentation.viewmodel.AInfo5ViewModel
+import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.*
 import java.util.concurrent.ExecutorService
@@ -50,15 +51,10 @@ class CameraXFragment : Fragment() {
     var defaultImageName = "Default_Photo"
     var defaultVideoName = "Default_Video"
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-    }
-
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
 
         // Inflate the layout for this fragment
         binding =
@@ -71,6 +67,9 @@ class CameraXFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         aInfo5ViewModel = (activity as MainActivity).aInfo5ViewModel
+
+        //Status Message using Shared Flow
+        observeStatusMessage()
 
         activity?.onBackPressedDispatcher?.addCallback(
             viewLifecycleOwner,
@@ -100,6 +99,22 @@ class CameraXFragment : Fragment() {
         // Set the screen
         aInfo5ViewModel.setTheScreenVariable(MainActivity.CAMERA_FRAGMENT)
 
+        aInfo5ViewModel.allConditionsMetCameraXFLD.observe(viewLifecycleOwner){ flag ->
+            if (flag == true){
+                binding.pbSavingPictureAndVideo.visibility = View.GONE
+                binding.tvPbMessagesCameraXFragment.visibility = View.GONE
+                binding.buttonImageCapture.isEnabled = true
+                binding.buttonVideoCapture.isEnabled = true
+            }
+            else {
+                binding.pbSavingPictureAndVideo.visibility = View.VISIBLE
+                binding.tvPbMessagesCameraXFragment.visibility = View.VISIBLE
+                binding.tvPbMessagesCameraXFragment.text = getString(R.string.string_mesage_photo_video_saved)
+                binding.buttonImageCapture.isEnabled = false
+                binding.buttonVideoCapture.isEnabled = false
+            }
+        }
+
         // Request camera permissions
         if (allPermissionsGranted()) {
             startCamera()
@@ -114,9 +129,10 @@ class CameraXFragment : Fragment() {
                                 startCamera()
                             } else {
                                 Log.i("DEBUG", "permission denied")
-                                Toast.makeText(this.requireContext(),
-                                    "Permissions not granted by the user.",
-                                    Toast.LENGTH_SHORT).show()
+                                aInfo5ViewModel.setStatusMessageSF("Permissions not granted by the user.")
+//                                Toast.makeText(this.requireContext(),
+//                                    "Permissions not granted by the user.",
+//                                    Toast.LENGTH_SHORT).show()
                                 activity?.finish()
                             }
                         }
@@ -127,13 +143,16 @@ class CameraXFragment : Fragment() {
 
         // Set up the listeners for take photo and video capture buttons
         binding.buttonImageCapture.setOnClickListener {
+            aInfo5ViewModel.setThePictureUploadedCXFFlagMLD(false)
             takePhoto()
-            binding.buttonImageCapture.isEnabled = false
-            Handler(Looper.getMainLooper()).postDelayed({
-                binding.buttonImageCapture.isEnabled = true
-            }, 600)
+            //binding.buttonImageCapture.isEnabled = false
+//            Handler(Looper.getMainLooper()).postDelayed({
+//                binding.buttonImageCapture.isEnabled = true
+//            }, 600)
         }
-        binding.buttonVideoCapture.setOnClickListener { captureVideo() }
+        binding.buttonVideoCapture.setOnClickListener {
+            captureVideo()
+        }
 
         cameraExecutor = Executors.newSingleThreadExecutor()
 
@@ -163,6 +182,18 @@ class CameraXFragment : Fragment() {
     }
 
     //Functions below
+
+    private fun observeStatusMessage() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                aInfo5ViewModel.statusMessageSF.collect { message ->
+                    binding.tvPbMessagesCameraXFragment.visibility = View.GONE
+                    // Show Toast, Snackbar, or dialog - executes exactly once
+                    Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
+    }
 
     private fun startCamera() {
         val cameraProviderFuture = ProcessCameraProvider.getInstance(this.requireContext())
@@ -249,6 +280,7 @@ class CameraXFragment : Fragment() {
                 object : ImageCapture.OnImageSavedCallback {
                     override fun onError(exc: ImageCaptureException) {
                         Log.e(MainActivity.TAG, "Photo capture failed: ${exc.message}", exc)
+                        aInfo5ViewModel.setThePictureUploadedCXFFlagMLD(true)
                     }
 
                     override fun onImageSaved(output: ImageCapture.OutputFileResults){
@@ -312,14 +344,19 @@ class CameraXFragment : Fragment() {
                             if (!recordEvent.hasError()) {
                                 val msg = "Video capture succeeded: " +
                                         "${recordEvent.outputResults.outputUri}"
-                                Toast.makeText(activity?.baseContext, msg, Toast.LENGTH_SHORT)
-                                    .show()
+                                aInfo5ViewModel.setStatusMessageSF(msg)
+//                                Toast.makeText(activity?.baseContext, msg, Toast.LENGTH_SHORT)
+//                                    .show()
                                 Log.d(MainActivity.TAG, msg)
-                            } else {
+                                aInfo5ViewModel.setTheVideoUploadedCXFFlagMLD(true)
+                            }
+                            else {
+                                aInfo5ViewModel.setTheVideoUploadedCXFFlagMLD(false)
                                 recording?.close()
                                 recording = null
                                 Log.e(MainActivity.TAG, "Video capture ends with error: " +
                                         "${recordEvent.error}")
+                                aInfo5ViewModel.setTheVideoUploadedCXFFlagMLD(true)
                             }
                             binding.buttonVideoCapture.apply {
                                 text = getString(R.string.string_start_capture)
@@ -345,17 +382,31 @@ class CameraXFragment : Fragment() {
         private const val FILENAME_DEFAULT_FORMAT = "yyyy-MM-dd-HH-mm-ss-SSS"
         @RequiresApi(Build.VERSION_CODES.R)
         private val REQUIRED_PERMISSIONS =
-            mutableListOf (
-                android.Manifest.permission.CAMERA,
-                android.Manifest.permission.RECORD_AUDIO,
-                android.Manifest.permission.MANAGE_EXTERNAL_STORAGE,
-                android.Manifest.permission.READ_MEDIA_IMAGES,
-                android.Manifest.permission.ACCESS_MEDIA_LOCATION
-            ).apply {
-                if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.P) {
-                    add(android.Manifest.permission.WRITE_EXTERNAL_STORAGE)
-                }
-            }.toTypedArray()
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                mutableListOf (
+                    android.Manifest.permission.CAMERA,
+                    android.Manifest.permission.RECORD_AUDIO,
+                    android.Manifest.permission.MANAGE_EXTERNAL_STORAGE,
+                    android.Manifest.permission.READ_MEDIA_IMAGES,
+                    android.Manifest.permission.ACCESS_MEDIA_LOCATION
+                ).apply {
+                    if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.P) {
+                        add(android.Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                    }
+                }.toTypedArray()
+            } else {
+                mutableListOf (
+                    android.Manifest.permission.CAMERA,
+                    android.Manifest.permission.RECORD_AUDIO,
+                    android.Manifest.permission.MANAGE_EXTERNAL_STORAGE,
+                    android.Manifest.permission.READ_EXTERNAL_STORAGE,
+                    android.Manifest.permission.ACCESS_MEDIA_LOCATION
+                ).apply {
+                    if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.P) {
+                        add(android.Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                    }
+                }.toTypedArray()
+            }
     }
 
 }

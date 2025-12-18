@@ -10,11 +10,15 @@ import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.core.net.toUri
 import androidx.databinding.DataBindingUtil
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.findNavController
 import com.example.auditapplication5.data.model.*
 import com.example.auditapplication5.databinding.FragmentEnterNameBinding
 import com.example.auditapplication5.presentation.viewmodel.AInfo5ViewModel
+import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -23,18 +27,12 @@ class EnterNameFragment : Fragment() {
     private lateinit var binding: FragmentEnterNameBinding
     private lateinit var aInfo5ViewModel: AInfo5ViewModel
     private lateinit var parentFolderURIString: String
-    var companyCodesAndNamesML = mutableListOf<CodeNameAndDisplayNameDC>()
-    private lateinit var companyCodesAndNamesListString: String
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         // Inflate the layout for this fragment
         binding =
             DataBindingUtil.inflate(layoutInflater, R.layout.fragment_enter_name, container, false)
@@ -47,6 +45,9 @@ class EnterNameFragment : Fragment() {
         aInfo5ViewModel = (activity as MainActivity).aInfo5ViewModel
 
         val TAG = MainActivity.TESTING_TAG
+
+        //Status Message using Shared Flow
+        observeStatusMessage()
 
         activity?.onBackPressedDispatcher?.addCallback(
             viewLifecycleOwner,
@@ -87,9 +88,13 @@ class EnterNameFragment : Fragment() {
         aInfo5ViewModel.allConditionsMetEnterNameLD.observe(viewLifecycleOwner){allMet ->
             if (allMet == true){
                 binding.pbEnterNameFragment.visibility = View.GONE
+                binding.tvPbMessagesOpeningScreenFragment.visibility = View.GONE
                 binding.llLayoutContainerEnterNameFragment.isEnabled = true
-            } else {
+            }
+            else {
                 binding.pbEnterNameFragment.visibility = View.VISIBLE
+                binding.tvPbMessagesOpeningScreenFragment.visibility = View.VISIBLE
+                binding.tvPbMessagesOpeningScreenFragment.text = getString(R.string.string_message_loading_from_db)
                 binding.llLayoutContainerEnterNameFragment.isEnabled = false
             }
         }
@@ -131,7 +136,7 @@ class EnterNameFragment : Fragment() {
                         }
                         aInfo5ViewModel.setTheParentFolderURIString(parentFolderURIString)
                         val result =
-                            (activity as MainActivity).areUriPermissionsGranted(parentFolderURIString)
+                            (activity as MainActivity).haveAllUriPermissionsBeenGranted(parentFolderURIString)
                         if (!result) {
                             (activity as MainActivity).takePersistableURIPermissions(
                                 parentFolderURIString.toUri()
@@ -169,7 +174,7 @@ class EnterNameFragment : Fragment() {
 
         //Putting the name of Company or Section in the Edit Text
         if (aInfo5ViewModel.getThePreviousScreenVariable() == MainActivity.SIMPLE_LIST_RV_FRAGMENT) {
-            if (aInfo5ViewModel.getTheCompanyNameToBeUpdatedFlag() == true) {
+            if (aInfo5ViewModel.retrieveTheCompanyNameToBeUpdatedFlag()) {
                 val presentCompanyNameID =
                     aInfo5ViewModel.getPresentCompanyCode() + MainActivity.PRESENT_COMPANY_ID
                 aInfo5ViewModel.getAInfo5ByIds(mutableListOf(presentCompanyNameID))
@@ -184,7 +189,7 @@ class EnterNameFragment : Fragment() {
                     }
 
             }
-            else if (aInfo5ViewModel.getFlagForSectionNameToBeUpdated() == true) {
+            else if (aInfo5ViewModel.retrieveFlagForSectionNameToBeUpdated()) {
                 val presentSectionNameID =
                     aInfo5ViewModel.getPresentCompanyCode() + aInfo5ViewModel.getPresentSectionCode() + MainActivity.PRESENT_SECTION_ID
                 aInfo5ViewModel.getAInfo5ByIds(mutableListOf(presentSectionNameID))
@@ -258,18 +263,20 @@ class EnterNameFragment : Fragment() {
                                     aInfo5ViewModel.getTheParentFolderURIString().toUri()
                                 )
                             } catch (e: FileSystemException) {
-                                Toast.makeText(
-                                    this.requireContext(),
-                                    "Directory Creation Failed. Please note $e",
-                                    Toast.LENGTH_SHORT
-                                ).show()
+                                aInfo5ViewModel.setStatusMessageSF("Directory Creation Failed. Please note $e")
+//                                Toast.makeText(
+//                                    this.requireContext(),
+//                                    "Directory Creation Failed. Please note $e",
+//                                    Toast.LENGTH_SHORT
+//                                ).show()
                             }
                         }
                         else {
                             try {
                                 aInfo5ViewModel.gettingCompanyDirectoryUriAndSavingIntoDB(companyName,aInfo5ViewModel.getTheParentFolderURIString().toUri() )
                             } catch (e: FileSystemException){
-                                Toast.makeText(context, "Getting this $companyName directory Uri has failed. Please note $e", Toast.LENGTH_SHORT).show()
+                                aInfo5ViewModel.setStatusMessageSF("Getting this $companyName directory Uri has failed. Please note $e")
+                                //Toast.makeText(context, "Getting this $companyName directory Uri has failed. Please note $e", Toast.LENGTH_SHORT).show()
                             }
 
                         }
@@ -333,17 +340,19 @@ class EnterNameFragment : Fragment() {
                                         aInfo5ViewModel.getTheParentFolderURIString().toUri()
                                     )
                                 } catch (e: FileSystemException) {
-                                    Toast.makeText(
-                                        this.requireContext(),
-                                        "Directory Creation Has Failed. Please note $e",
-                                        Toast.LENGTH_SHORT
-                                    ).show()
+                                    aInfo5ViewModel.setStatusMessageSF("Directory Creation Has Failed. Please note $e")
+//                                    Toast.makeText(
+//                                        this.requireContext(),
+//                                        "Directory Creation Has Failed. Please note $e",
+//                                        Toast.LENGTH_SHORT
+//                                    ).show()
                                 }
                             } else {
                                 try {
                                     aInfo5ViewModel.gettingCompanyDirectoryUriAndSavingIntoDB(companyName,aInfo5ViewModel.getTheParentFolderURIString().toUri() )
                                 } catch (e: FileSystemException){
-                                    Toast.makeText(context, "Getting this $companyName directory Uri has failed. Please note $e", Toast.LENGTH_SHORT).show()
+                                    aInfo5ViewModel.setStatusMessageSF("Getting this $companyName directory Uri has failed. Please note $e")
+                                    //Toast.makeText(context, "Getting this $companyName directory Uri has failed. Please note $e", Toast.LENGTH_SHORT).show()
                                 }
                             }
                             aInfo5ViewModel.setThePreviousScreenVariable(MainActivity.NOT_RELEVANT)
@@ -352,11 +361,12 @@ class EnterNameFragment : Fragment() {
                             it.findNavController()
                                 .navigate(R.id.action_enterNameFragment_to_sectionAndIntrosFragment)
                         } else {
-                            Toast.makeText(
-                                this.requireContext(),
-                                "This company name exists. Please enter a unique name.",
-                                Toast.LENGTH_SHORT
-                            ).show()
+                            aInfo5ViewModel.setStatusMessageSF("This company name exists. Please enter a unique name.")
+//                            Toast.makeText(
+//                                this.requireContext(),
+//                                "This company name exists. Please enter a unique name.",
+//                                Toast.LENGTH_SHORT
+//                            ).show()
                         }
                     }
                 }
@@ -419,6 +429,7 @@ class EnterNameFragment : Fragment() {
                                 .navigate(R.id.action_enterNameFragment_to_sectionAndIntrosFragment)
                         }
                         else {
+                            aInfo5ViewModel.setStatusMessageSF("This section exists")
                             Toast.makeText(
                                 this.requireContext(),
                                 "This section exists",
@@ -428,7 +439,7 @@ class EnterNameFragment : Fragment() {
                     }
                 }
                 else if (aInfo5ViewModel.getThePreviousScreenVariable() == MainActivity.SIMPLE_LIST_RV_FRAGMENT) {
-                    if (aInfo5ViewModel.getTheCompanyNameToBeUpdatedFlag() == true) {
+                    if (aInfo5ViewModel.retrieveTheCompanyNameToBeUpdatedFlag()) {
                         val newCompanyName = binding.etEnterName.text.toString().trim()
                         //Check to see if this name is unique
                         if (aInfo5ViewModel.uniquenessCheckInCodesAndNames(
@@ -451,14 +462,15 @@ class EnterNameFragment : Fragment() {
                             findNavController().navigate(R.id.action_enterNameFragment_to_sectionAndIntrosFragment)
                         }
                         else {
-                            Toast.makeText(
-                                this.requireContext(),
-                                "This company name exists. Please enter a unique name.",
-                                Toast.LENGTH_SHORT
-                            ).show()
+                            aInfo5ViewModel.setStatusMessageSF("This company name exists. Please enter a unique name.")
+//                            Toast.makeText(
+//                                this.requireContext(),
+//                                "This company name exists. Please enter a unique name.",
+//                                Toast.LENGTH_SHORT
+//                            ).show()
                         }
                     }
-                    else if (aInfo5ViewModel.getFlagForSectionNameToBeUpdated() == true) {
+                    else if (aInfo5ViewModel.retrieveFlagForSectionNameToBeUpdated()) {
                         val newSectionName = binding.etEnterName.text.toString().trim()
 
                         //Checking to see if this section name is unique
@@ -474,11 +486,12 @@ class EnterNameFragment : Fragment() {
                             aInfo5ViewModel.setThePreviousScreen2Variable(MainActivity.NOT_RELEVANT)
                             findNavController().navigate(R.id.action_enterNameFragment_to_sectionAndIntrosFragment)
                         } else {
-                            Toast.makeText(
-                                this.requireContext(),
-                                "This section exists. Please enter a unique name.",
-                                Toast.LENGTH_SHORT
-                            ).show()
+                            aInfo5ViewModel.setStatusMessageSF("This section exists. Please enter a unique name.")
+//                            Toast.makeText(
+//                                this.requireContext(),
+//                                "This section exists. Please enter a unique name.",
+//                                Toast.LENGTH_SHORT
+//                            ).show()
                         }
 
                     }
@@ -490,15 +503,18 @@ class EnterNameFragment : Fragment() {
         }
     }
 
-    override fun onPause() {
-        super.onPause()
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-    }
-
     //Functions below
+
+    private fun observeStatusMessage() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                aInfo5ViewModel.statusMessageSF.collect { message ->
+                    // Show Toast, Snackbar, or dialog - executes exactly once
+                    Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
+    }
 
     private fun showDialogForEmptyEditText() {
         val builder: AlertDialog.Builder = AlertDialog.Builder(this.requireContext())

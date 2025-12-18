@@ -1,13 +1,12 @@
 package com.example.auditapplication5
 
 import android.os.Bundle
-import android.util.Log
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.OnBackPressedCallback
 import androidx.databinding.DataBindingUtil
+import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.auditapplication5.data.model.*
@@ -21,15 +20,10 @@ class ParentChildRecyclerviewFragment : Fragment() {
     private lateinit var aInfo5ViewModel: AInfo5ViewModel
 
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-    }
-
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         // Inflate the layout for this fragment
         binding = DataBindingUtil.inflate(
             layoutInflater,
@@ -118,75 +112,77 @@ class ParentChildRecyclerviewFragment : Fragment() {
         var sectionPageFramework = SectionPageFrameworkDC()
         var sectionPageData = SectionPageDataDC()
 
-        if (selectedPageCode == "PC_General_Entry_01_PC") {
-            sectionPageFramework = aInfo5ViewModel.getTheDefaultSectionPageFramework()
-            sectionPageData = aInfo5ViewModel.getTheDefaultSectionPageData()
-        }
-        else if (selectedPageCode == "No Pages Present" || selectedPageCode == "") {
-            sectionPageFramework.pageCode = ""
-            sectionPageFramework = SectionPageFrameworkDC()
-            sectionPageData = SectionPageDataDC()
-        }
-        else {
-            sectionPageFramework.pageCode = selectedPageCode
-            sectionPageFramework.pageTitle =
-                aInfo5ViewModel.extractDisplayNameFromPageCode(selectedPageCode)
-            sectionPageData.pageTitle = sectionPageFramework.pageTitle
+        when (selectedPageCode) {
+            "PC_General_Entry_01_PC" -> {
+                sectionPageFramework = aInfo5ViewModel.getTheDefaultSectionPageFramework()
+                sectionPageData = aInfo5ViewModel.getTheDefaultSectionPageData()
+            }
+            "No Pages Present", "" -> {
+                sectionPageFramework.pageCode = ""
+                sectionPageFramework = SectionPageFrameworkDC()
+                sectionPageData = SectionPageDataDC()
+            }
+            else -> {
+                sectionPageFramework.pageCode = selectedPageCode
+                sectionPageFramework.pageTitle =
+                    aInfo5ViewModel.extractDisplayNameFromPageCode(selectedPageCode)
+                sectionPageData.pageTitle = sectionPageFramework.pageTitle
 
-            val questionsFrameworkItem = QuestionsFrameworkItemDC()
-            val observationsCheckboxesFrameworkItem = CheckboxesFrameworkItemDC()
-            val recommendationsCheckboxesFrameworkItem = CheckboxesFrameworkItemDC()
-            val standardsCheckboxesFrameworkItem = CheckboxesFrameworkItemDC()
+                val questionsFrameworkItem = QuestionsFrameworkItemDC()
+                val observationsCheckboxesFrameworkItem = CheckboxesFrameworkItemDC()
+                val recommendationsCheckboxesFrameworkItem = CheckboxesFrameworkItemDC()
+                val standardsCheckboxesFrameworkItem = CheckboxesFrameworkItemDC()
 
-            val questionsFrameworkDataItem = QuestionsFrameworkDataItemDC()
-            val observationsFrameworkDataItem = CheckboxesFrameworkDataItemDC()
-            val recommendationsFrameworkDataItem = CheckboxesFrameworkDataItemDC()
-            val standardsFrameworkDataItem = CheckboxesFrameworkDataItemDC()
+                val questionsFrameworkDataItem = QuestionsFrameworkDataItemDC()
+                val observationsFrameworkDataItem = CheckboxesFrameworkDataItemDC()
+                val recommendationsFrameworkDataItem = CheckboxesFrameworkDataItemDC()
+                val standardsFrameworkDataItem = CheckboxesFrameworkDataItemDC()
 
-            questionsFrameworkItem.questionsFrameworkTitle = sectionPageFramework.pageTitle
-            questionsFrameworkItem.pageCode = selectedPageCode
-            questionsFrameworkItem.serialStatus = MainActivity.PRIMARY_QUESTION_SET
-            sectionPageFramework.questionsFrameworkList.add(questionsFrameworkItem)
+                questionsFrameworkItem.questionsFrameworkTitle = sectionPageFramework.pageTitle
+                questionsFrameworkItem.pageCode = selectedPageCode
+                questionsFrameworkItem.serialStatus = MainActivity.PRIMARY_QUESTION_SET
+                sectionPageFramework.questionsFrameworkList.add(questionsFrameworkItem)
 
-            questionsFrameworkDataItem.questionsFrameworkTitle =
-                questionsFrameworkItem.questionsFrameworkTitle
-            questionsFrameworkDataItem.pageCode = selectedPageCode
-            sectionPageData.questionsFrameworkDataItemList.add(questionsFrameworkDataItem)
+                questionsFrameworkDataItem.questionsFrameworkTitle =
+                    questionsFrameworkItem.questionsFrameworkTitle
+                questionsFrameworkDataItem.pageCode = selectedPageCode
+                sectionPageData.questionsFrameworkDataItemList.add(questionsFrameworkDataItem)
 
-            observationsCheckboxesFrameworkItem.checkboxesFrameworkTitle = sectionPageFramework.pageTitle
-            observationsCheckboxesFrameworkItem.pageCode = selectedPageCode
-            observationsCheckboxesFrameworkItem.serialStatus = MainActivity.PRIMARY_QUESTION_SET
-            sectionPageFramework.observationsFrameworkList.add(observationsCheckboxesFrameworkItem)
+                observationsCheckboxesFrameworkItem.checkboxesFrameworkTitle = sectionPageFramework.pageTitle
+                observationsCheckboxesFrameworkItem.pageCode = selectedPageCode
+                observationsCheckboxesFrameworkItem.serialStatus = MainActivity.PRIMARY_QUESTION_SET
+                sectionPageFramework.observationsFrameworkList.add(observationsCheckboxesFrameworkItem)
 
-            observationsFrameworkDataItem.checkboxesFrameworkTitle =
-                observationsCheckboxesFrameworkItem.checkboxesFrameworkTitle
-            observationsFrameworkDataItem.pageCode = selectedPageCode
-            sectionPageData.observationsFrameworkDataItemList.add(observationsFrameworkDataItem)
+                observationsFrameworkDataItem.checkboxesFrameworkTitle =
+                    observationsCheckboxesFrameworkItem.checkboxesFrameworkTitle
+                observationsFrameworkDataItem.pageCode = selectedPageCode
+                sectionPageData.observationsFrameworkDataItemList.add(observationsFrameworkDataItem)
 
-            recommendationsCheckboxesFrameworkItem.checkboxesFrameworkTitle = sectionPageFramework.pageTitle
-            recommendationsCheckboxesFrameworkItem.pageCode = selectedPageCode
-            recommendationsCheckboxesFrameworkItem.serialStatus = MainActivity.PRIMARY_QUESTION_SET
-            sectionPageFramework.recommendationsFrameworkList.add(
-                recommendationsCheckboxesFrameworkItem
-            )
+                recommendationsCheckboxesFrameworkItem.checkboxesFrameworkTitle = sectionPageFramework.pageTitle
+                recommendationsCheckboxesFrameworkItem.pageCode = selectedPageCode
+                recommendationsCheckboxesFrameworkItem.serialStatus = MainActivity.PRIMARY_QUESTION_SET
+                sectionPageFramework.recommendationsFrameworkList.add(
+                    recommendationsCheckboxesFrameworkItem
+                )
 
-            recommendationsFrameworkDataItem.checkboxesFrameworkTitle =
-                recommendationsCheckboxesFrameworkItem.checkboxesFrameworkTitle
-            recommendationsFrameworkDataItem.pageCode = selectedPageCode
-            sectionPageData.recommendationsFrameworkDataItemList.add(
-                recommendationsFrameworkDataItem
-            )
+                recommendationsFrameworkDataItem.checkboxesFrameworkTitle =
+                    recommendationsCheckboxesFrameworkItem.checkboxesFrameworkTitle
+                recommendationsFrameworkDataItem.pageCode = selectedPageCode
+                sectionPageData.recommendationsFrameworkDataItemList.add(
+                    recommendationsFrameworkDataItem
+                )
 
-            standardsCheckboxesFrameworkItem.checkboxesFrameworkTitle = sectionPageFramework.pageTitle
-            standardsCheckboxesFrameworkItem.pageCode = selectedPageCode
-            standardsCheckboxesFrameworkItem.serialStatus = MainActivity.PRIMARY_QUESTION_SET
-            sectionPageFramework.standardsFrameworkList.add(standardsCheckboxesFrameworkItem)
+                standardsCheckboxesFrameworkItem.checkboxesFrameworkTitle = sectionPageFramework.pageTitle
+                standardsCheckboxesFrameworkItem.pageCode = selectedPageCode
+                standardsCheckboxesFrameworkItem.serialStatus = MainActivity.PRIMARY_QUESTION_SET
+                sectionPageFramework.standardsFrameworkList.add(standardsCheckboxesFrameworkItem)
 
-            standardsFrameworkDataItem.checkboxesFrameworkTitle =
-                standardsCheckboxesFrameworkItem.checkboxesFrameworkTitle
-            standardsFrameworkDataItem.pageCode = selectedPageCode
-            sectionPageData.standardsFrameworkDataItemList.add(standardsFrameworkDataItem)
+                standardsFrameworkDataItem.checkboxesFrameworkTitle =
+                    standardsCheckboxesFrameworkItem.checkboxesFrameworkTitle
+                standardsFrameworkDataItem.pageCode = selectedPageCode
+                sectionPageData.standardsFrameworkDataItemList.add(standardsFrameworkDataItem)
 
+            }
         }
 
         if (sectionPageFramework.pageCode != "") {
@@ -231,17 +227,18 @@ class ParentChildRecyclerviewFragment : Fragment() {
         findNavController().navigate(R.id.action_parentChildRecyclerviewFragment_to_observationsFragment)
     }
 
-    fun processSectionCode(input: String): String {
+    private fun processSectionCode(input: String): String {
         var resultString = ""
-        if (input == "Section_DropoffandBuildingEntry_0004_Section"){
-            resultString = "PG_Drop_Off_And_Building_Entry_PG"
-        } else {
+        resultString = if (input == "Section_DropoffandBuildingEntry_0004_Section"){
+            "PG_Drop_Off_And_Building_Entry_PG"
+        }
+        else {
             val parts = input.split("_")
             if (parts.size < 2) return ""
             val secondTerm = parts[1]  // "Gates" or "MiscellaneousRooms"
             // Proper camelCase split using regex - keeps capitalization
             val words = secondTerm.split(Regex("(?<=\\p{Ll})(?=\\p{Lu})")).filter { it.isNotEmpty() }
-            resultString = "PG_${words.joinToString("_")}_PG"
+            "PG_${words.joinToString("_")}_PG"
         }
 
         return resultString

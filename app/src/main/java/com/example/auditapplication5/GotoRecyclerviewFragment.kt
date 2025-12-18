@@ -21,15 +21,10 @@ class GotoRecyclerviewFragment : Fragment() {
     private lateinit var aInfo5ViewModel: AInfo5ViewModel
 
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-    }
-
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         // Inflate the layout for this fragment
         binding = DataBindingUtil.inflate(layoutInflater, R.layout.fragment_goto_recyclerview, container, false)
         return binding.root

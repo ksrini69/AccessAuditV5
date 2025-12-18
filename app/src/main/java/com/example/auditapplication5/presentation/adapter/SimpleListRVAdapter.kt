@@ -1,10 +1,8 @@
 package com.example.auditapplication5.presentation.adapter
 
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import com.example.auditapplication5.MainActivity
 import com.example.auditapplication5.data.model.CodeNameAndDisplayNameDC
 import com.example.auditapplication5.databinding.RvSimpleListItemBinding
 
@@ -26,7 +24,7 @@ class SimpleListRVAdapter(
         var name = ""
         var code = ""
         var pagesPresent = false
-        if (codeNameAndDisplayFlag == true){
+        if (codeNameAndDisplayFlag){
             code = codesAndNamesML[position].uniqueCodeName
             pagesPresent = codesAndNamesML[position].pagesPresent
             name = codesAndNamesML[position].displayName
@@ -40,10 +38,10 @@ class SimpleListRVAdapter(
 
     override fun getItemCount(): Int {
         var size = 0
-        if (codeNameAndDisplayFlag == true){
-            size = codesAndNamesML.size
+        size = if (codeNameAndDisplayFlag){
+            codesAndNamesML.size
         } else {
-            size = namesList.size
+            namesList.size
         }
         return size
     }
@@ -51,10 +49,10 @@ class SimpleListRVAdapter(
     inner class ViewHolder(val binding: RvSimpleListItemBinding) : RecyclerView.ViewHolder(binding.root){
         fun bind(name : String, code: String, pagesPresent: Boolean, clickListener: (name: String, code: String) -> Unit){
             var name1 = ""
-            if (pagesPresent == true){
-                name1 = name + " - pages present"
+            name1 = if (pagesPresent){
+                name + " - pages present"
             } else {
-                name1 = name
+                name
             }
             binding.tvSimpleListItem.text = name1
             binding.root.setOnClickListener {

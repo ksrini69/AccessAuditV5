@@ -10,10 +10,14 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.databinding.DataBindingUtil
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.findNavController
 import com.example.auditapplication5.data.model.*
 import com.example.auditapplication5.databinding.FragmentOpeningScreenBinding
 import com.example.auditapplication5.presentation.viewmodel.AInfo5ViewModel
+import kotlinx.coroutines.launch
 import kotlin.system.exitProcess
 
 
@@ -22,15 +26,10 @@ class OpeningScreenFragment : Fragment() {
     private lateinit var aInfo5ViewModel: AInfo5ViewModel
 
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-    }
-
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         // Inflate the layout for this fragment
         binding = DataBindingUtil.inflate(
             layoutInflater,
@@ -46,6 +45,9 @@ class OpeningScreenFragment : Fragment() {
         aInfo5ViewModel = (activity as MainActivity).aInfo5ViewModel
 
         val TAG = MainActivity.TESTING_TAG
+
+        //Status Message using Shared Flow
+        observeStatusMessage()
 
         activity?.onBackPressedDispatcher?.addCallback(
             viewLifecycleOwner,
@@ -112,7 +114,7 @@ class OpeningScreenFragment : Fragment() {
 
         binding.fabAddingTemplateFiles.setOnClickListener {
             val templatesLoadedFlag = aInfo5ViewModel.getTheTemplatesHaveBeenLoadedIntoDBFlag()
-            if (templatesLoadedFlag == true) {
+            if (templatesLoadedFlag) {
                 showDialogForNewTemplateUpload()
             } else {
                 aInfo5ViewModel.setTheFileFlag(MainActivity.TEMPLATE_DOCUMENT_LOAD)
@@ -144,7 +146,8 @@ class OpeningScreenFragment : Fragment() {
                     } else {
                         binding.llPasswordDatabaseDeletion.visibility = View.GONE
                         binding.llOpeningScreen.visibility = View.VISIBLE
-                        Toast.makeText(requireContext(),"The password entered is incorrect", Toast.LENGTH_SHORT).show()
+                        aInfo5ViewModel.setStatusMessageSF("The password entered is incorrect")
+                        //Toast.makeText(requireContext(),"The password entered is incorrect", Toast.LENGTH_SHORT).show()
                         aInfo5ViewModel.setTheScreenVariable(MainActivity.OPENING_SCREEN_FRAGMENT)
                     }
                 } else {
@@ -158,21 +161,25 @@ class OpeningScreenFragment : Fragment() {
 
     }
 
-    override fun onPause() {
-        super.onPause()
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-    }
-
     //Functions below
 
-    fun initialiseSomeViewModelVariablesHere(){
+    private fun observeStatusMessage() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                aInfo5ViewModel.statusMessageSF.collect { message ->
+                    // Show Toast, Snackbar, or dialog - executes exactly once
+                    Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
+    }
+
+    private fun initialiseSomeViewModelVariablesHere(){
 
         aInfo5ViewModel.clearTheCompanySectionCodeAndDisplayML()
         aInfo5ViewModel.setTheSectionAllDataLoadedFlagMLD(false)
         aInfo5ViewModel.setTheSectionAllPagesFrameworkLoadedFlagMLD(false)
+        aInfo5ViewModel.setTheAllSectionTemplatesUploadedForChecklistFlagMLD(false)
 
         aInfo5ViewModel.setTheCompanyReportUploadedFlagMLD(false)
         aInfo5ViewModel.setTheCompanyPhotosUploadedFlagMLD(false)
@@ -192,6 +199,9 @@ class OpeningScreenFragment : Fragment() {
         aInfo5ViewModel.setTheSectionIntroUpdatedInReportSIFFlagMLD(true)
         aInfo5ViewModel.setTheSectionPagesUpdatedInReportSIFFlagMLD(true)
 
+        aInfo5ViewModel.setThePictureUploadedCXFFlagMLD(true)
+        aInfo5ViewModel.setTheVideoUploadedCXFFlagMLD(true)
+
         //Generate and load the Default Reports List
         val reportsList = resources.getStringArray(R.array.Report_Choices).toMutableList()
         aInfo5ViewModel.setTheAllReportsList(reportsList)
@@ -207,72 +217,82 @@ class OpeningScreenFragment : Fragment() {
     private fun showDialog(title: String, message: String) {
         val builder: AlertDialog.Builder = AlertDialog.Builder(this.requireContext())
         val fileFlag = aInfo5ViewModel.getTheFileFlag()
-        if (fileFlag == MainActivity.DIRECTORY) {
-            builder.setTitle(title)
-                .setMessage(message)
-                .setPositiveButton("Yes") { dialog, _ ->
-                    val intent = Intent(Intent.ACTION_OPEN_DOCUMENT_TREE)
-                    (activity as MainActivity).openDocumentTree(intent)
-                    dialog.dismiss()
-                }
-                .setNeutralButton("No") { dialog, _ ->
-                    dialog.dismiss()
-                }
-        }
-        else if (fileFlag == MainActivity.AUDIT_DATABASE_DELETE) {
-            val templateDialogTitle = resources.getString(R.string.string_deleting_templates_db)
-            val templateDialogMessage =
-                resources.getString(R.string.string_message_for_deleting_templates_db)
-            builder.setTitle(title)
-                .setMessage(message)
-                .setPositiveButton("Yes") { dialog, _ ->
-                    aInfo5ViewModel.deleteAllAInfo5()
-                    aInfo5ViewModel.areAllAuditsDeletedMLD.value = true
-                    Toast.makeText(this.requireContext(), "Deletion of Audit Records is Complete", Toast.LENGTH_LONG).show()
-                    aInfo5ViewModel.setTheFileFlag(MainActivity.TEMPLATE_DATABASE_DELETE)
-                    dialog.dismiss()
-                    showDialog(templateDialogTitle, templateDialogMessage)
-                }
-                .setNeutralButton("No") { dialog, _ ->
-                    aInfo5ViewModel.setTheFileFlag(MainActivity.TEMPLATE_DATABASE_DELETE)
-                    dialog.dismiss()
-                    showDialog(templateDialogTitle, templateDialogMessage)
-                }
-        }
-        else if (fileFlag == MainActivity.TEMPLATE_DATABASE_DELETE) {
-            builder.setTitle(title)
-                .setMessage(message)
-                .setPositiveButton("Yes") { dialog, _ ->
-                    aInfo5ViewModel.deleteAllAInfo5Templates()
-                    Toast.makeText(this.requireContext(), "Deletion of Templates is Complete", Toast.LENGTH_LONG).show()
-                    dialog.dismiss()
-                    //Load the templateLoadedIntoDBFlag into Template DB
-                    val templateLoadedIntoDBFlagID = MainActivity.TEMPLATES_LOADED_INTO_DB_ID
-                    val aInfo5Template = AInfo5Templates(templateLoadedIntoDBFlagID, false.toString())
-                    aInfo5ViewModel.insertAInfo5Templates(aInfo5Template)
-                    //Clear the ViewModel variables that depend on the template
-                    aInfo5ViewModel.setTheTemplatesHaveBeenLoadedIntoDBFlag(false)
-                    aInfo5ViewModel.clearTheParentChildParentItemML()
+        when (fileFlag) {
+            MainActivity.DIRECTORY -> {
+                builder.setTitle(title)
+                    .setMessage(message)
+                    .setPositiveButton("Yes") { dialog, _ ->
+                        val intent = Intent(Intent.ACTION_OPEN_DOCUMENT_TREE)
+                        (activity as MainActivity).openDocumentTree(intent)
+                        dialog.dismiss()
+                    }
+                    .setNeutralButton("No") { dialog, _ ->
+                        dialog.dismiss()
+                    }
+            }
+            MainActivity.AUDIT_DATABASE_DELETE -> {
+                val templateDialogTitle = resources.getString(R.string.string_deleting_templates_db)
+                val templateDialogMessage =
+                    resources.getString(R.string.string_message_for_deleting_templates_db)
+                builder.setTitle(title)
+                    .setMessage(message)
+                    .setPositiveButton("Yes") { dialog, _ ->
+                        aInfo5ViewModel.deleteAllAInfo5()
+                        aInfo5ViewModel.areAllAuditsDeletedMLD.value = true
+                        aInfo5ViewModel.setStatusMessageSF("Deletion of Audit Records is Complete")
+                        //Toast.makeText(this.requireContext(), "Deletion of Audit Records is Complete", Toast.LENGTH_LONG).show()
+                        aInfo5ViewModel.setTheFileFlag(MainActivity.TEMPLATE_DATABASE_DELETE)
+                        dialog.dismiss()
+                        showDialog(templateDialogTitle, templateDialogMessage)
+                    }
+                    .setNeutralButton("No") { dialog, _ ->
+                        aInfo5ViewModel.setTheFileFlag(MainActivity.TEMPLATE_DATABASE_DELETE)
+                        dialog.dismiss()
+                        showDialog(templateDialogTitle, templateDialogMessage)
+                    }
+            }
+            MainActivity.TEMPLATE_DATABASE_DELETE -> {
+                builder.setTitle(title)
+                    .setMessage(message)
+                    .setPositiveButton("Yes") { dialog, _ ->
+                        aInfo5ViewModel.deleteAllAInfo5Templates()
+                        //Clear the Template related Variables in ViewModel
+                        aInfo5ViewModel.clearThePageTemplateList()
+                        aInfo5ViewModel.clearTheTemplateIDList()
+                        aInfo5ViewModel.clearThePageGroupIDsList()
+                        aInfo5ViewModel.clearTheParentChildParentItemML()
 
-                    //aInfo5ViewModel.setTheParentChildParentItemML(mutableListOf(aInfo5ViewModel.defaultRVParentChildParentItem))
-                    aInfo5ViewModel.clearThePageTemplateList()
-                    aInfo5ViewModel.clearThePageGroupIDsList()
+                        aInfo5ViewModel.setStatusMessageSF("Deletion of Templates is Complete")
+                        //Toast.makeText(this.requireContext(), "Deletion of Templates is Complete", Toast.LENGTH_LONG).show()
+                        dialog.dismiss()
+                        //Load the templateLoadedIntoDBFlag into Template DB
+                        val templateLoadedIntoDBFlagID = MainActivity.TEMPLATES_LOADED_INTO_DB_ID
+                        val aInfo5Template = AInfo5Templates(templateLoadedIntoDBFlagID, false.toString())
+                        aInfo5ViewModel.insertAInfo5Templates(aInfo5Template)
+                        //Clear the ViewModel variables that depend on the template
+                        aInfo5ViewModel.setTheTemplatesHaveBeenLoadedIntoDBFlag(false)
+                        aInfo5ViewModel.clearTheParentChildParentItemML()
 
-                    aInfo5ViewModel.clearTheTemplateIDList()
+                        //aInfo5ViewModel.setTheParentChildParentItemML(mutableListOf(aInfo5ViewModel.defaultRVParentChildParentItem))
+                        aInfo5ViewModel.clearThePageTemplateList()
+                        aInfo5ViewModel.clearThePageGroupIDsList()
 
-                    aInfo5ViewModel.templateIDsUploadingCompletedMLD.value = false
-                    aInfo5ViewModel.pageGroupIDsUploadingCompletedMLD.value = false
+                        aInfo5ViewModel.clearTheTemplateIDList()
 
-                    binding.llPasswordDatabaseDeletion.visibility = View.GONE
-                    binding.llOpeningScreen.visibility = View.VISIBLE
-                    aInfo5ViewModel.setTheScreenVariable(MainActivity.OPENING_SCREEN_FRAGMENT)
-                }
-                .setNeutralButton("No") { dialog, _ ->
-                    dialog.dismiss()
-                    binding.llPasswordDatabaseDeletion.visibility = View.GONE
-                    binding.llOpeningScreen.visibility = View.VISIBLE
-                    aInfo5ViewModel.setTheScreenVariable(MainActivity.OPENING_SCREEN_FRAGMENT)
-                }
+                        aInfo5ViewModel.templateIDsUploadingCompletedMLD.value = false
+                        aInfo5ViewModel.pageGroupIDsUploadingCompletedMLD.value = false
+
+                        binding.llPasswordDatabaseDeletion.visibility = View.GONE
+                        binding.llOpeningScreen.visibility = View.VISIBLE
+                        aInfo5ViewModel.setTheScreenVariable(MainActivity.OPENING_SCREEN_FRAGMENT)
+                    }
+                    .setNeutralButton("No") { dialog, _ ->
+                        dialog.dismiss()
+                        binding.llPasswordDatabaseDeletion.visibility = View.GONE
+                        binding.llOpeningScreen.visibility = View.VISIBLE
+                        aInfo5ViewModel.setTheScreenVariable(MainActivity.OPENING_SCREEN_FRAGMENT)
+                    }
+            }
         }
         builder.create().show()
     }

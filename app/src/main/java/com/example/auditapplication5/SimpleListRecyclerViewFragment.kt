@@ -26,11 +26,6 @@ class SimpleListRecyclerViewFragment : Fragment() {
     private lateinit var aInfo5ViewModel: AInfo5ViewModel
 
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-    }
-
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -135,7 +130,7 @@ class SimpleListRecyclerViewFragment : Fragment() {
                             }
                             aInfo5ViewModel.setTheParentFolderURIString(parentFolderURIString)
                             val result =
-                                (activity as MainActivity).areUriPermissionsGranted(parentFolderURIString)
+                                (activity as MainActivity).haveAllUriPermissionsBeenGranted(parentFolderURIString)
                             if (!result) {
                                 (activity as MainActivity).takePersistableURIPermissions(
                                     parentFolderURIString.toUri()
@@ -149,7 +144,7 @@ class SimpleListRecyclerViewFragment : Fragment() {
         }
         else {
             val result =
-                (activity as MainActivity).areUriPermissionsGranted(parentFolderURIString)
+                (activity as MainActivity).haveAllUriPermissionsBeenGranted(parentFolderURIString)
             if (!result) {
                 (activity as MainActivity).takePersistableURIPermissions(
                     parentFolderURIString.toUri()
@@ -222,7 +217,7 @@ class SimpleListRecyclerViewFragment : Fragment() {
                 aInfo5ViewModel.companySectionCDListUploadedSLRVFlagLD.observe(viewLifecycleOwner){ flag ->
                     if (flag == false){
                         val companySectionListIDML =
-                            mutableListOf<String>(aInfo5ViewModel.getPresentCompanyCode() + MainActivity.COMPANY_SECTION_LIST_ID)
+                            mutableListOf(aInfo5ViewModel.getPresentCompanyCode() + MainActivity.COMPANY_SECTION_LIST_ID)
                         aInfo5ViewModel.getAInfo5ByIds(companySectionListIDML)
                             .observe(viewLifecycleOwner) { list ->
                                 var sectionCodesAndNamesListString = ""
@@ -343,7 +338,7 @@ class SimpleListRecyclerViewFragment : Fragment() {
             }
         }
         else if (aInfo5ViewModel.getThePreviousScreenVariable() == MainActivity.SECTION_FRAGMENT_SECTION_CHOICE || aInfo5ViewModel.getThePreviousScreenVariable() == MainActivity.SECTION_FRAGMENT) {
-            binding.rvSimpleList.setBackgroundColor(0x3FBB86FC.toInt())
+            binding.rvSimpleList.setBackgroundColor(0x3FBB86FC)
             //binding.rvSimpleList.background = ResourcesCompat.getDrawable(resources, R.drawable.border_2dp, null)
             binding.rvSimpleList.layoutManager = LinearLayoutManager(this.requireContext())
             binding.rvSimpleList.adapter = SimpleListRVAdapter(
@@ -357,7 +352,7 @@ class SimpleListRecyclerViewFragment : Fragment() {
             }
         }
         else if (aInfo5ViewModel.getThePreviousScreenVariable() == MainActivity.SECTION_FRAGMENT_EDIT_1 || aInfo5ViewModel.getThePreviousScreenVariable() == MainActivity.SECTION_FRAGMENT_EDIT_2) {
-            binding.rvSimpleList.setBackgroundColor(0xFFCC99.toInt())
+            binding.rvSimpleList.setBackgroundColor(0xFFCC99)
             binding.rvSimpleList.layoutManager = LinearLayoutManager(this.requireContext())
             binding.rvSimpleList.adapter = SimpleListRVAdapter(
                 namesList,
@@ -445,15 +440,19 @@ class SimpleListRecyclerViewFragment : Fragment() {
 
     private fun editItemClicked(editOptionChosen: String = "", code: String = "") {
         val editingOptionsML = resources.getStringArray(R.array.Edit_Choices_2).toMutableList()
-        if (editOptionChosen == editingOptionsML[0]) {
-            aInfo5ViewModel.setTheCompanyNameToBeUpdatedFlag(true)
-            editCompanyName()
-        } else if (editOptionChosen == editingOptionsML[1]) {
-            aInfo5ViewModel.setTheAuditDateToBeUpdatedFlag(true)
-            editAuditDate()
-        } else if (editOptionChosen == editingOptionsML[2]) {
-            aInfo5ViewModel.setFlagForSectionNameToBeUpdated(true)
-            editSectionName()
+        when (editOptionChosen) {
+            editingOptionsML[0] -> {
+                aInfo5ViewModel.setTheCompanyNameToBeUpdatedFlag(true)
+                editCompanyName()
+            }
+            editingOptionsML[1] -> {
+                aInfo5ViewModel.setTheAuditDateToBeUpdatedFlag(true)
+                editAuditDate()
+            }
+            editingOptionsML[2] -> {
+                aInfo5ViewModel.setFlagForSectionNameToBeUpdated(true)
+                editSectionName()
+            }
         }
     }
 
@@ -469,14 +468,14 @@ class SimpleListRecyclerViewFragment : Fragment() {
 
     }
 
-    fun editCompanyName() {
+    private fun editCompanyName() {
         //Move to the Enter Name Fragment to edit the company name
         aInfo5ViewModel.setThePreviousScreen2Variable(aInfo5ViewModel.getThePreviousScreenVariable())
         aInfo5ViewModel.setThePreviousScreenVariable(MainActivity.SIMPLE_LIST_RV_FRAGMENT)
         findNavController().navigate(R.id.action_simpleListRecyclerViewFragment_to_enterNameFragment)
     }
 
-    fun editAuditDate() {
+    private fun editAuditDate() {
         datePickerDialog()
         if (aInfo5ViewModel.getThePreviousScreenVariable() == MainActivity.SECTION_FRAGMENT_EDIT_1) {
             aInfo5ViewModel.setTheScreenVariable(MainActivity.SECTION_FRAGMENT)
@@ -489,14 +488,14 @@ class SimpleListRecyclerViewFragment : Fragment() {
         findNavController().navigate(R.id.action_simpleListRecyclerViewFragment_to_sectionAndIntrosFragment)
     }
 
-    fun editSectionName() {
+    private fun editSectionName() {
         //Move to the Enter Name Fragment to edit the section name
         aInfo5ViewModel.setThePreviousScreen2Variable(aInfo5ViewModel.getThePreviousScreenVariable())
         aInfo5ViewModel.setThePreviousScreenVariable(MainActivity.SIMPLE_LIST_RV_FRAGMENT)
         findNavController().navigate(R.id.action_simpleListRecyclerViewFragment_to_enterNameFragment)
     }
 
-    fun deleteCompany() {
+    private fun deleteCompany() {
         showDialogForCompanyDeletion()
     }
 

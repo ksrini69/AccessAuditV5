@@ -11,7 +11,9 @@ import androidx.activity.OnBackPressedCallback
 import androidx.core.net.toUri
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.findNavController
 import com.example.auditapplication5.data.model.AInfo5
@@ -27,16 +29,12 @@ class SectionAndIntrosFragment : Fragment() {
     private lateinit var binding: FragmentSectionAndIntrosBinding
     private lateinit var aInfo5ViewModel: AInfo5ViewModel
     private var autoMinimizeJob: Job? = null
-    private val TEN_SECONDS = 10_000L // 2 minutes in ms
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-    }
+    private val TEN_SECONDS = 10_000L // 10 s in ms
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         // Inflate the layout for this fragment
         binding = DataBindingUtil.inflate(
             layoutInflater,
@@ -56,6 +54,9 @@ class SectionAndIntrosFragment : Fragment() {
         binding.lifecycleOwner = viewLifecycleOwner
 
         val TAG = MainActivity.TESTING_TAG
+
+        //Status Message using Shared Flow
+        observeStatusMessage()
 
         activity?.onBackPressedDispatcher?.addCallback(
             viewLifecycleOwner,
@@ -106,10 +107,21 @@ class SectionAndIntrosFragment : Fragment() {
 //                    companyIntroAndPhotoPathsData
 //                )
                 binding.pbEditDeleteMldRelated.visibility = View.GONE
+                binding.tvPbMessagesSectionAndIntrosFragment.visibility = View.GONE
                 binding.llSectionIntros.isEnabled = true
 
-            } else {
+            }
+            else {
                 binding.pbEditDeleteMldRelated.visibility = View.VISIBLE
+                binding.tvPbMessagesSectionAndIntrosFragment.visibility = View.VISIBLE
+                if (aInfo5ViewModel.editCompletedFlagLD.value == false){
+                    binding.tvPbMessagesSectionAndIntrosFragment.text = getString(R.string.string_message_edit_being_completed)
+                } else if (aInfo5ViewModel.deleteCompletedFlagLD.value == false){
+                    binding.tvPbMessagesSectionAndIntrosFragment.text = getString(R.string.string_message_deletion_being_completed)
+                } else {
+                    binding.tvPbMessagesSectionAndIntrosFragment.text = getString(R.string.string_message_records_retrieved_updated_in_database)
+                }
+
                 binding.llSectionIntros.isEnabled = false
 
             }
@@ -121,7 +133,7 @@ class SectionAndIntrosFragment : Fragment() {
         // Getting the company name and updating action bar.
         aInfo5ViewModel.companyNameUploadedFlagLD.observe(viewLifecycleOwner){companyNameFlag ->
             if (companyNameFlag == false){
-                if (aInfo5ViewModel.getTheCompanyNameToBeUpdatedFlag()) {
+                if (aInfo5ViewModel.retrieveTheCompanyNameToBeUpdatedFlag()) {
                     aInfo5ViewModel.setTheCompanyNameToBeUpdatedFlag(false)
                     val presentCompanyNameID =
                         aInfo5ViewModel.getPresentCompanyCode() + MainActivity.PRESENT_COMPANY_ID
@@ -133,7 +145,7 @@ class SectionAndIntrosFragment : Fragment() {
                                     presentCompanyName += item.framework
                                 }
                                 if (actionBar?.title?.contains(presentCompanyName) == false) {
-                                    actionBar.title = "Company Name: " + presentCompanyName
+                                    actionBar.title = "Company Name: $presentCompanyName"
                                 }
                             }
                             aInfo5ViewModel.setTheCompanyNameUploadedFlagMLD(true)
@@ -143,7 +155,7 @@ class SectionAndIntrosFragment : Fragment() {
                     val presentCompanyName =
                         aInfo5ViewModel.getThePresentCompanyCodeAndDisplayName().displayName
                     if (actionBar?.title?.contains(presentCompanyName) == false) {
-                        actionBar.title = "Company Name: " + presentCompanyName
+                        actionBar.title = "Company Name: $presentCompanyName"
                     }
                     aInfo5ViewModel.setTheCompanyNameUploadedFlagMLD(true)
                 }
@@ -237,7 +249,7 @@ class SectionAndIntrosFragment : Fragment() {
             if (companyURIFlag == false){
                 aInfo5ViewModel.setTheCompanyDirectoryUriId(aInfo5ViewModel.getPresentCompanyCode())
                 val companyDirectoryURIIdML =
-                    mutableListOf<String>(aInfo5ViewModel.getTheCompanyDirectoryUriId())
+                    mutableListOf(aInfo5ViewModel.getTheCompanyDirectoryUriId())
                 aInfo5ViewModel.getAInfo5ByIds(companyDirectoryURIIdML)
                     .observe(viewLifecycleOwner) { list ->
                         var companyDirectoryURIString = ""
@@ -344,15 +356,15 @@ class SectionAndIntrosFragment : Fragment() {
             val presentCompanyName =
                 aInfo5ViewModel.getThePresentCompanyCodeAndDisplayName().displayName
             if (actionBar?.title?.contains(presentCompanyName) == false) {
-                actionBar.title = "Company Name: " + presentCompanyName
+                actionBar.title = "Company Name: $presentCompanyName"
             }
             val date = aInfo5ViewModel.getTheCompanyAuditDate()
             if (actionBar?.subtitle?.contains(date) == false){
-                actionBar?.subtitle = "Audit Date: $date"
+                actionBar.subtitle = "Audit Date: $date"
             }
 
             //Updating the section name in the Choose Section button
-            if (aInfo5ViewModel.getFlagForSectionNameToBeUpdated()) {
+            if (aInfo5ViewModel.retrieveFlagForSectionNameToBeUpdated()) {
                 aInfo5ViewModel.setFlagForSectionNameToBeUpdated(false)
                 val presentSectionNameID =
                     aInfo5ViewModel.getPresentCompanyCode() + aInfo5ViewModel.getPresentSectionCode() + MainActivity.PRESENT_SECTION_ID
@@ -364,7 +376,7 @@ class SectionAndIntrosFragment : Fragment() {
                                 presentSectionName += item.framework
                             }
                             if (aInfo5ViewModel.getTheScreenVariable() == MainActivity.SECTION_FRAGMENT_SECTION_CHOICE){
-                                binding.buttonChooseSection.setText(presentSectionName)
+                                binding.buttonChooseSection.text = presentSectionName
                             } else {
                                 binding.buttonChooseSection.text = resources.getString(R.string.string_choose_a_section)
                             }
@@ -373,6 +385,9 @@ class SectionAndIntrosFragment : Fragment() {
                         }
                     }
             }
+
+            //Set the flag for getting Section Templates for Checklist report
+            aInfo5ViewModel.setTheAllSectionTemplatesUploadedForChecklistFlagMLD(false)
 
             //Getting the section framework and section data and loading it
             aInfo5ViewModel.sectionAllPagesFrameworkLoadedFlagLD.observe(viewLifecycleOwner) { frameworkFlagValue ->
@@ -418,11 +433,11 @@ class SectionAndIntrosFragment : Fragment() {
             val presentCompanyName =
                 aInfo5ViewModel.getThePresentCompanyCodeAndDisplayName().displayName
             if (actionBar?.title?.contains(presentCompanyName) == false) {
-                actionBar.title = "Company Name: " + presentCompanyName
+                actionBar.title = "Company Name: $presentCompanyName"
             }
             val date = aInfo5ViewModel.getTheCompanyAuditDate()
             if (actionBar?.subtitle?.contains(date) == false){
-                actionBar?.subtitle = "Audit Date: $date"
+                actionBar.subtitle = "Audit Date: $date"
             }
             binding.buttonNewSection.visibility = View.VISIBLE
             binding.llSectionIntroAndObservationsScreen.visibility = View.GONE
@@ -522,10 +537,12 @@ class SectionAndIntrosFragment : Fragment() {
         }
 
         binding.buttonReports.setOnClickListener {
+
             val reportChoicesML = resources.getStringArray(R.array.Report_Choices).toMutableList()
             val linkedHashMap = aInfo5ViewModel.makeLinkedHashMapFromML(
                 reportChoicesML,
-                MainActivity.SECTION_FRAGMENT
+                MainActivity.SECTION_FRAGMENT,
+                aInfo5ViewModel.getTheReportsToBeGeneratedList()
             )
             chooseReportsDialog(linkedHashMap)
         }
@@ -545,6 +562,18 @@ class SectionAndIntrosFragment : Fragment() {
     }
 
     //Functions below
+    private fun observeStatusMessage() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                aInfo5ViewModel.statusMessageSF.collect { message ->
+                    // Show Toast, Snackbar, or dialog - executes exactly once
+                    Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
+    }
+
+
     // When expanding the ScrollView (in your existing click handler)
     private fun expandScrollView() {
         binding.hsvSectionButtons.visibility = View.VISIBLE
@@ -627,7 +656,7 @@ class SectionAndIntrosFragment : Fragment() {
                 //aInfo5ViewModel.setCurrentDate(currentDate)
                 val actionBar = (activity as MainActivity).supportActionBar
                 if (actionBar != null) {
-                    actionBar.subtitle = "Audit Date: " + currentDate
+                    actionBar.subtitle = "Audit Date: $currentDate"
                 }
                 val dateID =
                     aInfo5ViewModel.getPresentCompanyCode() + MainActivity.COMPANY_AUDIT_DATE_ID
@@ -653,7 +682,7 @@ class SectionAndIntrosFragment : Fragment() {
             multiChoiceList.keys.toTypedArray(),
             multiChoiceList.values.toBooleanArray()
         ) { dialogInterface, which, isChecked ->
-            multiChoiceList.set(multiChoiceList.keys.toTypedArray().get(which), isChecked)
+            multiChoiceList[multiChoiceList.keys.toTypedArray().get(which)] = isChecked
         }
         builder.setPositiveButton("Ok") { dialog, id ->
             for (selection in multiChoiceList) {

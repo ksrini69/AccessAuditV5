@@ -1,14 +1,13 @@
 package com.example.auditapplication5
 
 import android.os.Bundle
-import android.util.Log
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.OnBackPressedCallback
 import androidx.core.net.toUri
 import androidx.databinding.DataBindingUtil
+import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.auditapplication5.data.model.PhotoDetailsDC
@@ -21,15 +20,10 @@ class PhotoDisplayRecyclerviewFragment : Fragment() {
     private lateinit var binding: FragmentPhotoDisplayRecyclerviewBinding
     private lateinit var aInfo5ViewModel: AInfo5ViewModel
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-    }
-
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         // Inflate the layout for this fragment
         binding = DataBindingUtil.inflate(layoutInflater, R.layout.fragment_photo_display_recyclerview, container, false )
         return binding.root
@@ -68,14 +62,6 @@ class PhotoDisplayRecyclerviewFragment : Fragment() {
 
         loadRecyclerView(aInfo5ViewModel.listPhotosByLocation(aInfo5ViewModel.getLocationForPhotos()))
 
-    }
-
-    override fun onPause() {
-        super.onPause()
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
     }
 
     //Functions below

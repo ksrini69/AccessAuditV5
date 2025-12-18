@@ -1,12 +1,10 @@
 package com.example.auditapplication5.presentation.adapter
 
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.example.auditapplication5.MainActivity
 import com.example.auditapplication5.data.model.RVParentChildParentItemDC
 import com.example.auditapplication5.databinding.RvParentChildParentItemBinding
 

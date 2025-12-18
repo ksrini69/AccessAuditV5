@@ -7,14 +7,14 @@ import com.example.auditapplication5.domain.usecase.*
 
 class AInfo5ViewModelFactory(
     val app: Application,
-    val insertAInfo5UseCase: InsertAInfo5UseCase,
-    val insertAInfo5TemplatesUseCase: InsertAInfo5TemplatesUseCase,
-    val deleteAInfo5UseCase: DeleteAInfo5UseCase,
-    val deleteAInfo5TemplatesUseCase: DeleteAInfo5TemplatesUseCase,
-    val deleteAllAInfo5UseCase: DeleteAllAInfo5UseCase,
-    val deleteAllAInfo5TemplatesUseCase: DeleteAllAInfo5TemplatesUseCase,
-    val getAInfo5ByIdsUseCase: GetAInfo5ByIdsUseCase,
-    val getAInfo5TemplatesByIdsUseCase: GetAInfo5TemplatesByIdsUseCase
+    private val insertAInfo5UseCase: InsertAInfo5UseCase,
+    private val insertAInfo5TemplatesUseCase: InsertAInfo5TemplatesUseCase,
+    private val deleteAInfo5UseCase: DeleteAInfo5UseCase,
+    private val deleteAInfo5TemplatesUseCase: DeleteAInfo5TemplatesUseCase,
+    private val deleteAllAInfo5UseCase: DeleteAllAInfo5UseCase,
+    private val deleteAllAInfo5TemplatesUseCase: DeleteAllAInfo5TemplatesUseCase,
+    private val getAInfo5ByIdsUseCase: GetAInfo5ByIdsUseCase,
+    private val getAInfo5TemplatesByIdsUseCase: GetAInfo5TemplatesByIdsUseCase
 ) : ViewModelProvider.Factory {
 
     override fun <T : ViewModel> create(modelClass: Class<T>): T {

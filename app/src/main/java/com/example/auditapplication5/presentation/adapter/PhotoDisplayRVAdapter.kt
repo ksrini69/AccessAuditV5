@@ -6,7 +6,6 @@ import android.graphics.BitmapFactory
 import android.graphics.Matrix
 import android.net.Uri
 import android.os.ParcelFileDescriptor
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -15,7 +14,6 @@ import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.toBitmap
 import androidx.core.net.toUri
 import androidx.recyclerview.widget.RecyclerView
-import com.example.auditapplication5.MainActivity
 import com.example.auditapplication5.R
 import com.example.auditapplication5.data.model.PhotoDetailsDC
 import com.example.auditapplication5.databinding.RvPhotoDisplayItemBinding
@@ -44,7 +42,7 @@ class PhotoDisplayRVAdapter(
         return photosList.size
     }
 
-    fun getBitmapFromUri(uri: Uri): Bitmap {
+    private fun getBitmapFromUri(uri: Uri): Bitmap {
         val contentResolver = context.contentResolver
         val parcelFileDescriptor: ParcelFileDescriptor =
             contentResolver?.openFileDescriptor(uri, "r")!!
@@ -53,7 +51,7 @@ class PhotoDisplayRVAdapter(
         parcelFileDescriptor.close()
         return image
     }
-    fun rotateBitmap(original: Bitmap, degrees: Double): Bitmap? {
+    private fun rotateBitmap(original: Bitmap, degrees: Double): Bitmap? {
         val x = original.width
         val y = original.height
         val matrix = Matrix()
@@ -61,7 +59,7 @@ class PhotoDisplayRVAdapter(
         return Bitmap.createBitmap(original, 0, 0, original.width, original.height, matrix, true)
     }
 
-    fun scaleBitmap(original: Bitmap): Bitmap? {
+    private fun scaleBitmap(original: Bitmap): Bitmap? {
         val x = original.width * 0.5
         val y = original.height * 0.5
         val matrix = Matrix()
@@ -96,13 +94,13 @@ class PhotoDisplayRVAdapter(
                 binding.tvCaptionInPhotoDisplayInRvItem.visibility = View.GONE
             }
             val uri = photoItem.photoUriString.toUri()
-            try {
+            flagImage = try {
                 uploadImageFile(uri, binding.ivRvPhotoDisplayItem)
-                flagImage = true
+                true
                 //Log.d(MainActivity.TESTING_TAG, "bind: True BIND Come Here?")
             }catch (e:Exception){
                 uploadFileNotFound(binding.ivRvPhotoDisplayItem)
-                flagImage = false
+                false
                 //Log.d(MainActivity.TESTING_TAG, "bind: False BIND Come Here?")
             }
 

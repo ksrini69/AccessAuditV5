@@ -17,6 +17,9 @@ import com.example.auditapplication5.MainActivity
 import com.example.auditapplication5.data.model.*
 import com.example.auditapplication5.domain.usecase.*
 import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import java.io.*
 
 class AInfo5ViewModel(
@@ -42,7 +45,7 @@ class AInfo5ViewModel(
             insertAInfo5TemplatesUseCase.execute(aInfo5Templates)
         }
 
-    fun deleteAInfo5(aInfo5: AInfo5) = viewModelScope.launch(Dispatchers.IO) {
+    private fun deleteAInfo5(aInfo5: AInfo5) = viewModelScope.launch(Dispatchers.IO) {
         deleteAInfo5UseCase.execute(aInfo5)
     }
 
@@ -85,11 +88,25 @@ class AInfo5ViewModel(
         statusMessage.value = Event(input)
     }
 
+    private val _statusMessageSF = MutableSharedFlow<String>(
+        replay = 1,
+        extraBufferCapacity = 1
+    )
+
+    val statusMessageSF: SharedFlow<String> = _statusMessageSF.asSharedFlow()
+
+    fun setStatusMessageSF(input: String) {
+        viewModelScope.launch {
+            _statusMessageSF.tryEmit(input) // Non-blocking emit
+        }
+    }
+
+
 //Company, Audit Date, Intro and Section related Variables and Functions
 
     // Getting the Parent Folder URI from the database
     private var parentFolderURIIDML: MutableList<String> =
-        mutableListOf<String>(MainActivity.PARENT_FOLDER_URI_ID)
+        mutableListOf(MainActivity.PARENT_FOLDER_URI_ID)
     val getParentFolderURIStringLD = getAInfo5ByIds(parentFolderURIIDML)
 
     private var parentFolderURIString = ""
@@ -122,7 +139,7 @@ class AInfo5ViewModel(
     }
 
     // Get the list of Companies and Corresponding Codes from the database
-    var companyCodesAndNamesID = MainActivity.COMPANY_CODES_NAMES_ID
+    private var companyCodesAndNamesID = MainActivity.COMPANY_CODES_NAMES_ID
     val getMLOfCompanyCodesAndNamesLD = getAInfo5ByIds(mutableListOf(companyCodesAndNamesID))
 
     //Company related Variables
@@ -143,7 +160,7 @@ class AInfo5ViewModel(
         companyCodeAndDisplayNameML.remove(input)
     }
 
-    fun modifyDisplayNameOfSpecificCompanyInML(newDisplayName: String, companyCode: String) {
+    private fun modifyDisplayNameOfSpecificCompanyInML(newDisplayName: String, companyCode: String) {
         for (item in companyCodeAndDisplayNameML) {
             if (item.uniqueCodeName == companyCode) {
                 item.displayName = newDisplayName
@@ -183,8 +200,8 @@ class AInfo5ViewModel(
         presentCompanyCodeAndDisplayName.displayName = input
     }
 
-    var companyNameToBeUpdatedFlag: Boolean = false
-    fun getTheCompanyNameToBeUpdatedFlag(): Boolean {
+    private var companyNameToBeUpdatedFlag: Boolean = false
+    fun retrieveTheCompanyNameToBeUpdatedFlag(): Boolean {
         return companyNameToBeUpdatedFlag
     }
 
@@ -319,7 +336,7 @@ class AInfo5ViewModel(
         }
     }
 
-    var companyAuditDate = ""
+    private var companyAuditDate = ""
     fun setTheCompanyAuditDate(input: String) {
         companyAuditDate = input
     }
@@ -329,7 +346,7 @@ class AInfo5ViewModel(
     }
 
 
-    var auditDateToBeUpdatedFlag: Boolean = false
+    private var auditDateToBeUpdatedFlag: Boolean = false
     fun getTheAuditDateToBeUpdatedFlag(): Boolean {
         return auditDateToBeUpdatedFlag
     }
@@ -339,7 +356,7 @@ class AInfo5ViewModel(
     }
 
     //Introductions and Section OBS,RECO, STDS related variables for company and sections
-    var whichIntroductionsOrObservationsToBeUploaded: String = ""
+    private var whichIntroductionsOrObservationsToBeUploaded: String = ""
     fun getTheWhichIntroductionsOrObservationsToBeUploadedVariable(): String {
         return whichIntroductionsOrObservationsToBeUploaded
     }
@@ -349,7 +366,7 @@ class AInfo5ViewModel(
     }
 
     //Section Related Variables
-    var templateSectionListID = mutableListOf(MainActivity.TEMPLATE_SECTION_LIST)
+    private var templateSectionListID = mutableListOf(MainActivity.TEMPLATE_SECTION_LIST)
     val getDefaultSectionList = getAInfo5TemplatesByIds(templateSectionListID)
 
     //Present Company Section List
@@ -417,7 +434,7 @@ class AInfo5ViewModel(
         companySectionCodeAndDisplayNameML.add(input)
     }
 
-    fun deleteSectionInTheCompanySectionCodeAndDisplayNameMLAndSave(input: CodeNameAndDisplayNameDC) {
+    private fun deleteSectionInTheCompanySectionCodeAndDisplayNameMLAndSave(input: CodeNameAndDisplayNameDC) {
         viewModelScope.launch(Dispatchers.Default) {
             val newCompanySectionCodeAndDisplayML = mutableListOf<CodeNameAndDisplayNameDC>()
             if (companySectionCodeAndDisplayNameML.isNotEmpty()) {
@@ -437,7 +454,7 @@ class AInfo5ViewModel(
         }
     }
 
-    fun modifyDisplayNameOfSpecificSectionInSectionCDML(
+    private fun modifyDisplayNameOfSpecificSectionInSectionCDML(
         newDisplayName: String,
         sectionCode: String
     ) {
@@ -546,8 +563,8 @@ class AInfo5ViewModel(
         presentSectionCodeAndDisplayName.pagesPresent = true
     }
 
-    var sectionNameToBeUpdatedFlag: Boolean = false
-    fun getFlagForSectionNameToBeUpdated(): Boolean {
+    private var sectionNameToBeUpdatedFlag: Boolean = false
+    fun retrieveFlagForSectionNameToBeUpdated(): Boolean {
         return sectionNameToBeUpdatedFlag
     }
 
@@ -555,7 +572,7 @@ class AInfo5ViewModel(
         sectionNameToBeUpdatedFlag = input
     }
 
-    var sectionFrameworkAndDataToBeUploadedFlag: Boolean = true
+    private var sectionFrameworkAndDataToBeUploadedFlag: Boolean = true
     fun getTheSectionFrameworkAndDataToBeUploadedFlag(): Boolean {
         return sectionFrameworkAndDataToBeUploadedFlag
     }
@@ -587,7 +604,7 @@ class AInfo5ViewModel(
 
     //Framework Related Variables and Functions
     //Define the Default Framework Page which is the General Entry Page
-    var defaultSectionPageFramework = SectionPageFrameworkDC(
+    private var defaultSectionPageFramework = SectionPageFrameworkDC(
         "General Entry", "PC_General_Entry_01_PC", 1,
         mutableListOf(), mutableListOf(), mutableListOf(), mutableListOf()
     )
@@ -602,7 +619,7 @@ class AInfo5ViewModel(
         return presentSectionAllPagesFramework
     }
 
-    fun setThePresentSectionAllPagesFramework(input: SectionAllPagesFrameworkDC) {
+    private fun setThePresentSectionAllPagesFramework(input: SectionAllPagesFrameworkDC) {
         presentSectionAllPagesFramework = input
     }
 
@@ -770,19 +787,19 @@ class AInfo5ViewModel(
                     stringToSectionAllPagesFramework(sectionAllPagesFrameworkString)
                 uniquePageCodesList =
                     getUniqueListOfPageCodesFromAllPagesFramework(sectionAllPagesFramework)
-                if (sectionAllDataString == "") {
-                    sectionAllData = createPresentSectionAllDataUsingSectionAllPagesFramework(
+                sectionAllData = if (sectionAllDataString == "") {
+                    createPresentSectionAllDataUsingSectionAllPagesFramework(
                         sectionAllPagesFramework
                     )
                 } else {
                     val sectionAllData1 = stringToSectionAllData(sectionAllDataString)
                     if (sectionAllData.sectionAllPagesData.sectionPageDataList.size != sectionAllPagesFramework.sectionPageFrameworkList.size) {
-                        sectionAllData = equaliseTheFrameworkAndDataStructureSizes(
+                        equaliseTheFrameworkAndDataStructureSizes(
                             sectionAllData1,
                             sectionAllPagesFramework
                         )
                     } else {
-                        sectionAllData = sectionAllData1
+                        sectionAllData1
                     }
                 }
             } else {
@@ -866,7 +883,7 @@ class AInfo5ViewModel(
     }
 
 
-    fun getUniqueListOfPageCodesFromAllPagesFramework(sectionAllPagesFramework: SectionAllPagesFrameworkDC): MutableList<String> {
+    private fun getUniqueListOfPageCodesFromAllPagesFramework(sectionAllPagesFramework: SectionAllPagesFrameworkDC): MutableList<String> {
         val result = mutableListOf<String>()
         if (sectionAllPagesFramework.sectionPageFrameworkList.isNotEmpty()) {
             for (pageIndex in 0 until sectionAllPagesFramework.sectionPageFrameworkList.size) {
@@ -876,9 +893,6 @@ class AInfo5ViewModel(
                 if (!result.contains(pagePageCode)) {
                     result.add(pagePageCode)
                 }
-                if (!isItemPresentInPageTemplateList(pagePageCode)) {
-
-                }
 
                 if (pageInFramework.questionsFrameworkList.isNotEmpty()) {
                     val questionsList = pageInFramework.questionsFrameworkList
@@ -886,9 +900,6 @@ class AInfo5ViewModel(
                         val questionsPageCode = questionsList[questionIndex].pageCode
                         if (!result.contains(questionsPageCode)) {
                             result.add(questionsPageCode)
-                        }
-                        if (!isItemPresentInPageTemplateList(questionsPageCode)) {
-
                         }
                     }
                 }
@@ -899,9 +910,6 @@ class AInfo5ViewModel(
                         val observationsPageCode = observationsList[observationsIndex].pageCode
                         if (!result.contains(observationsPageCode)) {
                             result.add(observationsPageCode)
-                        }
-                        if (!isItemPresentInPageTemplateList(observationsPageCode)) {
-
                         }
                     }
                 }
@@ -914,9 +922,6 @@ class AInfo5ViewModel(
                         if (!result.contains(recommendationsPageCode)) {
                             result.add(recommendationsPageCode)
                         }
-                        if (!isItemPresentInPageTemplateList(recommendationsPageCode)) {
-
-                        }
                     }
                 }
 
@@ -926,9 +931,6 @@ class AInfo5ViewModel(
                         val standardsPageCode = standardsList[standardsIndex].pageCode
                         if (!result.contains(standardsPageCode)) {
                             result.add(standardsPageCode)
-                        }
-                        if (!isItemPresentInPageTemplateList(standardsPageCode)) {
-
                         }
                     }
                 }
@@ -958,7 +960,7 @@ class AInfo5ViewModel(
     }
 
 
-    fun questionsFrameworkItemToML(questionsFrameworkItem: QuestionsFrameworkItemDC): MutableList<String> {
+    private fun questionsFrameworkItemToML(questionsFrameworkItem: QuestionsFrameworkItemDC): MutableList<String> {
         val result = mutableListOf<String>()
         result.add(questionsFrameworkItem.questionsFrameworkTitle)
         result.add(questionsFrameworkItem.pageCode)
@@ -968,14 +970,14 @@ class AInfo5ViewModel(
     }
 
     //delimiterLevel1 is used here
-    fun questionsFrameworkItemToString(questionsFrameworkItem: QuestionsFrameworkItemDC): String {
+    private fun questionsFrameworkItemToString(questionsFrameworkItem: QuestionsFrameworkItemDC): String {
         var questionsFrameworkItemString = ""
         val questionsFrameworkItemML = questionsFrameworkItemToML(questionsFrameworkItem)
         questionsFrameworkItemString = mlToStringUsingDelimiter1(questionsFrameworkItemML)
         return questionsFrameworkItemString
     }
 
-    fun stringToQuestionsFrameworkItem(input: String): QuestionsFrameworkItemDC {
+    private fun stringToQuestionsFrameworkItem(input: String): QuestionsFrameworkItemDC {
         val questionsFrameworkItem = QuestionsFrameworkItemDC()
         if (input != "") {
             if (input.contains(delimiterLevel1)) {
@@ -1033,7 +1035,7 @@ class AInfo5ViewModel(
         return questionsFrameworkItem
     }
 
-    fun checkboxesFrameworkItemToML(checkboxesFrameworkItem: CheckboxesFrameworkItemDC): MutableList<String> {
+    private fun checkboxesFrameworkItemToML(checkboxesFrameworkItem: CheckboxesFrameworkItemDC): MutableList<String> {
         val result = mutableListOf<String>()
         result.add(checkboxesFrameworkItem.checkboxesFrameworkTitle)
         result.add(checkboxesFrameworkItem.pageCode)
@@ -1042,14 +1044,14 @@ class AInfo5ViewModel(
         return result
     }
 
-    fun checkboxesFrameworkItemToString(checkboxesFrameworkItem: CheckboxesFrameworkItemDC): String {
+    private fun checkboxesFrameworkItemToString(checkboxesFrameworkItem: CheckboxesFrameworkItemDC): String {
         var checkboxesFrameworkItemString = ""
         val checkboxesFrameworkItemML = checkboxesFrameworkItemToML(checkboxesFrameworkItem)
         checkboxesFrameworkItemString = mlToStringUsingDelimiter1(checkboxesFrameworkItemML)
         return checkboxesFrameworkItemString
     }
 
-    fun stringToCheckboxesFrameworkItem(input: String): CheckboxesFrameworkItemDC {
+    private fun stringToCheckboxesFrameworkItem(input: String): CheckboxesFrameworkItemDC {
         val checkboxesFrameworkItem = CheckboxesFrameworkItemDC()
         if (input != "") {
             if (input.contains(delimiterLevel1)) {
@@ -1108,7 +1110,7 @@ class AInfo5ViewModel(
     }
 
     //deLimiterLevel2 is used here
-    fun questionsFrameworkListToString(input: MutableList<QuestionsFrameworkItemDC>): String {
+    private fun questionsFrameworkListToString(input: MutableList<QuestionsFrameworkItemDC>): String {
         var result = ""
         if (input.isNotEmpty()) {
             val inputMLToStringML = mutableListOf<String>()
@@ -1121,7 +1123,7 @@ class AInfo5ViewModel(
         return result
     }
 
-    fun stringToQuestionsFrameworkList(input: String): MutableList<QuestionsFrameworkItemDC> {
+    private fun stringToQuestionsFrameworkList(input: String): MutableList<QuestionsFrameworkItemDC> {
         val result = mutableListOf<QuestionsFrameworkItemDC>()
         if (input != "") {
             val inputML = stringToMLUsingDelimiter2(input)
@@ -1133,7 +1135,7 @@ class AInfo5ViewModel(
         return result
     }
 
-    fun checkboxesFrameworkListToString(input: MutableList<CheckboxesFrameworkItemDC>): String {
+    private fun checkboxesFrameworkListToString(input: MutableList<CheckboxesFrameworkItemDC>): String {
         var result = ""
         if (input.isNotEmpty()) {
             val inputMLToStringML = mutableListOf<String>()
@@ -1146,7 +1148,7 @@ class AInfo5ViewModel(
         return result
     }
 
-    fun stringToCheckboxesFrameworkList(input: String): MutableList<CheckboxesFrameworkItemDC> {
+    private fun stringToCheckboxesFrameworkList(input: String): MutableList<CheckboxesFrameworkItemDC> {
         val result = mutableListOf<CheckboxesFrameworkItemDC>()
         if (input != "") {
             val inputML = stringToMLUsingDelimiter2(input)
@@ -1159,7 +1161,7 @@ class AInfo5ViewModel(
     }
 
     //DelimiterLevel3 is used here
-    fun sectionPageFrameworkToML(sectionPageFramework: SectionPageFrameworkDC): MutableList<String> {
+    private fun sectionPageFrameworkToML(sectionPageFramework: SectionPageFrameworkDC): MutableList<String> {
         val result = mutableListOf<String>()
         result.add(sectionPageFramework.pageTitle)
         result.add(sectionPageFramework.pageCode)
@@ -1171,14 +1173,14 @@ class AInfo5ViewModel(
         return result
     }
 
-    fun sectionPageFrameworkToString(sectionPageFramework: SectionPageFrameworkDC): String {
+    private fun sectionPageFrameworkToString(sectionPageFramework: SectionPageFrameworkDC): String {
         var result = ""
         val sectionPageFrameworkMl = sectionPageFrameworkToML(sectionPageFramework)
         result = mlToStringUsingDelimiter3(sectionPageFrameworkMl)
         return result
     }
 
-    fun stringToSectionPageFramework(input: String): SectionPageFrameworkDC {
+    private fun stringToSectionPageFramework(input: String): SectionPageFrameworkDC {
         val sectionPageFramework = SectionPageFrameworkDC()
         if (input != "") {
             if (input.contains(delimiterLevel3)) {
@@ -1308,7 +1310,7 @@ class AInfo5ViewModel(
     }
 
     //DeLimiterLevel4 is used here
-    fun sectionAllPagesFrameworkToString(input: SectionAllPagesFrameworkDC): String {
+    private fun sectionAllPagesFrameworkToString(input: SectionAllPagesFrameworkDC): String {
         var result = ""
         if (input.sectionPageFrameworkList.isNotEmpty()) {
             val inputMLToStringML = mutableListOf<String>()
@@ -1323,7 +1325,7 @@ class AInfo5ViewModel(
         return result
     }
 
-    fun stringToSectionAllPagesFramework(input: String): SectionAllPagesFrameworkDC {
+    private fun stringToSectionAllPagesFramework(input: String): SectionAllPagesFrameworkDC {
         val result = SectionAllPagesFrameworkDC()
         if (input != "") {
             val inputML = stringToMLUsingDelimiter4(input)
@@ -1511,11 +1513,11 @@ class AInfo5ViewModel(
     }
 
     //Get the list of template ids from the template database
-    var templateIDListsID = mutableListOf(MainActivity.TEMPLATE_IDs_LIST_ID)
+    private var templateIDListsID = mutableListOf(MainActivity.TEMPLATE_IDs_LIST_ID)
     val getTemplateIdsListStringFromTemplateDB = getAInfo5TemplatesByIds(templateIDListsID)
 
     private var templateIDList = mutableListOf<String>()
-    fun setTheTemplateIDList(input: MutableList<String>) {
+    private fun setTheTemplateIDList(input: MutableList<String>) {
         templateIDList = input
     }
 
@@ -1529,7 +1531,7 @@ class AInfo5ViewModel(
 
     //Page group IDs List
     private var pageGroupIDsList = mutableListOf<String>()
-    fun setThePageGroupIDsList(input: MutableList<String>) {
+    private fun setThePageGroupIDsList(input: MutableList<String>) {
         pageGroupIDsList = input
     }
 
@@ -1549,8 +1551,9 @@ class AInfo5ViewModel(
                 withContext(Dispatchers.Main) {
                     setTheTemplateIDList(templateIDsList)
                     setThePageGroupIDsList(pageGroupIDsList)
-                    templateIDsUploadingCompletedMLD.value = templateIDsList.isNotEmpty()
-                    pageGroupIDsUploadingCompletedMLD.value = pageGroupIDsList.isNotEmpty()
+                    templateIDsUploadingCompletedMLD.value = true
+                    pageGroupIDsUploadingCompletedMLD.value = true
+
                     setTheTemplateStringUploadedMAFlagMLD(true)
                 }
             }
@@ -1596,7 +1599,7 @@ class AInfo5ViewModel(
         }
     }
 
-    fun collectTermsForPageGroup(input: MutableList<String>): MutableList<String> {
+    private fun collectTermsForPageGroup(input: MutableList<String>): MutableList<String> {
         var resultList = mutableListOf<String>()
         if (input.isNotEmpty()) {
             for (index in input.indices) {
@@ -1620,7 +1623,7 @@ class AInfo5ViewModel(
         return parentChildParentItemML
     }
 
-    fun addUniqueItemToTheParentChildParentItemML(input: RVParentChildParentItemDC) {
+    private fun addUniqueItemToTheParentChildParentItemML(input: RVParentChildParentItemDC) {
         if (!parentChildParentItemML.contains(input)) {
             parentChildParentItemML.add(input)
         }
@@ -1683,13 +1686,14 @@ class AInfo5ViewModel(
         presentSectionAllData: SectionAllDataDC = SectionAllDataDC()
     ) {
         viewModelScope.launch(Dispatchers.Default) {
+            val pageTemplateML = mutableListOf<PageTemplateDC>()
             if (aInfo5TemplatesML.isNotEmpty()) {
-                val pageTemplateML = mutableListOf<PageTemplateDC>()
                 for (item in aInfo5TemplatesML) {
                     var pageTemplate = PageTemplateDC()
                     if (item.id == "PC_General_Entry_01_PC") {
                         pageTemplate = getTheDefaultPageTemplate()
-                    } else {
+                    }
+                    else {
                         pageTemplate.pageCode = item.id
                         val pageTemplateString = item.template_string
                         if (pageTemplateString != "" && pageTemplateString != null) {
@@ -1719,24 +1723,74 @@ class AInfo5ViewModel(
                     }
                     pageTemplateML.add(pageTemplate)
                 }
-                withContext(Dispatchers.Main) {
-                    addUniquePageMLToPageTemplateMLMLD(pageTemplateML)
-                    setTheAllTemplatesUploadedFlagMLD(true)
-                }
-
+            }
+            else {
+                val pageTemplate = getTheDefaultPageTemplate()
+                pageTemplateML.add(pageTemplate)
+            }
+            withContext(Dispatchers.Main) {
+                addUniquePageMLToPageTemplateMLMLD(pageTemplateML)
                 //Check if presentSectionAllData is suitably updated wrt templates
-                isDataItemListUpdatedInPresentSectionAllData(
+                updateDataItemListInPresentSectionAllData(
                     presentSectionAllPagesFramework,
                     presentSectionAllData
                 )
-                withContext(Dispatchers.Main) {
-                    setTheSectionAllDataLoadedFlagMLD(true)
-                }
+                setTheAllTemplatesUploadedFlagMLD(true)
+                setTheSectionAllDataLoadedFlagMLD(true)
             }
         }
     }
 
-    fun isDataItemListUpdatedInPresentSectionAllData(
+    fun templateStringsToPageTemplatesForCheckListReportAndAddingToTemplatesListMLD(
+        aInfo5TemplatesML: MutableList<AInfo5Templates>
+    ){
+        viewModelScope.launch(Dispatchers.Default) {
+            val pageTemplateML = mutableListOf<PageTemplateDC>()
+            if (aInfo5TemplatesML.isNotEmpty()) {
+                for (item in aInfo5TemplatesML) {
+                    var pageTemplate = PageTemplateDC()
+                    if (item.id == "PC_General_Entry_01_PC") {
+                        pageTemplate = getTheDefaultPageTemplate()
+                    }
+                    else {
+                        pageTemplate.pageCode = item.id
+                        val pageTemplateString = item.template_string
+                        if (pageTemplateString != "" && pageTemplateString != null) {
+                            pageTemplate.questionsList =
+                                dbStringToQuestionTemplateItemList(pageTemplateString)
+                            if (pageTemplateString.contains(delimiterLevel2)) {
+                                val delimiter2Items = pageTemplateString.split(delimiterLevel2)
+                                for (itemLevel2 in delimiter2Items) {
+                                    val takeFirst13Characters = itemLevel2.take(13)
+                                    if (takeFirst13Characters != "") {
+                                        if (takeFirst13Characters.contains("Obs Remarks")) {
+                                            pageTemplate.observationsList =
+                                                dbStringtoCheckboxTemplateItemList(itemLevel2)
+                                        } else if (takeFirst13Characters.contains("Reco Remarks")) {
+                                            pageTemplate.recommendationsList =
+                                                dbStringtoCheckboxTemplateItemList(itemLevel2)
+                                        } else if (takeFirst13Characters.contains("Standards")) {
+                                            pageTemplate.standardsList =
+                                                dbStringtoCheckboxTemplateItemList(itemLevel2)
+                                        }
+                                    }
+                                }
+                            }
+                        } else {
+                            pageTemplate.pageCode = item.id + "-" + MainActivity.TEMPLATE_NOT_IN_DB
+                        }
+                    }
+                    pageTemplateML.add(pageTemplate)
+                }
+            }
+            withContext(Dispatchers.Main) {
+                addUniquePageMLToPageTemplateMLMLD(pageTemplateML)
+                setTheAllSectionTemplatesUploadedForChecklistFlagMLD(true)
+            }
+        }
+    }
+
+    fun updateDataItemListInPresentSectionAllData(
         presentSectionAllPagesFramework: SectionAllPagesFrameworkDC,
         presentSectionAllData: SectionAllDataDC
     ) {
@@ -1937,7 +1991,7 @@ class AInfo5ViewModel(
     var templatesUploadedFlagMLD = MutableLiveData<Boolean>()
 
     //Database string converted to QuestionTemplateItem and CheckboxTemplateItem
-    fun dbStringToQuestionTemplateItemList(pageCodeString: String): MutableList<QuestionTemplateItemDC> {
+    private fun dbStringToQuestionTemplateItemList(pageCodeString: String): MutableList<QuestionTemplateItemDC> {
         val result = mutableListOf<QuestionTemplateItemDC>()
         if (pageCodeString != "" && pageCodeString.contains(delimiterLevel2)) {
             val delimiter2Items = pageCodeString.split(delimiterLevel2)
@@ -1995,7 +2049,7 @@ class AInfo5ViewModel(
         return result
     }
 
-    fun dbStringtoCheckboxTemplateItemList(input: String): MutableList<CheckboxTemplateItemDC> {
+    private fun dbStringtoCheckboxTemplateItemList(input: String): MutableList<CheckboxTemplateItemDC> {
         val result = mutableListOf<CheckboxTemplateItemDC>()
         if (input != "") {
             if (input.contains(delimiterLevel1)) {
@@ -2063,7 +2117,7 @@ class AInfo5ViewModel(
     }
 
     //This variable holds the Default Page Template
-    var defaultPageTemplate = PageTemplateDC(
+    private var defaultPageTemplate = PageTemplateDC(
         "PC_General_Entry_01_PC",
         mutableListOf(),
         mutableListOf(),
@@ -2093,7 +2147,7 @@ class AInfo5ViewModel(
                 isItemPresentFlag = true
             }
         }
-        if (isItemPresentFlag == false) {
+        if (!isItemPresentFlag) {
             pageTemplateList.add(input)
         }
 
@@ -2117,18 +2171,25 @@ class AInfo5ViewModel(
     }
 
     //True represents that the item is present
-    fun isItemPresentInPageTemplateList(pageCode: String): Boolean {
-        var result = false
-        if (pageCode != "") {
-            for (item in pageTemplateList) {
-                if (item.pageCode == pageCode || item.pageCode.contains(MainActivity.TEMPLATE_NOT_IN_DB)) {
-                    result = true
-                    break
-                }
-            }
-        }
+//    fun isItemPresentInPageTemplateList(pageCode: String): Boolean {
+//        var result = false
+//        if (pageCode != "") {
+//            for (item in pageTemplateList) {
+//                if (item.pageCode == pageCode || item.pageCode.contains(MainActivity.TEMPLATE_NOT_IN_DB)) {
+//                    result = true
+//                    break
+//                }
+//            }
+//        }
+//
+//        return result
+//    }
 
-        return result
+    fun isItemPresentInPageTemplateList(pageCode: String): Boolean {
+        if (pageCode.isEmpty()) return false
+        return pageTemplateList.any {
+            it.pageCode == pageCode || it.pageCode.contains(MainActivity.TEMPLATE_NOT_IN_DB)
+        }
     }
 
     fun getItemFromPageTemplateList(pageCode: String): PageTemplateDC {
@@ -2168,7 +2229,7 @@ class AInfo5ViewModel(
         return result
     }
 
-    fun addUniquePageMLToPageTemplateMLMLD(input: MutableList<PageTemplateDC>) {
+    private fun addUniquePageMLToPageTemplateMLMLD(input: MutableList<PageTemplateDC>) {
         val currentList = pageTemplateMLMLD.value ?: mutableListOf()
         for (newItem in input) {
             var exists = false
@@ -2320,17 +2381,16 @@ class AInfo5ViewModel(
     }
 
     fun pageCountFormatForDisplay(count: Int): String {
-        val result = "Page $count  "
-        return result
+        return "Page $count  "
     }
 
     //Variables to store Company Intro Data
-    var companyIntroData = CompanyIntroDataDC()
+    private var companyIntroData = CompanyIntroDataDC()
     fun setTheCompanyIntroData(input: CompanyIntroDataDC) {
         companyIntroData = input
     }
 
-    fun getTheCompanyIntroData(): CompanyIntroDataDC {
+    private fun getTheCompanyIntroData(): CompanyIntroDataDC {
         return companyIntroData
     }
 
@@ -2361,7 +2421,7 @@ class AInfo5ViewModel(
     //that are gotten from the Framework List. PageCodes that have the
     //templates loaded are not included.
     var uniqueListOfSectionPageCodes = mutableListOf<String>()
-    fun setTheUniqueListOfSectionPageCodes(input: MutableList<String>) {
+    private fun setTheUniqueListOfSectionPageCodes(input: MutableList<String>) {
         uniqueListOfSectionPageCodes = input
     }
 
@@ -2376,7 +2436,7 @@ class AInfo5ViewModel(
     }
 
 
-    val defaultSectionPageData = SectionPageDataDC("General Entry", 1)
+    private val defaultSectionPageData = SectionPageDataDC("General Entry", 1)
     fun getTheDefaultSectionPageData(): SectionPageDataDC {
         return defaultSectionPageData
     }
@@ -2497,12 +2557,11 @@ class AInfo5ViewModel(
         return presentSectionAllData
     }
 
-    fun equaliseTheFrameworkAndDataStructureSizes(
+    private fun equaliseTheFrameworkAndDataStructureSizes(
         presentSectionAllData: SectionAllDataDC,
         presentSectionAllPagesFramework: SectionAllPagesFrameworkDC
     ): SectionAllDataDC {
-        val result: SectionAllDataDC
-        result = presentSectionAllData
+        val result: SectionAllDataDC = presentSectionAllData
         if (presentSectionAllPagesFramework.sectionPageFrameworkList.size > presentSectionAllData.sectionAllPagesData.sectionPageDataList.size) {
             if (presentSectionAllPagesFramework.sectionPageFrameworkList.isNotEmpty()) {
                 for (index in presentSectionAllData.sectionAllPagesData.sectionPageDataList.size until presentSectionAllPagesFramework.sectionPageFrameworkList.size) {
@@ -2687,7 +2746,7 @@ class AInfo5ViewModel(
         }
     }
 
-    fun updatePicturePathsInSectionIntroForThePresentSectionAllData(picturePaths: String) {
+    private fun updatePicturePathsInSectionIntroForThePresentSectionAllData(picturePaths: String) {
         presentSectionAllData.picturePathsInIntroductions = picturePaths
     }
 
@@ -2878,7 +2937,7 @@ class AInfo5ViewModel(
                                         break
                                     }
                                 }
-                                if (itemPresentFlag == true) {
+                                if (itemPresentFlag) {
                                     val questionDataItem = questionsDataItemList[indexDPresent]
                                     questionsDataItemList1.add(questionDataItem)
                                 } else {
@@ -2904,7 +2963,7 @@ class AInfo5ViewModel(
                                     break
                                 }
                             }
-                            if (itemPresentFlag == true) {
+                            if (itemPresentFlag) {
                                 val questionDataItem = questionsDataItemList[indexDPresent]
                                 questionsDataItemList1.add(questionDataItem)
                             } else {
@@ -2997,7 +3056,7 @@ class AInfo5ViewModel(
                                         break
                                     }
                                 }
-                                if (itemPresentFlag == true) {
+                                if (itemPresentFlag) {
                                     val questionDataItem = questionsDataItemList[indexDPresent]
                                     questionsDataItemList1.add(questionDataItem)
                                 } else {
@@ -3023,7 +3082,7 @@ class AInfo5ViewModel(
                                     break
                                 }
                             }
-                            if (itemPresentFlag == true) {
+                            if (itemPresentFlag) {
                                 val questionDataItem = questionsDataItemList[indexDPresent]
                                 questionsDataItemList1.add(questionDataItem)
                             } else {
@@ -3052,10 +3111,10 @@ class AInfo5ViewModel(
                 if (presentSectionAllData.sectionAllPagesData.sectionPageDataList[currentPageIndex].observationsFrameworkDataItemList.size >= observationsFrameworkIndex) {
                     val obsCheckboxesDataItemList =
                         presentSectionAllData.sectionAllPagesData.sectionPageDataList[currentPageIndex].observationsFrameworkDataItemList[observationsFrameworkIndex].checkboxDataItemML
-                    if (obsCheckboxesDataItemList.isEmpty()) {
-                        result = false
+                    result = if (obsCheckboxesDataItemList.isEmpty()) {
+                        false
                     } else {
-                        result = obsCheckboxesDataItemList.size == obsCheckboxTemplateList.size
+                        obsCheckboxesDataItemList.size == obsCheckboxTemplateList.size
                     }
                 }
             }
@@ -3115,10 +3174,10 @@ class AInfo5ViewModel(
                 if (presentSectionAllData.sectionAllPagesData.sectionPageDataList[currentPageIndex].recommendationsFrameworkDataItemList.size >= recommendationsFrameworkIndex) {
                     val recoCheckboxesDataItemList =
                         presentSectionAllData.sectionAllPagesData.sectionPageDataList[currentPageIndex].recommendationsFrameworkDataItemList[recommendationsFrameworkIndex].checkboxDataItemML
-                    if (recoCheckboxesDataItemList.isEmpty()) {
-                        result = false
+                    result = if (recoCheckboxesDataItemList.isEmpty()) {
+                        false
                     } else {
-                        result = recoCheckboxesDataItemList.size == recoCheckboxTemplateList.size
+                        recoCheckboxesDataItemList.size == recoCheckboxTemplateList.size
                     }
                 }
             }
@@ -3177,10 +3236,10 @@ class AInfo5ViewModel(
                 if (presentSectionAllData.sectionAllPagesData.sectionPageDataList[currentPageIndex].standardsFrameworkDataItemList.size >= standardsFrameworkIndex) {
                     val stdsCheckboxesDataItemList =
                         presentSectionAllData.sectionAllPagesData.sectionPageDataList[currentPageIndex].standardsFrameworkDataItemList[standardsFrameworkIndex].checkboxDataItemML
-                    if (stdsCheckboxesDataItemList.isEmpty()) {
-                        result = false
+                    result = if (stdsCheckboxesDataItemList.isEmpty()) {
+                        false
                     } else {
-                        result = stdsCheckboxesDataItemList.size == stdsCheckboxTemplateList.size
+                        stdsCheckboxesDataItemList.size == stdsCheckboxTemplateList.size
                     }
                 }
             }
@@ -3449,13 +3508,14 @@ class AInfo5ViewModel(
         oldButtonChoiceTextValue: String,
         buttonChoiceTextValue: String, currentPageIndex: Int
     ) {
-        val oldValue = oldButtonChoiceTextValue
-        val newValue = buttonChoiceTextValue
 
-        if (etObservationsMLD.value?.contains(oldValue) == true) {
-            etObservationsMLD.value = etObservationsMLD.value!!.replace(oldValue, newValue)
+        if (etObservationsMLD.value?.contains(oldButtonChoiceTextValue) == true) {
+            etObservationsMLD.value = etObservationsMLD.value!!.replace(
+                oldButtonChoiceTextValue,
+                buttonChoiceTextValue
+            )
         } else {
-            etObservationsMLD.value = etObservationsMLD.value + newValue
+            etObservationsMLD.value = etObservationsMLD.value + buttonChoiceTextValue
         }
         updateObservationsInObsForThePresentSectionAllData(
             etObservationsMLD.value.toString(),
@@ -3620,7 +3680,7 @@ class AInfo5ViewModel(
         sectionAllDataLoadedFlagMLD.value = input
     }
 
-    fun questionDataItemToML(questionDataItem: QuestionDataItemDC): MutableList<String> {
+    private fun questionDataItemToML(questionDataItem: QuestionDataItemDC): MutableList<String> {
         val result = mutableListOf<String>()
         result.add(questionDataItem.blockNumber)
         result.add(questionDataItem.mandatoryValue)
@@ -3632,14 +3692,14 @@ class AInfo5ViewModel(
     }
 
     //DelimiterLevel1 is used here
-    fun questionDataItemToString(questionDataItem: QuestionDataItemDC): String {
+    private fun questionDataItemToString(questionDataItem: QuestionDataItemDC): String {
         var result = ""
         val resultML = questionDataItemToML(questionDataItem)
         result = mlToStringUsingDelimiter1(resultML)
         return result
     }
 
-    fun stringToQuestionDataItem(input: String): QuestionDataItemDC {
+    private fun stringToQuestionDataItem(input: String): QuestionDataItemDC {
         val questionDataItem = QuestionDataItemDC()
         if (input != "") {
             if (input.contains(delimiterLevel1)) {
@@ -3730,7 +3790,7 @@ class AInfo5ViewModel(
     }
 
     //DelimiterLevel2 is used here
-    fun questionDataItemListToString(questionDataItemList: MutableList<QuestionDataItemDC>): String {
+    private fun questionDataItemListToString(questionDataItemList: MutableList<QuestionDataItemDC>): String {
         var result = ""
         val resultML = mutableListOf<String>()
         if (questionDataItemList.isNotEmpty()) {
@@ -3743,7 +3803,7 @@ class AInfo5ViewModel(
         return result
     }
 
-    fun stringToQuestionDataItemList(input: String): MutableList<QuestionDataItemDC> {
+    private fun stringToQuestionDataItemList(input: String): MutableList<QuestionDataItemDC> {
         val result = mutableListOf<QuestionDataItemDC>()
         if (input != "") {
             val inputML = stringToMLUsingDelimiter2(input)
@@ -3756,21 +3816,21 @@ class AInfo5ViewModel(
     }
 
     //DelimiterLevel1 is used here
-    fun checkboxDataItemToML(checkboxDataItem: CheckboxDataItemDC): MutableList<String> {
+    private fun checkboxDataItemToML(checkboxDataItem: CheckboxDataItemDC): MutableList<String> {
         val result = mutableListOf<String>()
         result.add(checkboxDataItem.checkboxTickedValue.toString())
         result.add(checkboxDataItem.priorityValues)
         return result
     }
 
-    fun checkboxDataItemToString(checkboxDataItem: CheckboxDataItemDC): String {
+    private fun checkboxDataItemToString(checkboxDataItem: CheckboxDataItemDC): String {
         var result = ""
         val resultML = checkboxDataItemToML(checkboxDataItem)
         result = mlToStringUsingDelimiter1(resultML)
         return result
     }
 
-    fun stringToCheckboxDataItem(input: String): CheckboxDataItemDC {
+    private fun stringToCheckboxDataItem(input: String): CheckboxDataItemDC {
         val checkboxDataItem = CheckboxDataItemDC()
         if (input != "") {
             if (input.contains(delimiterLevel1)) {
@@ -3806,7 +3866,7 @@ class AInfo5ViewModel(
     }
 
     //DelimiterLevel2 is used here
-    fun checkboxDataItemListToString(checkboxDataItemList: MutableList<CheckboxDataItemDC>): String {
+    private fun checkboxDataItemListToString(checkboxDataItemList: MutableList<CheckboxDataItemDC>): String {
         var result = ""
         val resultML = mutableListOf<String>()
         if (checkboxDataItemList.isNotEmpty()) {
@@ -3819,7 +3879,7 @@ class AInfo5ViewModel(
         return result
     }
 
-    fun stringToCheckboxDataItemList(input: String): MutableList<CheckboxDataItemDC> {
+    private fun stringToCheckboxDataItemList(input: String): MutableList<CheckboxDataItemDC> {
         val result = mutableListOf<CheckboxDataItemDC>()
         if (input != "") {
             val inputML = stringToMLUsingDelimiter2(input)
@@ -3832,7 +3892,7 @@ class AInfo5ViewModel(
     }
 
     //DelimiterLevel2 is used here
-    fun questionsFrameworkDataItemToML(questionsFrameworkDataItem: QuestionsFrameworkDataItemDC): MutableList<String> {
+    private fun questionsFrameworkDataItemToML(questionsFrameworkDataItem: QuestionsFrameworkDataItemDC): MutableList<String> {
         val result = mutableListOf<String>()
         result.add(questionsFrameworkDataItem.questionsFrameworkTitle)
         result.add(questionsFrameworkDataItem.pageCode)
@@ -3841,14 +3901,14 @@ class AInfo5ViewModel(
     }
 
     //DelimiterLevel 3 is used here
-    fun questionsFrameworkDataItemToString(questionsFrameworkDataItem: QuestionsFrameworkDataItemDC): String {
+    private fun questionsFrameworkDataItemToString(questionsFrameworkDataItem: QuestionsFrameworkDataItemDC): String {
         var result = ""
         val resultML = questionsFrameworkDataItemToML(questionsFrameworkDataItem)
         result = mlToStringUsingDelimiter3(resultML)
         return result
     }
 
-    fun stringToQuestionsFrameworkDataItem(input: String): QuestionsFrameworkDataItemDC {
+    private fun stringToQuestionsFrameworkDataItem(input: String): QuestionsFrameworkDataItemDC {
         val questionsFrameworkDataItem = QuestionsFrameworkDataItemDC()
         if (input != "") {
             if (input.contains(delimiterLevel3)) {
@@ -3896,7 +3956,7 @@ class AInfo5ViewModel(
         return questionsFrameworkDataItem
     }
 
-    fun checkboxesFrameworkDataItemToML(checkboxesFrameworkDataItem: CheckboxesFrameworkDataItemDC): MutableList<String> {
+    private fun checkboxesFrameworkDataItemToML(checkboxesFrameworkDataItem: CheckboxesFrameworkDataItemDC): MutableList<String> {
         val result = mutableListOf<String>()
         result.add(checkboxesFrameworkDataItem.checkboxesFrameworkTitle)
         result.add(checkboxesFrameworkDataItem.pageCode)
@@ -3904,14 +3964,14 @@ class AInfo5ViewModel(
         return result
     }
 
-    fun checkboxesFrameworkDataItemToString(checkboxesFrameworkDataItem: CheckboxesFrameworkDataItemDC): String {
+    private fun checkboxesFrameworkDataItemToString(checkboxesFrameworkDataItem: CheckboxesFrameworkDataItemDC): String {
         var result = ""
         val resultML = checkboxesFrameworkDataItemToML(checkboxesFrameworkDataItem)
         result = mlToStringUsingDelimiter3(resultML)
         return result
     }
 
-    fun stringToCheckboxesFrameworkDataItem(input: String): CheckboxesFrameworkDataItemDC {
+    private fun stringToCheckboxesFrameworkDataItem(input: String): CheckboxesFrameworkDataItemDC {
         val checkboxesFrameworkDataItem = CheckboxesFrameworkDataItemDC()
         if (input != "") {
             if (input.contains(delimiterLevel3)) {
@@ -3960,7 +4020,7 @@ class AInfo5ViewModel(
     }
 
     //DelimiterLevel4 is used here
-    fun questionsFrameworkDataItemListToString(questionsFrameworkDataItemList: MutableList<QuestionsFrameworkDataItemDC>): String {
+    private fun questionsFrameworkDataItemListToString(questionsFrameworkDataItemList: MutableList<QuestionsFrameworkDataItemDC>): String {
         var result = ""
         val resultML = mutableListOf<String>()
         if (questionsFrameworkDataItemList.isNotEmpty()) {
@@ -3974,7 +4034,7 @@ class AInfo5ViewModel(
         return result
     }
 
-    fun stringToQuestionsFrameworkDataItemList(input: String): MutableList<QuestionsFrameworkDataItemDC> {
+    private fun stringToQuestionsFrameworkDataItemList(input: String): MutableList<QuestionsFrameworkDataItemDC> {
         val questionsFrameworkDataItemList = mutableListOf<QuestionsFrameworkDataItemDC>()
         if (input != "") {
             val inputML = stringToMLUsingDelimiter4(input)
@@ -4000,7 +4060,7 @@ class AInfo5ViewModel(
         return result
     }
 
-    fun stringToCheckboxesFrameworkDataItemList(input: String): MutableList<CheckboxesFrameworkDataItemDC> {
+    private fun stringToCheckboxesFrameworkDataItemList(input: String): MutableList<CheckboxesFrameworkDataItemDC> {
         val checkboxesFrameworkDataItemList = mutableListOf<CheckboxesFrameworkDataItemDC>()
         if (input != "") {
             val inputML = stringToMLUsingDelimiter4(input)
@@ -4014,7 +4074,7 @@ class AInfo5ViewModel(
     }
 
 
-    fun sectionPageDataToML(sectionPageData: SectionPageDataDC): MutableList<String> {
+    private fun sectionPageDataToML(sectionPageData: SectionPageDataDC): MutableList<String> {
         val result = mutableListOf<String>()
         result.add(sectionPageData.pageTitle)
         result.add(sectionPageData.pageNumber.toString())
@@ -4030,14 +4090,14 @@ class AInfo5ViewModel(
     }
 
     //DelimiterLevel5 is used here
-    fun sectionPageDataToString(sectionPageData: SectionPageDataDC): String {
+    private fun sectionPageDataToString(sectionPageData: SectionPageDataDC): String {
         var result = ""
         val resultML = sectionPageDataToML(sectionPageData)
         result = mlToStringUsingDelimiter5(resultML)
         return result
     }
 
-    fun stringToSectionPageData(input: String): SectionPageDataDC {
+    private fun stringToSectionPageData(input: String): SectionPageDataDC {
         val sectionPageData = SectionPageDataDC()
         if (input != "") {
             if (input.contains(delimiterLevel5)) {
@@ -4243,7 +4303,7 @@ class AInfo5ViewModel(
         return result
     }
 
-    fun stringToSectionPageDataList(input: String): MutableList<SectionPageDataDC> {
+    private fun stringToSectionPageDataList(input: String): MutableList<SectionPageDataDC> {
         val sectionPageDataList = mutableListOf<SectionPageDataDC>()
         if (input != "") {
             val inputML = stringToMLUsingDelimiter6(input)
@@ -4257,7 +4317,7 @@ class AInfo5ViewModel(
     }
 
 
-    fun sectionAllDataToML(sectionAllData: SectionAllDataDC): MutableList<String> {
+    private fun sectionAllDataToML(sectionAllData: SectionAllDataDC): MutableList<String> {
         val result = mutableListOf<String>()
         result.add(sectionAllData.introduction)
         result.add(sectionAllData.picturePathsInIntroductions)
@@ -4273,7 +4333,7 @@ class AInfo5ViewModel(
         return result
     }
 
-    fun stringToSectionAllData(input: String): SectionAllDataDC {
+    private fun stringToSectionAllData(input: String): SectionAllDataDC {
         val sectionAllData = SectionAllDataDC()
         if (input != "") {
             if (input.contains(delimiterLevel7)) {
@@ -4321,14 +4381,14 @@ class AInfo5ViewModel(
     }
 
     //DelimiterLevel1 is used here
-    fun companyIntroDataToML(companyIntroData: CompanyIntroDataDC): MutableList<String> {
+    private fun companyIntroDataToML(companyIntroData: CompanyIntroDataDC): MutableList<String> {
         val result = mutableListOf<String>()
         result.add(companyIntroData.introduction)
         result.add(companyIntroData.picturePathsInIntroductions)
         return result
     }
 
-    fun companyIntroDataToString(companyIntroData: CompanyIntroDataDC): String {
+    private fun companyIntroDataToString(companyIntroData: CompanyIntroDataDC): String {
         var result = ""
         val resultML = companyIntroDataToML(companyIntroData)
         result = mlToStringUsingDelimiter1(resultML)
@@ -4375,7 +4435,7 @@ class AInfo5ViewModel(
 
     //MLD Flag to ensure that the edit has been completed. True stands for completion
     //False means that it is not yet complete
-    private var editCompletedFlagMLD = MutableLiveData<Boolean?>(true)
+    private var editCompletedFlagMLD = MutableLiveData(true)
     val editCompletedFlagLD: LiveData<Boolean?>
         get() = editCompletedFlagMLD
 
@@ -4453,6 +4513,16 @@ class AInfo5ViewModel(
         companyAuditDateUploadedFlagMLD.value = input
     }
 
+    //MLD Flag to ensure all the sectionTemplates have been uploaded. True stands for completion
+    //False means that it is not yet complete
+    private var allSectionTemplatesUploadedForChecklistFlagMLD = MutableLiveData(true)
+    val allSectionTemplatesUploadedForChecklistFlagLD: LiveData<Boolean?>
+        get() = allSectionTemplatesUploadedForChecklistFlagMLD
+
+    fun setTheAllSectionTemplatesUploadedForChecklistFlagMLD(input: Boolean) {
+        allSectionTemplatesUploadedForChecklistFlagMLD.value = input
+    }
+
 
     //All Conditions Met MLD - combines the MLD for ParentChildParent, SectionFramework, SectionData and Templates
 
@@ -4464,10 +4534,12 @@ class AInfo5ViewModel(
             val templatesLoaded = allTemplatesUploadedFlagMLD.value ?: false
             val editCompletedFlag = editCompletedFlagLD.value ?: false
             val deleteCompletedFlag = deleteCompletedFlagLD.value ?: false
+            val allSectionTemplatesUploadedForChecklistFlag = allSectionTemplatesUploadedForChecklistFlagLD.value?: false
 
             // Set true only if all are true
-            this.value = parentChildParentUploaded && frameworkUploaded && dataUploaded
-                    && templatesLoaded && editCompletedFlag && deleteCompletedFlag
+            this.value = parentChildParentUploaded && frameworkUploaded
+                    && dataUploaded && templatesLoaded && editCompletedFlag
+                    && deleteCompletedFlag && allSectionTemplatesUploadedForChecklistFlag
         }
         addSource(parentChildParentItemMLUploadedMLD, observer)
         addSource(sectionAllPagesFrameworkLoadedFlagLD, observer)
@@ -4475,6 +4547,7 @@ class AInfo5ViewModel(
         addSource(allTemplatesUploadedFlagMLD, observer)
         addSource(editCompletedFlagLD, observer)
         addSource(deleteCompletedFlagLD, observer)
+        addSource(allSectionTemplatesUploadedForChecklistFlagLD, observer)
     }
 
     //MLD Flag to ensure companyAuditDate has been updated in the companyReport.
@@ -4489,7 +4562,7 @@ class AInfo5ViewModel(
     //MLD Flag to ensure Company Intros has been updated in the companyReport.
     // True stands for completion. False means that it is not yet complete
     private var companyIntroUpdatedInReportSIFFlagMLD = MutableLiveData(true)
-    val companyIntroUpdatedInReportSIFFlagLD: LiveData<Boolean?>
+    private val companyIntroUpdatedInReportSIFFlagLD: LiveData<Boolean?>
         get() = companyIntroUpdatedInReportSIFFlagMLD
     fun setTheCompanyIntroUpdatedInReportSIFFlagMLD(input: Boolean) {
         companyIntroUpdatedInReportSIFFlagMLD.value = input
@@ -4498,7 +4571,7 @@ class AInfo5ViewModel(
     //MLD Flag to ensure Section Intros has been updated in the companyReport.
     // True stands for completion. False means that it is not yet complete
     private var sectionIntroUpdatedInReportSIFFlagMLD = MutableLiveData(true)
-    val sectionIntroUpdatedInReportSIFFlagLD: LiveData<Boolean?>
+    private val sectionIntroUpdatedInReportSIFFlagLD: LiveData<Boolean?>
         get() = sectionIntroUpdatedInReportSIFFlagMLD
     fun setTheSectionIntroUpdatedInReportSIFFlagMLD(input: Boolean) {
         sectionIntroUpdatedInReportSIFFlagMLD.value = input
@@ -4553,23 +4626,6 @@ class AInfo5ViewModel(
         addSource(companyIntroUpdatedInReportSIFFlagLD, observer)
         addSource(sectionIntroUpdatedInReportSIFFlagLD, observer)
         addSource(sectionPagesUpdatedInReportSIFFlagLD, observer)
-    }
-
-    val auditDateReportUpdateTriggerLD = MediatorLiveData<Boolean>().apply {
-        val triggerUpdate = Observer<Boolean?> {
-            val auditUploaded = companyAuditDateUploadedFlagLD.value ?: false
-            val reportUploaded = companyReportUploadedFlagLD.value ?: false
-            value = auditUploaded && reportUploaded
-            if (value == true) {
-                updateTheCompanyNameAuditDateAndIntroInCompanyReportAndSave(
-                    getThePresentCompanyCodeAndDisplayName().uniqueCodeName,
-                    "",
-                    getTheCompanyAuditDate(), ""
-                )
-            }
-        }
-        addSource(companyAuditDateUploadedFlagLD, triggerUpdate)
-        addSource(companyReportUploadedFlagLD, triggerUpdate)
     }
 
 
@@ -4755,6 +4811,40 @@ class AInfo5ViewModel(
         addSource(companySectionCDListUploadedSLRVFlagLD, observer)
     }
 
+    //MLD Flag to ensure picture has been uploaded. True stands for completion
+    //False means that it is not yet complete
+    private var pictureUploadedCXFFlagMLD = MutableLiveData(true)
+    val pictureUploadedCXFFlagLD: LiveData<Boolean?>
+        get() = pictureUploadedCXFFlagMLD
+
+    fun setThePictureUploadedCXFFlagMLD(input: Boolean) {
+        pictureUploadedCXFFlagMLD.value = input
+    }
+
+    //MLD Flag to ensure video has been uploaded. True stands for completion
+    //False means that it is not yet complete
+    private var videoUploadedCXFFlagMLD = MutableLiveData(true)
+    val videoUploadedCXFFlagLD: LiveData<Boolean?>
+        get() = videoUploadedCXFFlagMLD
+
+    fun setTheVideoUploadedCXFFlagMLD(input: Boolean) {
+        videoUploadedCXFFlagMLD.value = input
+    }
+
+
+
+    val allConditionsMetCameraXFLD= MediatorLiveData<Boolean>().apply {
+        val observer = Observer<Boolean?> {
+            val pictureUploadedFlag = pictureUploadedCXFFlagLD.value?: false
+            val videoUploadedFlag = videoUploadedCXFFlagLD.value?: false
+
+            // Set true only if all are true
+            this.value = pictureUploadedFlag && videoUploadedFlag
+        }
+
+        addSource(pictureUploadedCXFFlagLD, observer)
+        addSource(videoUploadedCXFFlagLD, observer)
+    }
 
 //Reports Related Variables and Functions for reports of different types
 
@@ -4764,20 +4854,12 @@ class AInfo5ViewModel(
     fun setTheCompanyReport(input: CompanyReportDC) {
         companyReport = input
     }
-
     fun getTheCompanyReport(): CompanyReportDC {
         return companyReport
     }
 
-    //Company Intro Report
-    private var companyIntroReport = CompanyIntroReportDC()
-
-    fun setTheCompanyIntroReport(input: CompanyIntroReportDC) {
-        companyIntroReport = input
-    }
-
-    fun getTheCompanyIntroReport(): CompanyIntroReportDC {
-        return companyIntroReport
+    fun setTheSectionReportListInCompanyReport(sectionReportList: MutableList<SectionReportDC>){
+        companyReport.sectionReportList = sectionReportList
     }
 
     fun uploadTheCompanyReportIntoViewModel(companyReportString: String) {
@@ -4799,27 +4881,6 @@ class AInfo5ViewModel(
             withContext(Dispatchers.Main) {
                 setTheCompanyReport(companyReport)
                 setTheCompanyReportUploadedFlagMLD(true)
-            }
-        }
-    }
-
-    fun uploadTheCompanyIntroReportIntoViewModel(companyIntroReportString: String) {
-        viewModelScope.launch(Dispatchers.Default) {
-            var companyIntroReport = CompanyIntroReportDC()
-            if (companyIntroReportString != "") {
-                companyIntroReport = stringToCompanyIntroReport(companyIntroReportString)
-            }
-            else {
-                companyIntroReport.companyCode = getPresentCompanyCode()
-                companyIntroReport.companyName = getPresentCompanyName()
-                companyIntroReport.companyAuditDate = getTheCompanyAuditDate()
-                companyIntroReport.companyIntroduction = ""
-            }
-
-            withContext(Dispatchers.Main) {
-                setTheCompanyIntroReport(companyIntroReport)
-                setTheCompanyReportUploadedFlagMLD(true)
-                setTheCompanyIntroReportUploadedFlag(true)
             }
         }
     }
@@ -4850,27 +4911,22 @@ class AInfo5ViewModel(
     }
 
     //The below function ensures that the reports are ordered in the Company Report
-    fun reorderSectionReportsInCompanyReportAndSave() {
-        viewModelScope.launch(Dispatchers.Default) {
-            val reorderedSectionReportList = mutableListOf<SectionReportDC>()
-            val companySectionCNAndD = getTheCompanySectionCodeAndDisplayNameML()
-            if (companySectionCNAndD.isNotEmpty()) {
-                if (companyReport.sectionReportList.isNotEmpty()) {
-                    for (sectionIndex in 0 until companySectionCNAndD.size) {
-                        for (reportIndex in 0 until companyReport.sectionReportList.size) {
-                            if (companyReport.sectionReportList[reportIndex].sectionCode == companySectionCNAndD[sectionIndex].uniqueCodeName) {
-                                reorderedSectionReportList.add(companyReport.sectionReportList[reportIndex])
-                                break
-                            }
-                        }
-                    }
+
+    private fun reorderSectionReportsInCompanyReport(){
+        val reorderedSectionReportList = mutableListOf<SectionReportDC>()
+        val companySectionCNAndD = getTheCompanySectionCodeAndDisplayNameML()
+        if (companySectionCNAndD.isNotEmpty()) {
+            for (sectionIndex in 0 until companySectionCNAndD.size) {
+                val matchingReport = companyReport.sectionReportList.find{it.sectionCode == companySectionCNAndD[sectionIndex].uniqueCodeName}
+                if (matchingReport != null){
+                    reorderedSectionReportList.add(matchingReport)
+                } else {
+                    break
                 }
             }
-            withContext(Dispatchers.Main) {
-                companyReport.sectionReportList = reorderedSectionReportList
-                //Save the companyReport to DB
-                //saveTheCompanyReportToDB(getTheCompanyReport())
-            }
+        }
+        if (reorderedSectionReportList.isNotEmpty()){
+            setTheSectionReportListInCompanyReport(reorderedSectionReportList)
         }
     }
 
@@ -4890,10 +4946,10 @@ class AInfo5ViewModel(
                 companyReport.sectionReportList.add(sectionReport)
             }
             withContext(Dispatchers.Main) {
-                if (sectionReportPresentFlag == true) {
+                if (sectionReportPresentFlag) {
                     companyReport.sectionReportList[sectionReportIndex] = sectionReport
                 }
-                reorderSectionReportsInCompanyReportAndSave()
+                reorderSectionReportsInCompanyReport()
             }
 
         }
@@ -4902,7 +4958,8 @@ class AInfo5ViewModel(
     fun updateSectionDetailsInCompanyReportAndSave(
         sectionCode: String,
         sectionName: String = "",
-        sectionAllData: SectionAllDataDC
+        sectionAllData: SectionAllDataDC,
+        sectionChildPageCodesList: MutableList<String> = mutableListOf()
     ) {
         viewModelScope.launch(Dispatchers.Default) {
             //val sectionAllData = getThePresentSectionAllData()
@@ -4922,9 +4979,9 @@ class AInfo5ViewModel(
             sectionReportNew.sixColumnTableExcel =
                 generateSectionSixColumnExcelTable(sectionAllData.sectionAllPagesData.sectionPageDataList)
             sectionReportNew.checkListTableWord =
-                generateSectionChecklistWordTable(sectionAllData.sectionAllPagesData.sectionPageDataList)
+                generateSectionChecklistWordTable(sectionAllData.sectionAllPagesData.sectionPageDataList, sectionChildPageCodesList)
             sectionReportNew.checkListTableExcel =
-                generateSectionChecklistExcelTable(sectionAllData.sectionAllPagesData.sectionPageDataList)
+                generateSectionChecklistExcelTable(sectionAllData.sectionAllPagesData.sectionPageDataList, sectionChildPageCodesList)
 
             if (companyReport.sectionReportList.isNotEmpty()) {
                 for (index in 0 until companyReport.sectionReportList.size) {
@@ -4945,6 +5002,7 @@ class AInfo5ViewModel(
                 else {
                     companyReport.sectionReportList.add(sectionReportNew)
                 }
+                reorderSectionReportsInCompanyReport()
                 //Save the companyReport to DB
                 saveTheCompanyReportToDB(getTheCompanyReport())
                 setTheSectionPagesUpdatedInReportSIFFlagMLD(true)
@@ -4974,7 +5032,7 @@ class AInfo5ViewModel(
         saveTheCompanyReportToDB(getTheCompanyReport())
     }
 
-    fun deleteSectionReportInCompanyReportAndSave(sectionCode: String) {
+    private fun deleteSectionReportInCompanyReportAndSave(sectionCode: String) {
         viewModelScope.launch(Dispatchers.Default) {
             val newCompanyReport = CompanyReportDC()
             if (companyReport.sectionReportList.isNotEmpty()) {
@@ -4993,10 +5051,7 @@ class AInfo5ViewModel(
                 }
             }
         }
-
-
     }
-
 
     fun saveTheCompanyReportToDB(companyReport: CompanyReportDC) {
         viewModelScope.launch(Dispatchers.IO) {
@@ -5007,7 +5062,7 @@ class AInfo5ViewModel(
         }
     }
 
-    fun generateSectionThreeColumnWordTable(sectionPageDataList: MutableList<SectionPageDataDC>): String {
+    private fun generateSectionThreeColumnWordTable(sectionPageDataList: MutableList<SectionPageDataDC>): String {
         var threeColumnWordTable = ""
         if (sectionPageDataList.isNotEmpty()) {
             for (pageIndex in 0 until sectionPageDataList.size) {
@@ -5022,7 +5077,8 @@ class AInfo5ViewModel(
                                     ";"
                                 ) + "$" +
                                 sectionPageDataList[pageIndex].standards.replace("\n", ";") + "\n"
-                } else {
+                }
+                else {
                     threeColumnWordTable =
                         threeColumnWordTable + sectionPageDataList[pageIndex].pageTitle.replace(
                             "\n",
@@ -5037,12 +5093,12 @@ class AInfo5ViewModel(
                                 sectionPageDataList[pageIndex].standards.replace("\n", ";") + "\n"
                 }
             }
-            threeColumnWordTable = threeColumnWordTable + "}"
+            threeColumnWordTable += "}"
         }
         return threeColumnWordTable
     }
 
-    fun generateSectionThreeColumnExcelTable(sectionPageDataList: MutableList<SectionPageDataDC>): String {
+    private fun generateSectionThreeColumnExcelTable(sectionPageDataList: MutableList<SectionPageDataDC>): String {
         var threeColumnExcelTable = ""
         if (sectionPageDataList.isNotEmpty()) {
             for (pageIndex in 0 until sectionPageDataList.size) {
@@ -5072,12 +5128,12 @@ class AInfo5ViewModel(
                                 sectionPageDataList[pageIndex].standards.replace("\n", ";") + "\n"
                 }
             }
-            threeColumnExcelTable = threeColumnExcelTable + "}"
+            threeColumnExcelTable += "}"
         }
         return threeColumnExcelTable
     }
 
-    fun generateSectionSixColumnWordTable(sectionPageDataList: MutableList<SectionPageDataDC>): String {
+    private fun generateSectionSixColumnWordTable(sectionPageDataList: MutableList<SectionPageDataDC>): String {
         var sixColumnWordTable = ""
         if (sectionPageDataList.isNotEmpty()) {
             for (pageIndex in 0 until sectionPageDataList.size) {
@@ -5119,12 +5175,12 @@ class AInfo5ViewModel(
                                 sectionPageDataList[pageIndex].standards.replace("\n", ";") + "\n"
                 }
             }
-            sixColumnWordTable = sixColumnWordTable + "}"
+            sixColumnWordTable += "}"
         }
         return sixColumnWordTable
     }
 
-    fun generateSectionSixColumnExcelTable(sectionPageDataList: MutableList<SectionPageDataDC>): String {
+    private fun generateSectionSixColumnExcelTable(sectionPageDataList: MutableList<SectionPageDataDC>): String {
         var sixColumnExcelTable = ""
         if (sectionPageDataList.isNotEmpty()) {
             for (pageIndex in 0 until sectionPageDataList.size) {
@@ -5145,7 +5201,8 @@ class AInfo5ViewModel(
                                     ";"
                                 ) + "$" +
                                 sectionPageDataList[pageIndex].standards.replace("\n", ";") + "\n"
-                } else {
+                }
+                else {
                     sixColumnExcelTable =
                         sixColumnExcelTable + sectionPageDataList[pageIndex].pageTitle.replace(
                             "\n",
@@ -5166,107 +5223,147 @@ class AInfo5ViewModel(
                                 sectionPageDataList[pageIndex].standards.replace("\n", ";") + "\n"
                 }
             }
-            sixColumnExcelTable = sixColumnExcelTable + "}"
+            sixColumnExcelTable += "}"
         }
         return sixColumnExcelTable
     }
 
-    fun generateSectionChecklistWordTable(sectionPageDataList: MutableList<SectionPageDataDC>): String {
-        var checklistWordTable = ""
-        checklistWordTable =
-            "Checklist" + "$" + "DataField1" + "$" + "DataField2" + "$" + "DataField3" + "$" + "Button Choice\n"
+    private fun generateSectionChecklistWordTable(sectionPageDataList: MutableList<SectionPageDataDC>, sectionChildPageCodesList: MutableList<String> = mutableListOf()): String {
+        val dataPageCodes = buildSet {
+            sectionPageDataList.forEach { section ->
+                section.questionsFrameworkDataItemList.mapTo(this) { it.pageCode }
+                section.observationsFrameworkDataItemList.mapTo(this) { it.pageCode }
+                section.recommendationsFrameworkDataItemList.mapTo(this) { it.pageCode }
+                section.standardsFrameworkDataItemList.mapTo(this) { it.pageCode }
+            }
+        }
+
+        val missingPageCodesInSectionPageDataList = sectionChildPageCodesList.minus(dataPageCodes)
+
+        var checklistWordTableListString = ""
+
         if (sectionPageDataList.isNotEmpty()) {
             for (pageIndex in 0 until sectionPageDataList.size) {
                 if (sectionPageDataList[pageIndex].questionsFrameworkDataItemList.isNotEmpty()) {
-                    val questionsFrameworkList =
-                        sectionPageDataList[pageIndex].questionsFrameworkDataItemList
+                    val questionsFrameworkList = sectionPageDataList[pageIndex].questionsFrameworkDataItemList
                     for (frameworkIndex in 0 until questionsFrameworkList.size) {
                         val pageCode = questionsFrameworkList[frameworkIndex].pageCode
-                        if (pageCode == "PC_General_Entry_01_PC") {
-                            checklistWordTable =
-                                checklistWordTable + questionsFrameworkList[frameworkIndex].questionsFrameworkTitle + "$" + "$" + "$" + "$" + "\n"
-                        } else {
-                            if (isItemPresentInPageTemplateList(pageCode) == true) {
-                                val itemQuestionsList =
-                                    getItemFromPageTemplateList(pageCode).questionsList
-                                val itemDataList =
-                                    questionsFrameworkList[frameworkIndex].questionDataItemList
-                                checklistWordTable =
-                                    checklistWordTable + questionsFrameworkList[frameworkIndex].questionsFrameworkTitle + "$" + "$" + "$" + "$" + "\n"
-                                if (itemQuestionsList.isNotEmpty()) {
-                                    for (questionsListIndex in 0 until itemQuestionsList.size) {
-                                        checklistWordTable =
-                                            checklistWordTable + itemQuestionsList[questionsListIndex].question + "$"
-                                        if (questionsListIndex < itemDataList.size) {
-                                            checklistWordTable =
+                        if (pageCode != "PC_General_Entry_01_PC") {
+                            if (isItemPresentInPageTemplateMLMLD(pageCode)) {
+                                val itemQuestionsList = getItemFromPageTemplateMLMLD(pageCode)?.questionsList
+                                val itemDataList = questionsFrameworkList[frameworkIndex].questionDataItemList
+                                var checklistWordTable = "\n" + "[H4] " + questionsFrameworkList[frameworkIndex].questionsFrameworkTitle + " Checklist\n\n"
+                                checklistWordTable += "Checklist Questions" + "$" + "DataField1" + "$" + "DataField2" + "$" + "DataField3" + "$" + "Button Choice\n"
+                                if (itemQuestionsList != null) {
+                                    if (itemQuestionsList.isNotEmpty()) {
+                                        for (questionsListIndex in 0 until itemQuestionsList.size) {
+                                            checklistWordTable = checklistWordTable + itemQuestionsList[questionsListIndex].question + "$"
+                                            checklistWordTable = if (questionsListIndex < itemDataList.size) {
                                                 checklistWordTable + itemDataList[questionsListIndex].data1Value + "$" + itemDataList[questionsListIndex].data2Value + "$" + itemDataList[questionsListIndex].data3Value + "$" + itemDataList[questionsListIndex].buttonOptionChosen + "\n"
-                                        } else {
-                                            checklistWordTable =
+                                            } else {
                                                 checklistWordTable + "$" + "$" + "$" + "\n"
+                                            }
                                         }
                                     }
                                 }
-                            } else {
-                                checklistWordTable =
-                                    checklistWordTable + questionsFrameworkList[frameworkIndex].questionsFrameworkTitle + "$" + "$" + "$" + "$" + "\n"
+                                checklistWordTable += "}\n\n"
+                                checklistWordTableListString += checklistWordTable
                             }
                         }
                     }
                 }
             }
-            checklistWordTable = checklistWordTable + "}"
         }
 
-        return checklistWordTable
+        if (missingPageCodesInSectionPageDataList.isNotEmpty()){
+            for (pageCode in missingPageCodesInSectionPageDataList){
+                if (isItemPresentInPageTemplateMLMLD(pageCode)) {
+                    val itemQuestionsList = getItemFromPageTemplateMLMLD(pageCode)?.questionsList
+                    var checklistWordTable = "\n" + "[H4] " + extractDisplayNameFromPageCode(pageCode) + " Checklist\n"
+                    checklistWordTable += "Checklist Questions" + "$" + "DataField1" + "$" + "DataField2" + "$" + "DataField3" + "$" + "Button Choice\n"
+                    if (itemQuestionsList != null) {
+                        if (itemQuestionsList.isNotEmpty()) {
+                            for (questionsListIndex in 0 until itemQuestionsList.size) {
+                                checklistWordTable = checklistWordTable + itemQuestionsList[questionsListIndex].question + "$" + "$" + "$" + "$ \n"
+                            }
+                        }
+                    }
+                    checklistWordTable += "}\n\n"
+                    checklistWordTableListString += checklistWordTable
+                }
+            }
+        }
+
+        return checklistWordTableListString
     }
 
-    fun generateSectionChecklistExcelTable(sectionPageDataList: MutableList<SectionPageDataDC>): String {
-        var checklistExcelTable = ""
-        checklistExcelTable =
-            "Checklist" + "$" + "DataField1" + "$" + "DataField2" + "$" + "DataField3" + "$" + "Button Choice\n"
+    private fun generateSectionChecklistExcelTable(sectionPageDataList: MutableList<SectionPageDataDC>, sectionChildPageCodesList: MutableList<String> = mutableListOf()): String {
+        val dataPageCodes = buildSet {
+            sectionPageDataList.forEach { section ->
+                section.questionsFrameworkDataItemList.mapTo(this) { it.pageCode }
+                section.observationsFrameworkDataItemList.mapTo(this) { it.pageCode }
+                section.recommendationsFrameworkDataItemList.mapTo(this) { it.pageCode }
+                section.standardsFrameworkDataItemList.mapTo(this) { it.pageCode }
+            }
+        }
+
+        val missingPageCodesInSectionPageDataList = sectionChildPageCodesList.minus(dataPageCodes)
+
+        var checklistExcelTableListString = ""
+
         if (sectionPageDataList.isNotEmpty()) {
             for (pageIndex in 0 until sectionPageDataList.size) {
                 if (sectionPageDataList[pageIndex].questionsFrameworkDataItemList.isNotEmpty()) {
-                    val questionsFrameworkList =
-                        sectionPageDataList[pageIndex].questionsFrameworkDataItemList
+                    val questionsFrameworkList = sectionPageDataList[pageIndex].questionsFrameworkDataItemList
                     for (frameworkIndex in 0 until questionsFrameworkList.size) {
                         val pageCode = questionsFrameworkList[frameworkIndex].pageCode
-                        if (pageCode == "PC_General_Entry_01_PC") {
-                            checklistExcelTable =
-                                checklistExcelTable + questionsFrameworkList[frameworkIndex].questionsFrameworkTitle + "$" + "$" + "$" + "$" + "\n"
-                        } else {
-                            if (isItemPresentInPageTemplateList(pageCode) == true) {
-                                val itemQuestionsList =
-                                    getItemFromPageTemplateList(pageCode).questionsList
-                                val itemDataList =
-                                    questionsFrameworkList[frameworkIndex].questionDataItemList
-                                checklistExcelTable =
-                                    checklistExcelTable + questionsFrameworkList[frameworkIndex].questionsFrameworkTitle + "$" + "$" + "$" + "$" + "\n"
-                                if (itemQuestionsList.isNotEmpty()) {
-                                    for (questionsListIndex in 0 until itemQuestionsList.size) {
-                                        checklistExcelTable =
-                                            checklistExcelTable + itemQuestionsList[questionsListIndex].question + "$"
-                                        if (questionsListIndex < itemDataList.size) {
-                                            checklistExcelTable =
+                        if (pageCode != "PC_General_Entry_01_PC") {
+                            if (isItemPresentInPageTemplateMLMLD(pageCode)) {
+                                val itemQuestionsList = getItemFromPageTemplateMLMLD(pageCode)?.questionsList
+                                val itemDataList = questionsFrameworkList[frameworkIndex].questionDataItemList
+                                var checklistExcelTable = "\n" + "[H4] " + questionsFrameworkList[frameworkIndex].questionsFrameworkTitle + " Excel Checklist\n\n"
+                                checklistExcelTable += "Checklist Questions" + "$" + "DataField1" + "$" + "DataField2" + "$" + "DataField3" + "$" + "Button Choice\n"
+                                if (itemQuestionsList != null) {
+                                    if (itemQuestionsList.isNotEmpty()) {
+                                        for (questionsListIndex in 0 until itemQuestionsList.size) {
+                                            checklistExcelTable = checklistExcelTable + itemQuestionsList[questionsListIndex].question + "$"
+                                            checklistExcelTable = if (questionsListIndex < itemDataList.size) {
                                                 checklistExcelTable + itemDataList[questionsListIndex].data1Value + "$" + itemDataList[questionsListIndex].data2Value + "$" + itemDataList[questionsListIndex].data3Value + "$" + itemDataList[questionsListIndex].buttonOptionChosen + "\n"
-                                        } else {
-                                            checklistExcelTable =
+                                            } else {
                                                 checklistExcelTable + "$" + "$" + "$" + "\n"
+                                            }
                                         }
                                     }
                                 }
-                            } else {
-                                checklistExcelTable =
-                                    checklistExcelTable + questionsFrameworkList[frameworkIndex].questionsFrameworkTitle + "$" + "$" + "$" + "$" + "\n"
+                                checklistExcelTable += "}\n\n"
+                                checklistExcelTableListString += checklistExcelTable
                             }
                         }
                     }
                 }
             }
-            checklistExcelTable = checklistExcelTable + "}"
         }
 
-        return checklistExcelTable
+        if (missingPageCodesInSectionPageDataList.isNotEmpty()){
+            for (pageCode in missingPageCodesInSectionPageDataList){
+                if (isItemPresentInPageTemplateMLMLD(pageCode)) {
+                    val itemQuestionsList = getItemFromPageTemplateMLMLD(pageCode)?.questionsList
+                    var checklistExcelTable = "\n" + "[H4] " + extractDisplayNameFromPageCode(pageCode) + " Excel Checklist\n"
+                    checklistExcelTable += "Checklist Questions" + "$" + "DataField1" + "$" + "DataField2" + "$" + "DataField3" + "$" + "Button Choice\n"
+                    if (itemQuestionsList != null) {
+                        if (itemQuestionsList.isNotEmpty()) {
+                            for (questionsListIndex in 0 until itemQuestionsList.size) {
+                                checklistExcelTable = checklistExcelTable + itemQuestionsList[questionsListIndex].question + "$" + "$" + "$" + "$ \n"
+                            }
+                        }
+                    }
+                    checklistExcelTable += "}\n\n"
+                    checklistExcelTableListString += checklistExcelTable
+                }
+            }
+        }
+
+        return checklistExcelTableListString
     }
 
 
@@ -5280,12 +5377,19 @@ class AInfo5ViewModel(
             var sectionReportIndex = 0
             val sectionReportNew = SectionReportDC()
             if (companyReport.sectionReportList.isNotEmpty()) {
-                for (index in 0 until companyReport.sectionReportList.size) {
-                    if (companyReport.sectionReportList[index].sectionCode == sectionCode) {
-                        sectionReportPresentFlag = true
-                        sectionReportIndex = index
-                        break
-                    }
+                sectionReportIndex = companyReport.sectionReportList.indexOfFirst { it.sectionCode == sectionCode }
+                sectionReportPresentFlag = sectionReportIndex >= 0
+//                for (index in 0 until companyReport.sectionReportList.size) {
+//                    if (companyReport.sectionReportList[index].sectionCode == sectionCode) {
+//                        sectionReportPresentFlag = true
+//                        sectionReportIndex = index
+//                        break
+//                    }
+//                }
+                if (!sectionReportPresentFlag){
+                    sectionReportNew.sectionCode = sectionCode
+                    sectionReportNew.sectionName = sectionName
+                    sectionReportNew.sectionIntroduction = sectionIntroduction
                 }
             }
             else {
@@ -5308,6 +5412,7 @@ class AInfo5ViewModel(
                 else {
                     companyReport.sectionReportList.add(sectionReportNew)
                 }
+                reorderSectionReportsInCompanyReport()
                 //Save the companyReport to DB
                 val companyReportID = getPresentCompanyCode() + MainActivity.COMPANY_REPORT_ID
                 val companyReportString = companyReportToString(companyReport)
@@ -5318,7 +5423,7 @@ class AInfo5ViewModel(
         }
     }
 
-    fun sectionReportToML(input: SectionReportDC): MutableList<String> {
+    private fun sectionReportToML(input: SectionReportDC): MutableList<String> {
         val result = mutableListOf<String>()
         result.add(input.sectionCode)
         result.add(input.sectionName)
@@ -5334,7 +5439,7 @@ class AInfo5ViewModel(
         return result
     }
 
-    fun sectionReportToString(sectionReport: SectionReportDC): String {
+    private fun sectionReportToString(sectionReport: SectionReportDC): String {
         var result = ""
         val resultML = sectionReportToML(sectionReport)
         result = mlToStringUsingDelimiter1(resultML)
@@ -5546,7 +5651,7 @@ class AInfo5ViewModel(
         return sectionReport
     }
 
-    fun sectionReportListToString(sectionReportList: MutableList<SectionReportDC>): String {
+    private fun sectionReportListToString(sectionReportList: MutableList<SectionReportDC>): String {
         var result = ""
         val resultML = mutableListOf<String>()
         if (sectionReportList.isNotEmpty()) {
@@ -5559,7 +5664,7 @@ class AInfo5ViewModel(
         return result
     }
 
-    fun stringToSectionReportList(input: String): MutableList<SectionReportDC> {
+    private fun stringToSectionReportList(input: String): MutableList<SectionReportDC> {
         val sectionReportList = mutableListOf<SectionReportDC>()
         if (input != "") {
             val inputML = stringToMLUsingDelimiter2(input)
@@ -5572,7 +5677,7 @@ class AInfo5ViewModel(
         return sectionReportList
     }
 
-    fun companyIntroReportToML(input: CompanyIntroReportDC): MutableList<String> {
+    private fun companyIntroReportToML(input: CompanyIntroReportDC): MutableList<String> {
         val result = mutableListOf<String>()
         result.add(input.companyCode)
         result.add(input.companyName)
@@ -5588,7 +5693,7 @@ class AInfo5ViewModel(
         return result
     }
 
-    fun stringToCompanyIntroReport(input: String): CompanyIntroReportDC {
+    private fun stringToCompanyIntroReport(input: String): CompanyIntroReportDC {
         val companyIntroReport = CompanyIntroReportDC()
         if (input != "") {
             if (input.contains(delimiterLevel1)) {
@@ -5646,7 +5751,7 @@ class AInfo5ViewModel(
         return companyIntroReport
     }
 
-    fun companyReportToML(input: CompanyReportDC): MutableList<String> {
+    private fun companyReportToML(input: CompanyReportDC): MutableList<String> {
         val result = mutableListOf<String>()
         result.add(input.companyCode)
         result.add(input.companyName)
@@ -5722,7 +5827,7 @@ class AInfo5ViewModel(
     }
 
     //This flag indicates if the companyReport has been uploaded or not
-    var companyReportUploadedFlag = false
+    private var companyReportUploadedFlag = false
     fun setTheCompanyReportUploadedFlag(input: Boolean) {
         companyReportUploadedFlag = input
     }
@@ -5731,8 +5836,8 @@ class AInfo5ViewModel(
         return companyReportUploadedFlag
     }
 
-    var companyIntroReportUploadedFlag = false
-    fun setTheCompanyIntroReportUploadedFlag(input: Boolean) {
+    private var companyIntroReportUploadedFlag = false
+    private fun setTheCompanyIntroReportUploadedFlag(input: Boolean) {
         companyIntroReportUploadedFlag = input
     }
 
@@ -5791,7 +5896,7 @@ class AInfo5ViewModel(
     }
 
 
-    fun generateThreeColumnWordReport() {
+    private fun generateThreeColumnWordReport() {
         var threeColumnReport = ""
         val companyReport = getTheCompanyReport()
         threeColumnReport =
@@ -5801,12 +5906,14 @@ class AInfo5ViewModel(
                             "\n",
                             ";"
                         )
-                    };;^12;[H2] Observations and Recommendations;;"
+                    }\n\n ;;^12;[H2] Observations and Recommendations;;\n\n"
         if (companyReport.sectionReportList.isNotEmpty()) {
             for (page in 0 until companyReport.sectionReportList.size) {
                 val sectionPage = companyReport.sectionReportList[page]
-                threeColumnReport =
-                    threeColumnReport + "[H3] ${sectionPage.sectionName};${sectionPage.sectionIntroduction};${sectionPage.threeColumnTableWord};;;;"
+                threeColumnReport += "[H3] ${sectionPage.sectionName};${sectionPage.sectionIntroduction};\n \n ${sectionPage.threeColumnTableWord};;;;\n\n"
+                if (sectionPage.sectionName != ""){
+
+                }
             }
         }
         val fileNameWithoutExtension = getPresentCompanyName() + "_Word"
@@ -5831,7 +5938,7 @@ class AInfo5ViewModel(
 
     }
 
-    fun generateThreeColumnExcelReport() {
+    private fun generateThreeColumnExcelReport() {
         var threeColumnReport = ""
         val companyReport = getTheCompanyReport()
         threeColumnReport =
@@ -5845,8 +5952,10 @@ class AInfo5ViewModel(
         if (companyReport.sectionReportList.isNotEmpty()) {
             for (page in 0 until companyReport.sectionReportList.size) {
                 val sectionPage = companyReport.sectionReportList[page]
-                threeColumnReport =
-                    threeColumnReport + "[H3] ${sectionPage.sectionName};${sectionPage.sectionIntroduction};${sectionPage.threeColumnTableExcel};;;;"
+                if (sectionPage.sectionName != ""){
+                    threeColumnReport += "[H3] ${sectionPage.sectionName};${sectionPage.sectionIntroduction};${sectionPage.threeColumnTableExcel};;;;"
+                }
+
             }
         }
         val fileNameWithoutExtension = getPresentCompanyName() + "_Excel"
@@ -5879,12 +5988,14 @@ class AInfo5ViewModel(
                             "\n",
                             ";"
                         )
-                    };;^12;[H2] Observations and Recommendations;;"
+                    }\n\n;;^12;[H2] Observations and Recommendations;;\n\n"
         if (companyReport.sectionReportList.isNotEmpty()) {
             for (page in 0 until companyReport.sectionReportList.size) {
                 val sectionPage = companyReport.sectionReportList[page]
-                sixColumnReport =
-                    sixColumnReport + "[H3] ${sectionPage.sectionName};${sectionPage.sectionIntroduction};${sectionPage.sixColumnTableWord};;;;"
+                sixColumnReport += "[H3] ${sectionPage.sectionName};${sectionPage.sectionIntroduction};\n\n ${sectionPage.sixColumnTableWord};;;;\n\n"
+                if (sectionPage.sectionName != ""){
+
+                }
             }
         }
         val fileNameWithoutExtension = getPresentCompanyName() + "_Word"
@@ -5907,7 +6018,7 @@ class AInfo5ViewModel(
         }
     }
 
-    fun generateSixColumnExcelReport() {
+    private fun generateSixColumnExcelReport() {
         var sixColumnReport = ""
         val companyReport = getTheCompanyReport()
         sixColumnReport =
@@ -5921,8 +6032,9 @@ class AInfo5ViewModel(
         if (companyReport.sectionReportList.isNotEmpty()) {
             for (page in 0 until companyReport.sectionReportList.size) {
                 val sectionPage = companyReport.sectionReportList[page]
-                sixColumnReport =
-                    sixColumnReport + "[H3] ${sectionPage.sectionName};${sectionPage.sectionIntroduction};${sectionPage.sixColumnTableExcel};;;;"
+                if (sectionPage.sectionName != ""){
+                    sixColumnReport += "[H3] ${sectionPage.sectionName};${sectionPage.sectionIntroduction};${sectionPage.sixColumnTableExcel};;;;"
+                }
             }
         }
         val fileNameWithoutExtension = getPresentCompanyName() + "_Excel"
@@ -5945,7 +6057,7 @@ class AInfo5ViewModel(
         }
     }
 
-    fun generateChecklistWordReport() {
+    private fun generateChecklistWordReport() {
         var checkListWordReport = ""
         val companyReport = getTheCompanyReport()
         checkListWordReport =
@@ -5959,8 +6071,9 @@ class AInfo5ViewModel(
         if (companyReport.sectionReportList.isNotEmpty()) {
             for (page in 0 until companyReport.sectionReportList.size) {
                 val sectionPage = companyReport.sectionReportList[page]
-                checkListWordReport =
-                    checkListWordReport + "[H3] ${sectionPage.sectionName};${sectionPage.sectionIntroduction};${sectionPage.checkListTableWord};;;;"
+                if (sectionPage.sectionName != ""){
+                    checkListWordReport += "[H3] ${sectionPage.sectionName};${sectionPage.sectionIntroduction};${sectionPage.checkListTableWord};;;;"
+                }
             }
         }
         val fileNameWithoutExtension = getPresentCompanyName() + "_Word"
@@ -5983,7 +6096,7 @@ class AInfo5ViewModel(
         }
     }
 
-    fun generateChecklistExcelReport() {
+    private fun generateChecklistExcelReport() {
         var checkListExcelReport = ""
         val companyReport = getTheCompanyReport()
         checkListExcelReport =
@@ -5997,8 +6110,9 @@ class AInfo5ViewModel(
         if (companyReport.sectionReportList.isNotEmpty()) {
             for (page in 0 until companyReport.sectionReportList.size) {
                 val sectionPage = companyReport.sectionReportList[page]
-                checkListExcelReport =
-                    checkListExcelReport + "[H3] ${sectionPage.sectionName};${sectionPage.sectionIntroduction};${sectionPage.checkListTableExcel};;;;"
+                if (sectionPage.sectionName != ""){
+                    checkListExcelReport += "[H3] ${sectionPage.sectionName};${sectionPage.sectionIntroduction};${sectionPage.checkListTableExcel};;;;"
+                }
             }
         }
         val fileNameWithoutExtension = getPresentCompanyName() + "_Excel"
@@ -6064,17 +6178,17 @@ class AInfo5ViewModel(
 
     fun makePresentPhotoName(location: String, count: Int, sectionName1: String = ""): String {
         var presentPhotoName = ""
-        if (location.contains(getPresentCompanyCode()) == true) {
+        if (location.contains(getPresentCompanyCode())) {
             presentPhotoName = MainActivity.COMPANY_INTRODUCTION + "_" + count.toString()
-        } else if (location.contains(getPresentSectionCode()) == true) {
+        } else if (location.contains(getPresentSectionCode())) {
 
             var sectionName = sectionName1
             if (sectionName == "") {
                 val list = location.split("_")
-                if (list.size > 1) {
-                    sectionName = list[1]
+                sectionName = if (list.size > 1) {
+                    list[1]
                 } else {
-                    sectionName = location
+                    location
                 }
             }
 
@@ -6090,21 +6204,21 @@ class AInfo5ViewModel(
     }
 
     //The below function changes the photo name to photoName_M. M stands for Modified
-    fun modifyPhotoName(selectedPhotoName: String): String {
+    private fun modifyPhotoName(selectedPhotoName: String): String {
         var result = ""
-        if (selectedPhotoName != "") {
+        result = if (selectedPhotoName != "") {
             if (selectedPhotoName.contains(".jpg")) {
                 if (selectedPhotoName.contains("_M.jpg")) {
-                    result = selectedPhotoName
+                    selectedPhotoName
                 } else {
-                    result = selectedPhotoName.replace(".jpg", "_M.jpg")
+                    selectedPhotoName.replace(".jpg", "_M.jpg")
                 }
 
             } else {
-                result = selectedPhotoName + "_M.jpg"
+                selectedPhotoName + "_M.jpg"
             }
         } else {
-            result = "Default.jpg"
+            "Default.jpg"
         }
         return result
     }
@@ -6136,15 +6250,15 @@ class AInfo5ViewModel(
 
     //This variable stores all the details of the company photos
     private var companyPhotosList: MutableList<PhotoDetailsDC> = mutableListOf()
-    fun setTheCompanyPhotosList(input: MutableList<PhotoDetailsDC>) {
+    private fun setTheCompanyPhotosList(input: MutableList<PhotoDetailsDC>) {
         companyPhotosList = input
     }
 
-    fun getTheCompanyPhotosList(): MutableList<PhotoDetailsDC> {
+    private fun getTheCompanyPhotosList(): MutableList<PhotoDetailsDC> {
         return companyPhotosList
     }
 
-    fun addPhotoToCompanyPhotosList(input: PhotoDetailsDC) {
+    private fun addPhotoToCompanyPhotosList(input: PhotoDetailsDC) {
         val companyPhotosList = getTheCompanyPhotosList()
         var isPhotoPresentInPhotosList = false
         for (photo in companyPhotosList) {
@@ -6156,12 +6270,12 @@ class AInfo5ViewModel(
                 break
             }
         }
-        if (isPhotoPresentInPhotosList == false) {
+        if (!isPhotoPresentInPhotosList) {
             getTheCompanyPhotosList().add(input)
         }
     }
 
-    fun addAndUpdateInPhotosList() {
+    private fun addAndUpdateInPhotosList() {
         val selectedPhoto = getSelectedPhotoItemDC()
         val modifiedPhoto = getModifiedPhotoItemDC()
         val photosList = getTheCompanyPhotosList()
@@ -6176,7 +6290,7 @@ class AInfo5ViewModel(
                 break
             }
         }
-        if (isModifiedPhotoPresent == false) {
+        if (!isModifiedPhotoPresent) {
             for (photo in photosList) {
                 if (photo.fullPhotoName == selectedPhoto.fullPhotoName) {
                     selectedPhotoIndex = photosList.indexOf(photo)
@@ -6191,7 +6305,7 @@ class AInfo5ViewModel(
         }
     }
 
-    fun deleteSectionPhotosInCompanyPhotosListAndSaveToDb(sectionCode: String) {
+    private fun deleteSectionPhotosInCompanyPhotosListAndSaveToDb(sectionCode: String) {
         viewModelScope.launch(Dispatchers.Default) {
             val newCompanyPhotosList = mutableListOf<PhotoDetailsDC>()
             for (item in companyPhotosList) {
@@ -6203,7 +6317,7 @@ class AInfo5ViewModel(
         }
     }
 
-    fun photoDetailsToML(photoDetails: PhotoDetailsDC): MutableList<String> {
+    private fun photoDetailsToML(photoDetails: PhotoDetailsDC): MutableList<String> {
         val result = mutableListOf<String>()
         result.add(photoDetails.location)
         result.add(photoDetails.fullPhotoName)
@@ -6213,14 +6327,14 @@ class AInfo5ViewModel(
     }
 
     //DelimiterLevel1 is used here
-    fun photoDetailsToString(photoDetails: PhotoDetailsDC): String {
+    private fun photoDetailsToString(photoDetails: PhotoDetailsDC): String {
         var result = ""
         val resultML = photoDetailsToML(photoDetails)
         result = mlToStringUsingDelimiter1(resultML)
         return result
     }
 
-    fun stringToPhotoDetails(input: String): PhotoDetailsDC {
+    private fun stringToPhotoDetails(input: String): PhotoDetailsDC {
         val photoDetails = PhotoDetailsDC()
         if (input != "") {
             if (input.contains(delimiterLevel1)) {
@@ -6281,7 +6395,7 @@ class AInfo5ViewModel(
     }
 
     //DelimiterLevel2 is used here
-    fun photoDetailsListToString(photoDetailsList: MutableList<PhotoDetailsDC>): String {
+    private fun photoDetailsListToString(photoDetailsList: MutableList<PhotoDetailsDC>): String {
         var result = ""
         val resultML = mutableListOf<String>()
         if (photoDetailsList.isNotEmpty()) {
@@ -6324,7 +6438,7 @@ class AInfo5ViewModel(
         }
     }
 
-    fun saveCompanyPhotoDetailsListToDB() {
+    private fun saveCompanyPhotoDetailsListToDB() {
         viewModelScope.launch(Dispatchers.IO) {
             val photoDetailsListID = getPresentCompanyCode() + MainActivity.PHOTOS_LIST_ID
             val photoDetailsListString = photoDetailsListToString(getTheCompanyPhotosList())
@@ -6397,11 +6511,11 @@ class AInfo5ViewModel(
     }
 
     private var oldModifiedPhotoItemCaption = ""
-    fun setOldModifiedPhotoCaption(input: String) {
+    private fun setOldModifiedPhotoCaption(input: String) {
         oldModifiedPhotoItemCaption = input
     }
 
-    fun getOldModifiedPhotoCaption(): String {
+    private fun getOldModifiedPhotoCaption(): String {
         return oldModifiedPhotoItemCaption
     }
 
@@ -6449,7 +6563,7 @@ class AInfo5ViewModel(
             if (originalFullPhotoName != "") {
                 if (originalPhotoDC.fullPhotoName != "") {
                     val originalPhotoComputerPath = "\\Picture\\" + originalPhotoDC.fullPhotoName
-                    val modifiedPhotoComputerPath = "\\Picture\\" + modifiedFullPhotoName
+                    val modifiedPhotoComputerPath = "\\Picture\\$modifiedFullPhotoName"
                     if (tvPhotoPathsInIntroductionsFragmentMLD.value?.contains(
                             originalPhotoComputerPath
                         ) == false
@@ -6465,7 +6579,7 @@ class AInfo5ViewModel(
                         }
                     } else {
                         if (tvPhotoPathsInIntroductionsFragmentMLD.value?.contains(
-                                originalPhotoComputerPath + ";" + modifiedPhotoComputerPath
+                                "$originalPhotoComputerPath;$modifiedPhotoComputerPath"
                             ) == false
                         ) {
                             setModifiedPhotoNamePresentFlag(false)
@@ -6480,7 +6594,7 @@ class AInfo5ViewModel(
                                 tvPhotoPathsInIntroductionsFragmentMLD.value =
                                     tvPhotoPathsInIntroductionsFragmentMLD.value!!.replace(
                                         originalPhotoComputerPath,
-                                        originalPhotoComputerPath + ";" + modifiedPhotoComputerPath
+                                        "$originalPhotoComputerPath;$modifiedPhotoComputerPath"
                                     )
                             }
                         } else {
@@ -6513,7 +6627,7 @@ class AInfo5ViewModel(
             if (originalFullPhotoName != "") {
                 if (originalPhotoDC.fullPhotoName != "") {
                     val originalPhotoComputerPath = "\\Picture\\" + originalPhotoDC.fullPhotoName
-                    val modifiedPhotoComputerPath = "\\Picture\\" + modifiedFullPhotoName
+                    val modifiedPhotoComputerPath = "\\Picture\\$modifiedFullPhotoName"
                     if (tvPhotoPathsInIntroductionsFragmentMLD.value?.contains(
                             originalPhotoComputerPath
                         ) == false
@@ -6529,7 +6643,7 @@ class AInfo5ViewModel(
                         }
                     } else {
                         if (tvPhotoPathsInIntroductionsFragmentMLD.value?.contains(
-                                originalPhotoComputerPath + ";" + modifiedPhotoComputerPath
+                                "$originalPhotoComputerPath;$modifiedPhotoComputerPath"
                             ) == false
                         ) {
                             setModifiedPhotoNamePresentFlag(false)
@@ -6544,7 +6658,7 @@ class AInfo5ViewModel(
                                 tvPhotoPathsInIntroductionsFragmentMLD.value =
                                     tvPhotoPathsInIntroductionsFragmentMLD.value!!.replace(
                                         originalPhotoComputerPath,
-                                        originalPhotoComputerPath + ";" + modifiedPhotoComputerPath
+                                        "$originalPhotoComputerPath;$modifiedPhotoComputerPath"
                                     )
                             }
                         } else {
@@ -6586,7 +6700,7 @@ class AInfo5ViewModel(
             if (originalFullPhotoName != "") {
                 if (originalPhotoDC.fullPhotoName != "") {
                     val originalPhotoComputerPath = "\\Picture\\" + originalPhotoDC.fullPhotoName
-                    val modifiedPhotoComputerPath = "\\Picture\\" + modifiedFullPhotoName
+                    val modifiedPhotoComputerPath = "\\Picture\\$modifiedFullPhotoName"
                     var otherPageIndex = 0
                     var otherPageContainsOriginalComputerPath = false
                     if (tvPhotoPathsInObservationsFragmentMLD.value?.contains(
@@ -6610,7 +6724,7 @@ class AInfo5ViewModel(
                                 tvPhotoPathsInObservationsFragmentMLD.value =
                                     tvPhotoPathsInObservationsFragmentMLD.value!!.replace(
                                         originalPhotoComputerPath,
-                                        originalPhotoComputerPath + ";" + modifiedPhotoComputerPath
+                                        "$originalPhotoComputerPath;$modifiedPhotoComputerPath"
                                     )
                             }
                         } else {
@@ -6637,14 +6751,14 @@ class AInfo5ViewModel(
                         for (index in 0 until sectionPageDataList.size) {
                             if (sectionPageDataList[index].photoPaths.contains(
                                     originalPhotoComputerPath
-                                ) == true
+                                )
                             ) {
                                 otherPageContainsOriginalComputerPath = true
                                 otherPageIndex = index
                                 break
                             }
                         }
-                        if (otherPageContainsOriginalComputerPath == true) {
+                        if (otherPageContainsOriginalComputerPath) {
                             var tvPhotoPathsInObs = sectionPageDataList[otherPageIndex].photoPaths
                             if (!tvPhotoPathsInObs.contains("$originalPhotoComputerPath;$modifiedPhotoComputerPath")) {
                                 setModifiedPhotoNamePresentFlag(false)
@@ -6663,7 +6777,7 @@ class AInfo5ViewModel(
                                     tvPhotoPathsInObs =
                                         tvPhotoPathsInObs.replace(
                                             originalPhotoComputerPath,
-                                            originalPhotoComputerPath + ";" + modifiedPhotoComputerPath
+                                            "$originalPhotoComputerPath;$modifiedPhotoComputerPath"
                                         )
                                     updatePicturePathsInObsForThePresentSectionAllData(
                                         tvPhotoPathsInObs,
@@ -6736,40 +6850,38 @@ class AInfo5ViewModel(
     }
 
     fun saveCaption(caption: String, modifiedPhoto: PhotoDetailsDC): PhotoDetailsDC {
-        val modifiedPhotoItem = modifiedPhoto
         if (caption != "") {
-            if (caption.contains("[CC]") == false) {
-                modifiedPhotoItem.photoCaption = "[CC]" + caption
+            if (!caption.contains("[CC]")) {
+                modifiedPhoto.photoCaption = "[CC]$caption"
             } else {
-                modifiedPhotoItem.photoCaption = caption
+                modifiedPhoto.photoCaption = caption
             }
         } else {
-            modifiedPhotoItem.photoCaption = caption
+            modifiedPhoto.photoCaption = caption
         }
-        return modifiedPhotoItem
+        return modifiedPhoto
     }
 
     fun insertNewCaption(modifiedPhotoDC: PhotoDetailsDC) {
-        val modifiedPhotosDCItem = modifiedPhotoDC
         val oldModifiedPhotoCaption = getOldModifiedPhotoCaption()
         if (getTheWhichIntroductionsOrObservationsToBeUploadedVariable() == MainActivity.COMPANY_INTRODUCTION) {
-            val modifiedPhotoComputerPath = "\\Picture\\" + modifiedPhotosDCItem.fullPhotoName
-            if (modifiedPhotosDCItem.photoCaption.trim() != oldModifiedPhotoCaption.trim()) {
+            val modifiedPhotoComputerPath = "\\Picture\\" + modifiedPhotoDC.fullPhotoName
+            if (modifiedPhotoDC.photoCaption.trim() != oldModifiedPhotoCaption.trim()) {
                 if (oldModifiedPhotoCaption.trim() != "") {
                     if (tvPhotoPathsInIntroductionsFragmentMLD.value?.contains(
-                            modifiedPhotoComputerPath + ";" + oldModifiedPhotoCaption
+                            "$modifiedPhotoComputerPath;$oldModifiedPhotoCaption"
                         ) == true
                     ) {
-                        if (modifiedPhotosDCItem.photoCaption.trim() != "") {
+                        if (modifiedPhotoDC.photoCaption.trim() != "") {
                             tvPhotoPathsInIntroductionsFragmentMLD.value =
                                 tvPhotoPathsInIntroductionsFragmentMLD.value!!.replace(
-                                    modifiedPhotoComputerPath + ";" + oldModifiedPhotoCaption,
-                                    modifiedPhotoComputerPath + ";" + modifiedPhotosDCItem.photoCaption
+                                    "$modifiedPhotoComputerPath;$oldModifiedPhotoCaption",
+                                    modifiedPhotoComputerPath + ";" + modifiedPhotoDC.photoCaption
                                 )
                         } else {
                             tvPhotoPathsInIntroductionsFragmentMLD.value =
                                 tvPhotoPathsInIntroductionsFragmentMLD.value!!.replace(
-                                    modifiedPhotoComputerPath + ";" + oldModifiedPhotoCaption,
+                                    "$modifiedPhotoComputerPath;$oldModifiedPhotoCaption",
                                     modifiedPhotoComputerPath
                                 )
                         }
@@ -6777,14 +6889,14 @@ class AInfo5ViewModel(
                         tvPhotoPathsInIntroductionsFragmentMLD.value =
                             tvPhotoPathsInIntroductionsFragmentMLD.value!!.replace(
                                 modifiedPhotoComputerPath,
-                                modifiedPhotoComputerPath + ";" + modifiedPhotosDCItem.photoCaption
+                                modifiedPhotoComputerPath + ";" + modifiedPhotoDC.photoCaption
                             )
                     }
                 } else {
                     tvPhotoPathsInIntroductionsFragmentMLD.value =
                         tvPhotoPathsInIntroductionsFragmentMLD.value!!.replace(
                             modifiedPhotoComputerPath,
-                            modifiedPhotoComputerPath + ";" + modifiedPhotosDCItem.photoCaption
+                            modifiedPhotoComputerPath + ";" + modifiedPhotoDC.photoCaption
                         )
                 }
                 updateTheIntroInTheCompanyIntroData(etIntroductionsMLD.value.toString())
@@ -6793,23 +6905,23 @@ class AInfo5ViewModel(
             }
 
         } else if (getTheWhichIntroductionsOrObservationsToBeUploadedVariable() == MainActivity.SECTION_INTRODUCTION) {
-            val modifiedPhotoComputerPath = "\\Picture\\" + modifiedPhotosDCItem.fullPhotoName
-            if (modifiedPhotosDCItem.photoCaption.trim() != oldModifiedPhotoCaption.trim()) {
+            val modifiedPhotoComputerPath = "\\Picture\\" + modifiedPhotoDC.fullPhotoName
+            if (modifiedPhotoDC.photoCaption.trim() != oldModifiedPhotoCaption.trim()) {
                 if (oldModifiedPhotoCaption.trim() != "") {
                     if (tvPhotoPathsInIntroductionsFragmentMLD.value?.contains(
-                            modifiedPhotoComputerPath + ";" + oldModifiedPhotoCaption
+                            "$modifiedPhotoComputerPath;$oldModifiedPhotoCaption"
                         ) == true
                     ) {
-                        if (modifiedPhotosDCItem.photoCaption.trim() != "") {
+                        if (modifiedPhotoDC.photoCaption.trim() != "") {
                             tvPhotoPathsInIntroductionsFragmentMLD.value =
                                 tvPhotoPathsInIntroductionsFragmentMLD.value!!.replace(
-                                    modifiedPhotoComputerPath + ";" + oldModifiedPhotoCaption,
-                                    modifiedPhotoComputerPath + ";" + modifiedPhotosDCItem.photoCaption
+                                    "$modifiedPhotoComputerPath;$oldModifiedPhotoCaption",
+                                    modifiedPhotoComputerPath + ";" + modifiedPhotoDC.photoCaption
                                 )
                         } else {
                             tvPhotoPathsInIntroductionsFragmentMLD.value =
                                 tvPhotoPathsInIntroductionsFragmentMLD.value!!.replace(
-                                    modifiedPhotoComputerPath + ";" + oldModifiedPhotoCaption,
+                                    "$modifiedPhotoComputerPath;$oldModifiedPhotoCaption",
                                     modifiedPhotoComputerPath
                                 )
                         }
@@ -6817,14 +6929,14 @@ class AInfo5ViewModel(
                         tvPhotoPathsInIntroductionsFragmentMLD.value =
                             tvPhotoPathsInIntroductionsFragmentMLD.value!!.replace(
                                 modifiedPhotoComputerPath,
-                                modifiedPhotoComputerPath + ";" + modifiedPhotosDCItem.photoCaption
+                                modifiedPhotoComputerPath + ";" + modifiedPhotoDC.photoCaption
                             )
                     }
                 } else {
                     tvPhotoPathsInIntroductionsFragmentMLD.value =
                         tvPhotoPathsInIntroductionsFragmentMLD.value!!.replace(
                             modifiedPhotoComputerPath,
-                            modifiedPhotoComputerPath + ";" + modifiedPhotosDCItem.photoCaption
+                            modifiedPhotoComputerPath + ";" + modifiedPhotoDC.photoCaption
                         )
                 }
                 val sectionPagesFrameworkAndDataID =
@@ -6841,25 +6953,25 @@ class AInfo5ViewModel(
             }
 
         } else if (getTheWhichIntroductionsOrObservationsToBeUploadedVariable() == MainActivity.SECTION_OBSERVATIONS) {
-            val modifiedPhotoComputerPath = "\\Picture\\" + modifiedPhotosDCItem.fullPhotoName
+            val modifiedPhotoComputerPath = "\\Picture\\" + modifiedPhotoDC.fullPhotoName
             var otherPageIndex = 0
             var otherPageContainsOriginalComputerPath = false
-            if (modifiedPhotosDCItem.photoCaption.trim() != oldModifiedPhotoCaption.trim()) {
+            if (modifiedPhotoDC.photoCaption.trim() != oldModifiedPhotoCaption.trim()) {
                 if (oldModifiedPhotoCaption.trim() != "") {
                     if (tvPhotoPathsInObservationsFragmentMLD.value?.contains(
-                            modifiedPhotoComputerPath + ";" + oldModifiedPhotoCaption
+                            "$modifiedPhotoComputerPath;$oldModifiedPhotoCaption"
                         ) == true
                     ) {
-                        if (modifiedPhotosDCItem.photoCaption.trim() != "") {
+                        if (modifiedPhotoDC.photoCaption.trim() != "") {
                             tvPhotoPathsInObservationsFragmentMLD.value =
                                 tvPhotoPathsInObservationsFragmentMLD.value!!.replace(
-                                    modifiedPhotoComputerPath + ";" + oldModifiedPhotoCaption,
-                                    modifiedPhotoComputerPath + ";" + modifiedPhotosDCItem.photoCaption
+                                    "$modifiedPhotoComputerPath;$oldModifiedPhotoCaption",
+                                    modifiedPhotoComputerPath + ";" + modifiedPhotoDC.photoCaption
                                 )
                         } else {
                             tvPhotoPathsInObservationsFragmentMLD.value =
                                 tvPhotoPathsInObservationsFragmentMLD.value!!.replace(
-                                    modifiedPhotoComputerPath + ";" + oldModifiedPhotoCaption,
+                                    "$modifiedPhotoComputerPath;$oldModifiedPhotoCaption",
                                     modifiedPhotoComputerPath
                                 )
                         }
@@ -6868,21 +6980,21 @@ class AInfo5ViewModel(
                             presentSectionAllData.sectionAllPagesData.sectionPageDataList
                         for (index in 0 until sectionPageDataList.size) {
                             if (sectionPageDataList[index].photoPaths.contains(
-                                    modifiedPhotoComputerPath + ";" + oldModifiedPhotoCaption
-                                ) == true
+                                    "$modifiedPhotoComputerPath;$oldModifiedPhotoCaption"
+                                )
                             ) {
                                 otherPageContainsOriginalComputerPath = true
                                 otherPageIndex = index
                                 break
                             }
                         }
-                        if (otherPageContainsOriginalComputerPath == true) {
+                        if (otherPageContainsOriginalComputerPath) {
                             var tvPhotoPathsInObs = sectionPageDataList[otherPageIndex].photoPaths
-                            if (modifiedPhotosDCItem.photoCaption.trim() != "") {
+                            if (modifiedPhotoDC.photoCaption.trim() != "") {
                                 tvPhotoPathsInObs =
                                     tvPhotoPathsInObs.replace(
-                                        modifiedPhotoComputerPath + ";" + oldModifiedPhotoCaption,
-                                        modifiedPhotoComputerPath + ";" + modifiedPhotosDCItem.photoCaption
+                                        "$modifiedPhotoComputerPath;$oldModifiedPhotoCaption",
+                                        modifiedPhotoComputerPath + ";" + modifiedPhotoDC.photoCaption
                                     )
                                 updatePicturePathsInObsForThePresentSectionAllData(
                                     tvPhotoPathsInObs,
@@ -6891,7 +7003,7 @@ class AInfo5ViewModel(
                             } else {
                                 tvPhotoPathsInObs =
                                     tvPhotoPathsInObs.replace(
-                                        modifiedPhotoComputerPath + ";" + oldModifiedPhotoCaption,
+                                        "$modifiedPhotoComputerPath;$oldModifiedPhotoCaption",
                                         modifiedPhotoComputerPath
                                     )
                                 updatePicturePathsInObsForThePresentSectionAllData(
@@ -6903,7 +7015,7 @@ class AInfo5ViewModel(
                             tvPhotoPathsInObservationsFragmentMLD.value =
                                 tvPhotoPathsInObservationsFragmentMLD.value!!.replace(
                                     modifiedPhotoComputerPath,
-                                    modifiedPhotoComputerPath + ";" + modifiedPhotosDCItem.photoCaption
+                                    modifiedPhotoComputerPath + ";" + modifiedPhotoDC.photoCaption
                                 )
                         }
                     }
@@ -6915,7 +7027,7 @@ class AInfo5ViewModel(
                         tvPhotoPathsInObservationsFragmentMLD.value =
                             tvPhotoPathsInObservationsFragmentMLD.value!!.replace(
                                 modifiedPhotoComputerPath,
-                                modifiedPhotoComputerPath + ";" + modifiedPhotosDCItem.photoCaption
+                                modifiedPhotoComputerPath + ";" + modifiedPhotoDC.photoCaption
                             )
                     } else {
                         val sectionPageDataList =
@@ -6923,19 +7035,19 @@ class AInfo5ViewModel(
                         for (index in 0 until sectionPageDataList.size) {
                             if (sectionPageDataList[index].photoPaths.contains(
                                     modifiedPhotoComputerPath
-                                ) == true
+                                )
                             ) {
                                 otherPageContainsOriginalComputerPath = true
                                 otherPageIndex = index
                                 break
                             }
                         }
-                        if (otherPageContainsOriginalComputerPath == true) {
+                        if (otherPageContainsOriginalComputerPath) {
                             var tvPhotoPathsInObs = sectionPageDataList[otherPageIndex].photoPaths
                             tvPhotoPathsInObs =
                                 tvPhotoPathsInObs.replace(
                                     modifiedPhotoComputerPath,
-                                    modifiedPhotoComputerPath + ";" + modifiedPhotosDCItem.photoCaption
+                                    modifiedPhotoComputerPath + ";" + modifiedPhotoDC.photoCaption
                                 )
                             updatePicturePathsInObsForThePresentSectionAllData(
                                 tvPhotoPathsInObs,
@@ -6969,7 +7081,7 @@ class AInfo5ViewModel(
     //Flag is meant to check if the company photos have been uploaded
     //False means no. True means yes.
     private var companyPhotosUploadedFlag: Boolean = false
-    fun setTheCompanyPhotosUploadedFlag(input: Boolean) {
+    private fun setTheCompanyPhotosUploadedFlag(input: Boolean) {
         companyPhotosUploadedFlag = input
     }
 
@@ -6988,11 +7100,11 @@ class AInfo5ViewModel(
     }
 
     private var modifiedPhotoNamePresentFlag: Boolean = false
-    fun setModifiedPhotoNamePresentFlag(input: Boolean) {
+    private fun setModifiedPhotoNamePresentFlag(input: Boolean) {
         modifiedPhotoNamePresentFlag = input
     }
 
-    fun getModifiedPhotoNamePresentFlag(): Boolean {
+    private fun retrieveTheModifiedPhotoNamePresentFlag(): Boolean {
         return modifiedPhotoNamePresentFlag
     }
 
@@ -7007,30 +7119,30 @@ class AInfo5ViewModel(
         modifiedPhotoDCItem.photoCaption = oldModifiedPhotoCaption
         setModifiedPhotoItemDC(modifiedPhotoDCItem)
         if (getTheWhichIntroductionsOrObservationsToBeUploadedVariable() == MainActivity.COMPANY_INTRODUCTION) {
-            val modifiedPhotoComputerPath = "\\Picture\\" + modifiedPhotoName
-            if (getModifiedPhotoNamePresentFlag() == false) {
+            val modifiedPhotoComputerPath = "\\Picture\\$modifiedPhotoName"
+            if (!retrieveTheModifiedPhotoNamePresentFlag()) {
                 if (tvPhotoPathsInIntroductionsFragmentMLD.value?.contains(modifiedPhotoComputerPath) == true) {
                     if (oldModifiedPhotoCaption.trim() != "") {
                         if (tvPhotoPathsInIntroductionsFragmentMLD.value?.contains(
-                                modifiedPhotoComputerPath + ";" + oldModifiedPhotoCaption
+                                "$modifiedPhotoComputerPath;$oldModifiedPhotoCaption"
                             ) == true
                         ) {
                             tvPhotoPathsInIntroductionsFragmentMLD.value =
                                 tvPhotoPathsInIntroductionsFragmentMLD.value!!.replace(
-                                    ";" + modifiedPhotoComputerPath + ";" + oldModifiedPhotoCaption,
+                                    ";$modifiedPhotoComputerPath;$oldModifiedPhotoCaption",
                                     ""
                                 )
                         } else {
                             tvPhotoPathsInIntroductionsFragmentMLD.value =
                                 tvPhotoPathsInIntroductionsFragmentMLD.value!!.replace(
-                                    ";" + modifiedPhotoComputerPath,
+                                    ";$modifiedPhotoComputerPath",
                                     ""
                                 )
                         }
                     } else {
                         tvPhotoPathsInIntroductionsFragmentMLD.value =
                             tvPhotoPathsInIntroductionsFragmentMLD.value!!.replace(
-                                ";" + modifiedPhotoComputerPath,
+                                ";$modifiedPhotoComputerPath",
                                 ""
                             )
                     }
@@ -7040,30 +7152,30 @@ class AInfo5ViewModel(
                 saveTheCompanyIntroDataIntoDB()
             }
         } else if (getTheWhichIntroductionsOrObservationsToBeUploadedVariable() == MainActivity.SECTION_INTRODUCTION) {
-            val modifiedPhotoComputerPath = "\\Picture\\" + modifiedPhotoName
-            if (getModifiedPhotoNamePresentFlag() == false) {
+            val modifiedPhotoComputerPath = "\\Picture\\$modifiedPhotoName"
+            if (!retrieveTheModifiedPhotoNamePresentFlag()) {
                 if (tvPhotoPathsInIntroductionsFragmentMLD.value?.contains(modifiedPhotoComputerPath) == true) {
                     if (oldModifiedPhotoCaption.trim() != "") {
                         if (tvPhotoPathsInIntroductionsFragmentMLD.value?.contains(
-                                modifiedPhotoComputerPath + ";" + oldModifiedPhotoCaption
+                                "$modifiedPhotoComputerPath;$oldModifiedPhotoCaption"
                             ) == true
                         ) {
                             tvPhotoPathsInIntroductionsFragmentMLD.value =
                                 tvPhotoPathsInIntroductionsFragmentMLD.value!!.replace(
-                                    ";" + modifiedPhotoComputerPath + ";" + oldModifiedPhotoCaption,
+                                    ";$modifiedPhotoComputerPath;$oldModifiedPhotoCaption",
                                     ""
                                 )
                         } else {
                             tvPhotoPathsInIntroductionsFragmentMLD.value =
                                 tvPhotoPathsInIntroductionsFragmentMLD.value!!.replace(
-                                    ";" + modifiedPhotoComputerPath,
+                                    ";$modifiedPhotoComputerPath",
                                     ""
                                 )
                         }
                     } else {
                         tvPhotoPathsInIntroductionsFragmentMLD.value =
                             tvPhotoPathsInIntroductionsFragmentMLD.value!!.replace(
-                                ";" + modifiedPhotoComputerPath,
+                                ";$modifiedPhotoComputerPath",
                                 ""
                             )
                     }
@@ -7081,30 +7193,30 @@ class AInfo5ViewModel(
                 )
             }
         } else if (getTheWhichIntroductionsOrObservationsToBeUploadedVariable() == MainActivity.SECTION_OBSERVATIONS) {
-            val modifiedPhotoComputerPath = "\\Picture\\" + modifiedPhotoName
-            if (getModifiedPhotoNamePresentFlag() == false) {
+            val modifiedPhotoComputerPath = "\\Picture\\$modifiedPhotoName"
+            if (!retrieveTheModifiedPhotoNamePresentFlag()) {
                 if (tvPhotoPathsInObservationsFragmentMLD.value?.contains(modifiedPhotoComputerPath) == true) {
                     if (oldModifiedPhotoCaption.trim() != "") {
                         if (tvPhotoPathsInObservationsFragmentMLD.value?.contains(
-                                modifiedPhotoComputerPath + ";" + oldModifiedPhotoCaption
+                                "$modifiedPhotoComputerPath;$oldModifiedPhotoCaption"
                             ) == true
                         ) {
                             tvPhotoPathsInObservationsFragmentMLD.value =
                                 tvPhotoPathsInObservationsFragmentMLD.value!!.replace(
-                                    ";" + modifiedPhotoComputerPath + ";" + oldModifiedPhotoCaption,
+                                    ";$modifiedPhotoComputerPath;$oldModifiedPhotoCaption",
                                     ""
                                 )
                         } else {
                             tvPhotoPathsInObservationsFragmentMLD.value =
                                 tvPhotoPathsInObservationsFragmentMLD.value!!.replace(
-                                    ";" + modifiedPhotoComputerPath,
+                                    ";$modifiedPhotoComputerPath",
                                     ""
                                 )
                         }
                     } else {
                         tvPhotoPathsInObservationsFragmentMLD.value =
                             tvPhotoPathsInObservationsFragmentMLD.value!!.replace(
-                                ";" + modifiedPhotoComputerPath,
+                                ";$modifiedPhotoComputerPath",
                                 ""
                             )
                     }
@@ -7138,11 +7250,11 @@ class AInfo5ViewModel(
                 val context = getApplication<Application>().applicationContext
                 val modifiedPhotoItemDC = getModifiedPhotoItemDC()
                 var modifiedPhotoFullName = ""
-                if (modifiedPhotoItemDC.fullPhotoName != "") {
-                    modifiedPhotoFullName = modifiedPhotoItemDC.fullPhotoName
+                modifiedPhotoFullName = if (modifiedPhotoItemDC.fullPhotoName != "") {
+                    modifiedPhotoItemDC.fullPhotoName
                 } else {
                     val photoName = getSelectedPhotoItemDC().fullPhotoName
-                    modifiedPhotoFullName = modifyPhotoName(photoName)
+                    modifyPhotoName(photoName)
                 }
                 if (modifiedPhotoItemDC.photoCaption == "") {
                     modifiedPhotoItemDC.photoCaption = etTextCaptionsMLD.value.toString()
@@ -7236,19 +7348,38 @@ class AInfo5ViewModel(
                             val stream = ByteArrayOutputStream()
                             val bitmap = photoUri?.let { uriToBitmap(it) }
                             if (bitmap != null) {
-                                val bitmapRotated = bitmap.let { rotateBitmap(it, 00.00) }
+                                val bitmapRotated = rotateBitmap(bitmap, 00.00)
                                 bitmapRotated?.compress(Bitmap.CompressFormat.JPEG, 100, stream)
                                 val bitmapdata: ByteArray = stream.toByteArray()
                                 alterDocument(file.uri, bitmapdata)
 
                                 //Delete the photo in the Pictures Folder
                                 //deleteAFileOrADirectory()
+                                try {
+                                    photoUri.let { uri ->
+                                        val rowsDeleted = context.contentResolver.delete(uri, null, null)
+                                        if (rowsDeleted == 0) {
+                                            Log.w("PhotoDelete", "No rows deleted, file might not exist or no permission")
+                                            // Optional: Implement a fallback or user notification if needed
+                                        } else {
+                                            Log.i("PhotoDelete", "Photo deleted successfully")
+                                        }
+                                    }
+                                } catch (securityException: SecurityException) {
+                                    Log.e("PhotoDelete", "Permission denied to delete photo: ${securityException.message}")
+                                    // On Android 10+ you may need to handle RecoverableSecurityException by requesting user confirmation
+                                    // For example, prompt the user to grant delete permission via IntentSender if applicable
+                                } catch (illegalArgumentException: IllegalArgumentException) {
+                                    Log.e("PhotoDelete", "Invalid Uri for deletion: ${illegalArgumentException.message}")
+                                } catch (e: Exception) {
+                                    Log.e("PhotoDelete", "Failed to delete photo: ${e.message}")
+                                }
 
                                 //Add picture path into tvPhotoIntroductions and save into database
                                 withContext(Dispatchers.Main) {
                                     if (getTheWhichIntroductionsOrObservationsToBeUploadedVariable() == MainActivity.COMPANY_INTRODUCTION) {
                                         if (getPresentPhotoName() != "") {
-                                            val photoComputerPath = ";;\\Picture\\" + photoFullName
+                                            val photoComputerPath = ";;\\Picture\\$photoFullName"
                                             if (tvPhotoPathsInIntroductionsFragmentMLD.value?.contains(
                                                     photoComputerPath
                                                 ) == false
@@ -7264,7 +7395,7 @@ class AInfo5ViewModel(
                                         saveTheCompanyIntroDataIntoDB()
                                     } else if (getTheWhichIntroductionsOrObservationsToBeUploadedVariable() == MainActivity.SECTION_INTRODUCTION) {
                                         if (getPresentPhotoName() != "") {
-                                            val photoComputerPath = ";;\\Picture\\" + photoFullName
+                                            val photoComputerPath = ";;\\Picture\\$photoFullName"
                                             if (tvPhotoPathsInIntroductionsFragmentMLD.value?.contains(
                                                     photoComputerPath
                                                 ) == false
@@ -7287,7 +7418,7 @@ class AInfo5ViewModel(
 
                                     } else if (getTheWhichIntroductionsOrObservationsToBeUploadedVariable() == MainActivity.SECTION_OBSERVATIONS) {
                                         if (getPresentPhotoName() != "") {
-                                            val photoComputerPath = ";;\\Picture\\" + photoFullName
+                                            val photoComputerPath = ";;\\Picture\\$photoFullName"
                                             if (tvPhotoPathsInObservationsFragmentMLD.value?.contains(
                                                     photoComputerPath
                                                 ) == false
@@ -7329,12 +7460,15 @@ class AInfo5ViewModel(
                                     setTheCompanyPhotosUploadedFlag(false)
                                     //Update the count number in ViewModel and present PhotoName
                                     setThePhotoCount(getThePhotoCount().plus(1))
+                                    //Update the Picture Uploaded Flag to Continue Taking Photos
+                                    setThePictureUploadedCXFFlagMLD(true)
                                 }
                             }
                         } else {
                             //Error Message
                             withContext(Dispatchers.Main) {
                                 //statusMessage.value = Event("Error: File Write Failed!")
+                                setThePictureUploadedCXFFlagMLD(true)
                             }
                         }
                     }
@@ -7344,7 +7478,7 @@ class AInfo5ViewModel(
 
     }
 
-    fun uriToBitmap(selectedFileUri: Uri): Bitmap? {
+    private fun uriToBitmap(selectedFileUri: Uri): Bitmap? {
         try {
             val context = getApplication<Application>().applicationContext
             val contentResolver = context.contentResolver
@@ -7371,19 +7505,19 @@ class AInfo5ViewModel(
 //DeLimiters and String to * and * to String Functions
     //DeLimiters
 
-    var delimiterLevel1 = "{%DASPL#1}"
+    private var delimiterLevel1 = "{%DASPL#1}"
 
-    var delimiterLevel2 = "{%DASPL#2}"
+    private var delimiterLevel2 = "{%DASPL#2}"
 
-    var delimiterLevel3 = "{%DASPL#3}"
+    private var delimiterLevel3 = "{%DASPL#3}"
 
-    var delimiterLevel4 = "{%DASPL#4}"
+    private var delimiterLevel4 = "{%DASPL#4}"
 
-    var delimiterLevel5 = "{%DASPL#5}"
+    private var delimiterLevel5 = "{%DASPL#5}"
 
-    var delimiterLevel6 = "{%DASPL#6}"
+    private var delimiterLevel6 = "{%DASPL#6}"
 
-    var delimiterLevel7 = "{%DASPL#7}"
+    private var delimiterLevel7 = "{%DASPL#7}"
 
     fun mlToStringUsingDelimiter1(inputList: MutableList<String>): String {
         var result = ""
@@ -7408,8 +7542,8 @@ class AInfo5ViewModel(
         } else {
             if (input.contains(delimiterLevel1)) {
                 val inputList = input.split(delimiterLevel1)
-                for (index in 0 until inputList.size) {
-                    resultList.add(inputList[index])
+                for (element in inputList) {
+                    resultList.add(element)
                 }
             } else {
                 resultList.add(input)
@@ -7418,7 +7552,7 @@ class AInfo5ViewModel(
         return resultList
     }
 
-    fun mlToStringUsingDelimiter2(inputList: MutableList<String>): String {
+    private fun mlToStringUsingDelimiter2(inputList: MutableList<String>): String {
         var result = ""
         if (inputList.isNotEmpty()) {
             for (index in 0 until inputList.size) {
@@ -7434,15 +7568,15 @@ class AInfo5ViewModel(
         return result
     }
 
-    fun stringToMLUsingDelimiter2(input: String): MutableList<String> {
+    private fun stringToMLUsingDelimiter2(input: String): MutableList<String> {
         var resultList = mutableListOf<String>()
         if (input == "") {
             resultList = mutableListOf()
         } else {
             if (input.contains(delimiterLevel2)) {
                 val inputList = input.split(delimiterLevel2)
-                for (index in 0 until inputList.size) {
-                    resultList.add(inputList[index])
+                for (element in inputList) {
+                    resultList.add(element)
                 }
             } else {
                 resultList.add(input)
@@ -7451,7 +7585,7 @@ class AInfo5ViewModel(
         return resultList
     }
 
-    fun mlToStringUsingDelimiter3(inputList: MutableList<String>): String {
+    private fun mlToStringUsingDelimiter3(inputList: MutableList<String>): String {
         var result = ""
         if (inputList.isNotEmpty()) {
             for (index in 0 until inputList.size) {
@@ -7474,8 +7608,8 @@ class AInfo5ViewModel(
         } else {
             if (input.contains(delimiterLevel3)) {
                 val inputList = input.split(delimiterLevel3)
-                for (index in 0 until inputList.size) {
-                    resultList.add(inputList[index])
+                for (element in inputList) {
+                    resultList.add(element)
                 }
             } else {
                 resultList.add(input)
@@ -7484,7 +7618,7 @@ class AInfo5ViewModel(
         return resultList
     }
 
-    fun mlToStringUsingDelimiter4(inputList: MutableList<String>): String {
+    private fun mlToStringUsingDelimiter4(inputList: MutableList<String>): String {
         var result = ""
         if (inputList.isNotEmpty()) {
             for (index in 0 until inputList.size) {
@@ -7500,15 +7634,15 @@ class AInfo5ViewModel(
         return result
     }
 
-    fun stringToMLUsingDelimiter4(input: String): MutableList<String> {
+    private fun stringToMLUsingDelimiter4(input: String): MutableList<String> {
         var resultList = mutableListOf<String>()
         if (input == "") {
             resultList = mutableListOf()
         } else {
             if (input.contains(delimiterLevel4)) {
                 val inputList = input.split(delimiterLevel4)
-                for (index in 0 until inputList.size) {
-                    resultList.add(inputList[index])
+                for (element in inputList) {
+                    resultList.add(element)
                 }
             } else {
                 resultList.add(input)
@@ -7517,7 +7651,7 @@ class AInfo5ViewModel(
         return resultList
     }
 
-    fun mlToStringUsingDelimiter5(inputList: MutableList<String>): String {
+    private fun mlToStringUsingDelimiter5(inputList: MutableList<String>): String {
         var result = ""
         if (inputList.isNotEmpty()) {
             for (index in 0 until inputList.size) {
@@ -7540,8 +7674,8 @@ class AInfo5ViewModel(
         } else {
             if (input.contains(delimiterLevel5)) {
                 val inputList = input.split(delimiterLevel5)
-                for (index in 0 until inputList.size) {
-                    resultList.add(inputList[index])
+                for (element in inputList) {
+                    resultList.add(element)
                 }
             } else {
                 resultList.add(input)
@@ -7550,7 +7684,7 @@ class AInfo5ViewModel(
         return resultList
     }
 
-    fun mlToStringUsingDelimiter6(inputList: MutableList<String>): String {
+    private fun mlToStringUsingDelimiter6(inputList: MutableList<String>): String {
         var result = ""
         if (inputList.isNotEmpty()) {
             for (index in 0 until inputList.size) {
@@ -7566,15 +7700,15 @@ class AInfo5ViewModel(
         return result
     }
 
-    fun stringToMLUsingDelimiter6(input: String): MutableList<String> {
+    private fun stringToMLUsingDelimiter6(input: String): MutableList<String> {
         var resultList = mutableListOf<String>()
         if (input == "") {
             resultList = mutableListOf()
         } else {
             if (input.contains(delimiterLevel6)) {
                 val inputList = input.split(delimiterLevel6)
-                for (index in 0 until inputList.size) {
-                    resultList.add(inputList[index])
+                for (element in inputList) {
+                    resultList.add(element)
                 }
             } else {
                 resultList.add(input)
@@ -7583,7 +7717,7 @@ class AInfo5ViewModel(
         return resultList
     }
 
-    fun mlToStringUsingDelimiter7(inputList: MutableList<String>): String {
+    private fun mlToStringUsingDelimiter7(inputList: MutableList<String>): String {
         var result = ""
         if (inputList.isNotEmpty()) {
             for (index in 0 until inputList.size) {
@@ -7606,8 +7740,8 @@ class AInfo5ViewModel(
         } else {
             if (input.contains(delimiterLevel6)) {
                 val inputList = input.split(delimiterLevel7)
-                for (index in 0 until inputList.size) {
-                    resultList.add(inputList[index])
+                for (element in inputList) {
+                    resultList.add(element)
                 }
             } else {
                 resultList.add(input)
@@ -7619,12 +7753,12 @@ class AInfo5ViewModel(
     fun pageCodeToAMPCode(pageCode: String): String {
         var result = ""
         if (pageCode != "") {
-            if (pageCode.contains("PC_") && pageCode.contains("_PC")) {
-                result = pageCode.replace("PC", "APM")
+            result = if (pageCode.contains("PC_") && pageCode.contains("_PC")) {
+                pageCode.replace("PC", "APM")
             } else if (pageCode == "Observations" || pageCode == "Recommendations" || pageCode == "Standards") {
-                result = "APM_" + pageCode + "_APM"
+                "APM_" + pageCode + "_APM"
             } else {
-                result = ""
+                ""
             }
         }
         return result
@@ -7656,25 +7790,28 @@ class AInfo5ViewModel(
 
     fun makeLinkedHashMapFromML(
         input: MutableList<String>,
-        screen: String = ""
+        screen: String = "",
+        reportsToBeGenerated: MutableList<String> = mutableListOf()
     ): LinkedHashMap<String, Boolean> {
         var result = linkedMapOf<String, Boolean>()
         if (input.isNotEmpty()) {
             for (index in 0 until input.size) {
-                if (index == 0 || index == 2) {
-                    result[input[index]] = screen == MainActivity.SECTION_FRAGMENT
-                } else {
+                if (screen == MainActivity.SECTION_FRAGMENT){
+                    result[input[index]] = reportsToBeGenerated.contains(input[index])
+                }
+                else {
                     result[input[index]] = false
                 }
             }
-        } else {
+        }
+        else {
             result = linkedMapOf()
         }
         return result
     }
 
     // Code and Display Related functions for Company and Sections
-    fun codeAndDisplayNameToML(input: CodeNameAndDisplayNameDC): MutableList<String> {
+    private fun codeAndDisplayNameToML(input: CodeNameAndDisplayNameDC): MutableList<String> {
         val result = mutableListOf<String>()
         result.add(input.uniqueCodeName)
         result.add(input.displayName)
@@ -7682,7 +7819,7 @@ class AInfo5ViewModel(
         return result
     }
 
-    fun codeAndDisplayNameToString(codeAndDisplayName: CodeNameAndDisplayNameDC): String {
+    private fun codeAndDisplayNameToString(codeAndDisplayName: CodeNameAndDisplayNameDC): String {
         var result = ""
         val resultML = codeAndDisplayNameToML(codeAndDisplayName)
         result = mlToStringUsingDelimiter1(resultML)
@@ -7772,7 +7909,7 @@ class AInfo5ViewModel(
         if (input == "") {
             codeAndDisplayML = mutableListOf()
         } else {
-            if (input.contains(delimiterLevel1) == true) {
+            if (input.contains(delimiterLevel1)) {
                 val listLevel1 = input.split(delimiterLevel1)
                 for (item in listLevel1) {
                     val codeAndDisplay = generateUniqueCodeFromCDCollection(
@@ -7804,10 +7941,10 @@ class AInfo5ViewModel(
         if (input == "") {
             codeAndDisplayML.clear()
         } else {
-            if (input.contains(delimiterLevel2) == true) {
+            if (input.contains(delimiterLevel2)) {
                 val listLevel2 = input.split(delimiterLevel2)
                 for (item in listLevel2) {
-                    if (item.contains(delimiterLevel1) == true) {
+                    if (item.contains(delimiterLevel1)) {
                         val codeAndDisplayName = stringToCodeAndDisplayName(item)
                         //val listLevel1 = item.split(delimiterLevel1)
                         //val codeAndDisplay = CodeNameAndDisplayNameDC(listLevel1[0], listLevel1[1], listLevel1[2].toBoolean())
@@ -7822,7 +7959,7 @@ class AInfo5ViewModel(
                     }
                 }
             } else {
-                if (input.contains(delimiterLevel1) == true) {
+                if (input.contains(delimiterLevel1)) {
                     val listLevel1 = input.split(delimiterLevel1)
                     if (listLevel1.size > 2) {
                         for (item in listLevel1) {
@@ -7866,7 +8003,7 @@ class AInfo5ViewModel(
             codeAndDisplayString = ""
             for (item in input) {
                 if (input.indexOf(item) == 0) {
-                    if (item.uniqueCodeName != "" && (item.uniqueCodeName.contains("Comp_") && item.uniqueCodeName.contains(
+                    codeAndDisplayString = if (item.uniqueCodeName != "" && (item.uniqueCodeName.contains("Comp_") && item.uniqueCodeName.contains(
                             "_Comp"
                         ) || item.uniqueCodeName.contains("Section_") && item.uniqueCodeName.contains(
                             "_Section"
@@ -7874,9 +8011,9 @@ class AInfo5ViewModel(
                     ) {
                         val level1String =
                             item.uniqueCodeName + delimiterLevel1 + item.displayName + delimiterLevel1 + item.pagesPresent.toString()
-                        codeAndDisplayString = level1String
+                        level1String
                     } else {
-                        codeAndDisplayString = ""
+                        ""
                     }
                 } else {
                     if (item.uniqueCodeName != "" && (item.uniqueCodeName.contains("Comp_") && item.uniqueCodeName.contains(
@@ -7926,15 +8063,15 @@ class AInfo5ViewModel(
             codeNameIsUniqueFlag = true
         }
 
-        if (codeNameIsUniqueFlag == false) {
-            codeNameAndDisplay = CodeNameAndDisplayNameDC("", "", false)
+        codeNameAndDisplay = if (!codeNameIsUniqueFlag) {
+            CodeNameAndDisplayNameDC("", "", false)
         } else {
-            codeNameAndDisplay = CodeNameAndDisplayNameDC(itemCode, displayName, false)
+            CodeNameAndDisplayNameDC(itemCode, displayName, false)
         }
         return codeNameAndDisplay
     }
 
-    fun extractMaxNumberFromCDCollection(codeAndDisplayML: MutableList<CodeNameAndDisplayNameDC>): Int {
+    private fun extractMaxNumberFromCDCollection(codeAndDisplayML: MutableList<CodeNameAndDisplayNameDC>): Int {
         var maxNumber = 0
         if (codeAndDisplayML.isNotEmpty()) {
             for (item in codeAndDisplayML) {
@@ -7958,19 +8095,19 @@ class AInfo5ViewModel(
         return maxNumber
     }
 
-    fun generateCodeNumberStringFromInt(maxNumber: Int): String {
+    private fun generateCodeNumberStringFromInt(maxNumber: Int): String {
         var codeNumber = ""
         var maxNumberPositive = 0
-        if (maxNumber < 0) {
-            maxNumberPositive = -maxNumber
+        maxNumberPositive = if (maxNumber < 0) {
+            -maxNumber
         } else {
-            maxNumberPositive = maxNumber
+            maxNumber
         }
         val codeNumberString = (maxNumberPositive + 1).toString()
         when (codeNumberString.length) {
-            1 -> codeNumber = "000" + codeNumberString
-            2 -> codeNumber = "00" + codeNumberString
-            3 -> codeNumber = "0" + codeNumberString
+            1 -> codeNumber = "000$codeNumberString"
+            2 -> codeNumber = "00$codeNumberString"
+            3 -> codeNumber = "0$codeNumberString"
             4 -> codeNumber = codeNumberString
         }
         return codeNumber
@@ -8336,12 +8473,12 @@ class AInfo5ViewModel(
         }
     }
 
-    fun fileExists(name: String, dirUri: Uri?): Boolean? {
+    private fun fileExists(name: String, dirUri: Uri?): Boolean? {
         val context = getApplication<Application>().applicationContext
         return DocumentFile.fromTreeUri(context, dirUri!!)?.findFile(name)?.exists()
     }
 
-    fun createTextFileWithExtension(name: String, dirUri: Uri?, extension: String) {
+    private fun createTextFileWithExtension(name: String, dirUri: Uri?, extension: String) {
         viewModelScope.launch {
             val fullFileName = name + extension
             val context = getApplication<Application>().applicationContext
@@ -8358,7 +8495,7 @@ class AInfo5ViewModel(
 
     }
 
-    fun writeToTextFile(dirUri: Uri?, fullFileName: String, content: String) {
+    private fun writeToTextFile(dirUri: Uri?, fullFileName: String, content: String) {
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
                 val context = getApplication<Application>().applicationContext
@@ -8390,30 +8527,24 @@ class AInfo5ViewModel(
         }
     }
 
-    fun fileNameFromURI(uri: Uri?): String {
+    private fun fileNameFromURI(uri: Uri?): String {
         val context = getApplication<Application>().applicationContext
         val contentResolver = context.contentResolver
         val returnCursor = uri?.let { contentResolver.query(it, null, null, null, null) }
         val nameIndex = returnCursor?.getColumnIndex(OpenableColumns.DISPLAY_NAME)
-        if (returnCursor != null) {
-            returnCursor.moveToFirst()
-        }
+        returnCursor?.moveToFirst()
         val fileName = nameIndex?.let { returnCursor.getString(it) }
-        if (returnCursor != null) {
-            returnCursor.close()
-        }
+        returnCursor?.close()
         return fileName!!
     }
 
     fun directoryNameFromURI(uri: Uri?): String {
-        var directoryURIString = ""
+        val directoryURIString = ""
         val context = getApplication<Application>().applicationContext
         val contentResolver = context.contentResolver
         val returnCursor = uri?.let { contentResolver.query(it, null, null, null, null) }
         val nameIndex = returnCursor?.getColumnIndex(OpenableColumns.DISPLAY_NAME)
-        if (returnCursor != null) {
-            returnCursor.moveToFirst()
-        }
+        returnCursor?.moveToFirst()
 //        val fileName = nameIndex?.let { returnCursor.getString(it) }
 //        if (returnCursor != null) {
 //            returnCursor.close()
@@ -8469,7 +8600,7 @@ class AInfo5ViewModel(
         }
     }
 
-    fun renameDocument(dirUri: Uri?, fullOldFileName: String, fullNewFileName: String): Uri? {
+    private fun renameDocument(dirUri: Uri?, fullOldFileName: String, fullNewFileName: String): Uri? {
         var renamedFileUri: Uri? = null
         val context = getApplication<Application>().applicationContext
         val dir = DocumentFile.fromTreeUri(context, dirUri!!)

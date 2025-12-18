@@ -1,6 +1,5 @@
 package com.example.auditapplication5.presentation.adapter
 
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -8,10 +7,8 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.auditapplication5.MainActivity
 import com.example.auditapplication5.R
-import com.example.auditapplication5.data.model.QuestionTemplateItemDC
 import com.example.auditapplication5.data.model.QuestionsFrameworkItemDC
 import com.example.auditapplication5.data.model.SectionAllDataDC
-
 import com.example.auditapplication5.databinding.QuestionsFrameworkItemBinding
 import com.example.auditapplication5.presentation.viewmodel.AInfo5ViewModel
 
@@ -78,7 +75,7 @@ class QuestionsFrameworkRVAdapter(
             }
             if (result == false){
                 aInfo5ViewModel.updateQuestionDataItemListUsingTemplateInPresentSectionAllData(currentPageIndex,position,
-                    questionTemplateItemMLN!!
+                    questionTemplateItemMLN
                 )
             }
 

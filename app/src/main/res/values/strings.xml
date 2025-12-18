@@ -131,6 +131,11 @@
     <string name="string_Standards_Below">Standards Below</string>
     <string name="string_score">Score</string>
     <string name="string_button_score_view">Button to go to the Score View</string>
+    <string name="string_message_loading_from_db">Loading Records from the Database</string>
+    <string name="string_mesage_photo_video_saved">Photo/Video is being saved into directory</string>
+    <string name="string_message_records_retrieved_updated_in_database">Records are being retrieved/updated in the database</string>
+    <string name="string_message_deletion_being_completed">The Deletion is being completed.</string>
+    <string name="string_message_edit_being_completed">The Edit Process is being completed.</string>
 
 
     <string-array name="Priority_Choices">

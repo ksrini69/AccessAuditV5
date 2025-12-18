@@ -3,13 +3,10 @@ package com.example.auditapplication5
 import android.content.Context
 import android.graphics.*
 import android.util.AttributeSet
-import android.util.Log
 import android.util.TypedValue
 import android.view.MotionEvent
 import android.view.View
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import com.example.auditapplication5.presentation.viewmodel.AInfo5ViewModel
 import kotlin.math.pow
 import kotlin.math.sqrt
 
@@ -28,17 +25,17 @@ class DrawingView(context: Context, attrs: AttributeSet): View(context,attrs) {
     private val mTextList = ArrayList<CustomText>()
     private val mUndoTextList = ArrayList<CustomText>()
 
-    var startX = 0.0f
-    var startY = 0.0f
-    var endX = 0.0f
-    var endY = 0.0f
+    private var startX = 0.0f
+    private var startY = 0.0f
+    private var endX = 0.0f
+    private var endY = 0.0f
 
     var chooseShape = 0
 
 
 
     private var textDrawnFlag = false
-    fun setFlagIfTextDrawn(input: Boolean){
+    private fun setFlagIfTextDrawn(input: Boolean){
         textDrawnFlag = input
     }
     fun getFlagIfTextDrawn(): Boolean{
@@ -60,15 +57,15 @@ class DrawingView(context: Context, attrs: AttributeSet): View(context,attrs) {
             TypedValue.COMPLEX_UNIT_DIP,
             input, resources.displayMetrics)
     }
-    fun getSizeForText(): Float{
+    private fun getSizeForText(): Float{
         return textSize
     }
 
     private var textColor: Int = 0
-    fun setColorForText(input: Int){
+    private fun setColorForText(input: Int){
         textColor = input
     }
-    fun getColorForText(): Int{
+    private fun getColorForText(): Int{
         return textColor
     }
 
@@ -76,15 +73,15 @@ class DrawingView(context: Context, attrs: AttributeSet): View(context,attrs) {
     fun setTextPathDirection(input: Int){
         pathDirectionForText = input
     }
-    fun getTextPathDirection(): Int{
+    private fun getTextPathDirection(): Int{
         return pathDirectionForText
     }
 
-    var textPath = Path()
-    fun setPathForText(input: Path){
+    private var textPath = Path()
+    private fun setPathForText(input: Path){
         textPath = input
     }
-    fun getPathForText(): Path {
+    private fun getPathForText(): Path {
         return textPath
     }
     //Mutable Live Data for Dynamic Inputting of Text
@@ -103,21 +100,21 @@ class DrawingView(context: Context, attrs: AttributeSet): View(context,attrs) {
         canvas = Canvas(mCanvasBitmap!!)
     }
 
-    override fun onDraw(canvas: Canvas?) {
+    override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
-        canvas?.drawBitmap(mCanvasBitmap!!, 0f,0f, mCanvasPaint)
+        canvas.drawBitmap(mCanvasBitmap!!, 0f,0f, mCanvasPaint)
 
         for(path in mPaths){
             mDrawPaint?.style = Paint.Style.STROKE
             mDrawPaint!!.strokeWidth = path.brushThickness
             mDrawPaint!!.color = path.color
-            canvas?.drawPath(path, mDrawPaint!!)
+            canvas.drawPath(path, mDrawPaint!!)
         }
 
         if(!mDrawPath!!.isEmpty) {
             mDrawPaint!!.strokeWidth = mDrawPath!!.brushThickness
             mDrawPaint!!.color = mDrawPath!!.color
-            canvas?.drawPath(mDrawPath!!, mDrawPaint!!)
+            canvas.drawPath(mDrawPath!!, mDrawPaint!!)
         }
 
         if (mTextList.size > 0){
@@ -127,7 +124,7 @@ class DrawingView(context: Context, attrs: AttributeSet): View(context,attrs) {
                 mDrawPaint?.style = Paint.Style.FILL_AND_STROKE
                 mDrawPaint?.strokeWidth = 0.0F
                 setPathForText(pathsForTextWriting(texts.pathDirection,texts.textStartX,texts.textStartY))
-                canvas?.drawTextOnPath(texts.text, getPathForText(),0.0F,0.0F,mDrawPaint!!)
+                canvas.drawTextOnPath(texts.text, getPathForText(),0.0F,0.0F,mDrawPaint!!)
                 mDrawPaint?.style = Paint.Style.STROKE
             }
         }
@@ -270,14 +267,14 @@ class DrawingView(context: Context, attrs: AttributeSet): View(context,attrs) {
         mDrawPaint!!.color = color
     }
 
-    fun CustomRectangle(startX: Float, startY: Float, endX: Float, endY: Float): RectF {
+    private fun CustomRectangle(startX: Float, startY: Float, endX: Float, endY: Float): RectF {
         return RectF(startX, startY, endX, endY)
 
     }
 
     //Arrows related functions
 
-    fun determinePoints2And3(tipX: Float, tipY: Float, tailX: Float, tailY: Float ): MutableList<Float> {
+    private fun determinePoints2And3(tipX: Float, tipY: Float, tailX: Float, tailY: Float ): MutableList<Float> {
         val twoOtherPointsArray = mutableListOf<Float>()
         val arrowHeight = mBrushSize*2.3F
         val arrowWidth = mBrushSize*2.3F
@@ -300,20 +297,12 @@ class DrawingView(context: Context, attrs: AttributeSet): View(context,attrs) {
         return twoOtherPointsArray
     }
 
-    fun drawTriangle(x1: Float, y1: Float, x2: Float, y2: Float,x3: Float, y3: Float ){
+    private fun drawTriangle(x1: Float, y1: Float, x2: Float, y2: Float, x3: Float, y3: Float ){
         val pathTriangle = mDrawPath
-        if (pathTriangle != null) {
-            pathTriangle.moveTo(x1,y1)
-        }
-        if (pathTriangle != null) {
-            pathTriangle.lineTo(x2,y2)
-        }
-        if (pathTriangle != null) {
-            pathTriangle.moveTo(x3,y3)
-        }
-        if (pathTriangle != null) {
-            pathTriangle.lineTo(x1,y1)
-        }
+        pathTriangle?.moveTo(x1,y1)
+        pathTriangle?.lineTo(x2,y2)
+        pathTriangle?.moveTo(x3,y3)
+        pathTriangle?.lineTo(x1,y1)
     }
 
 
@@ -325,7 +314,7 @@ class DrawingView(context: Context, attrs: AttributeSet): View(context,attrs) {
         canvas?.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR)
         invalidate()
     }
-    fun pathsForTextWriting(type: Int, startX: Float, startY: Float): Path{
+    private fun pathsForTextWriting(type: Int, startX: Float, startY: Float): Path{
         val path = Path()
         when(type){
             1 -> {

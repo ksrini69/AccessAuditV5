@@ -24,6 +24,7 @@
             android:contentDescription="@string/string_textview_that_display_the_question_number"
             android:gravity="start|center_vertical"
             android:paddingStart="5dp"
+            android:paddingEnd="1dp"
             android:text="@string/string_b01"
             android:textSize="16sp"
             android:textStyle="bold"

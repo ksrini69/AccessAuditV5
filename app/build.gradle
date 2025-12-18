@@ -10,12 +10,12 @@ apply plugin: 'kotlin-android'
 
 android {
     namespace 'com.example.auditapplication5'
-    compileSdk 33
+    compileSdk 34
 
     defaultConfig {
         applicationId "com.example.auditapplication5"
         minSdk 26
-        targetSdk 33
+        targetSdk 34
         versionCode 1
         versionName "1.0"
 
@@ -37,7 +37,7 @@ android {
         targetCompatibility JavaVersion.VERSION_1_8
     }
     kotlinOptions {
-        jvmTarget = '1.8'
+        jvmTarget = '17'
     }
     // Allow references to generated code
     kapt {
@@ -98,6 +98,7 @@ dependencies {
     // Dependencies for Hilt
     implementation("com.google.dagger:hilt-android:2.44")
     kapt("com.google.dagger:hilt-android-compiler:2.44")
+
 
     // Storage Access Framework related
 

@@ -5,7 +5,6 @@ import android.app.Activity
 import android.app.AlertDialog
 import android.content.DialogInterface
 import android.content.Intent
-import android.content.pm.ActivityInfo
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Canvas
@@ -14,7 +13,6 @@ import android.net.Uri
 import android.os.Bundle
 import android.os.ParcelFileDescriptor
 import android.provider.MediaStore
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -28,9 +26,14 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
 import androidx.databinding.DataBindingUtil
+import androidx.fragment.app.Fragment
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import com.example.auditapplication5.databinding.FragmentPhotoModificationBinding
 import com.example.auditapplication5.presentation.viewmodel.AInfo5ViewModel
+import kotlinx.coroutines.launch
 import java.io.FileDescriptor
 import java.io.IOException
 
@@ -42,9 +45,9 @@ class PhotoModificationFragment : Fragment() {
     private var mImageButtonCurrentPaint : ImageButton? = null
     private var mImageButtonCurrentBrush: ImageButton? = null
 
-    lateinit var imageView: ImageView
+    private lateinit var imageView: ImageView
 
-    val openGalleryLauncher : ActivityResultLauncher<Intent> =
+    private val openGalleryLauncher : ActivityResultLauncher<Intent> =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
                 result ->
             if (result.resultCode == Activity.RESULT_OK && result.data != null){
@@ -61,23 +64,20 @@ class PhotoModificationFragment : Fragment() {
                 val isGranted = it.value
 
                 if (isGranted) {
-                    Toast.makeText(this.requireContext(), "Permission Granted. Now you can read the storage files",
-                        Toast.LENGTH_SHORT).show()
+                    aInfo5ViewModel.setStatusMessageSF("Permission Granted. Now you can read the storage files")
+//                    Toast.makeText(this.requireContext(), "Permission Granted. Now you can read the storage files",
+//                        Toast.LENGTH_SHORT).show()
                     val pickIntent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
                     openGalleryLauncher.launch(pickIntent)
                 } else {
                     if (permissionName == Manifest.permission.READ_EXTERNAL_STORAGE ){
-                        Toast.makeText(this.requireContext(), "You have not granted permission",
-                            Toast.LENGTH_SHORT).show()
+                        aInfo5ViewModel.setStatusMessageSF("You have not granted permission")
+//                        Toast.makeText(this.requireContext(), "You have not granted permission",
+//                            Toast.LENGTH_SHORT).show()
                     }
                 }
             }
         }
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -102,10 +102,13 @@ class PhotoModificationFragment : Fragment() {
         //Set The Screen Variable upon entry into this fragment
         aInfo5ViewModel.setTheScreenVariable(MainActivity.PHOTO_MODIFICATION_FRAGMENT)
 
+        //Status Message using Shared Flow
+        observeStatusMessage()
+
         activity?.onBackPressedDispatcher?.addCallback(viewLifecycleOwner, object : OnBackPressedCallback(true){
             override fun handleOnBackPressed() {
                 if (aInfo5ViewModel.getTheScreenVariable() == MainActivity.PHOTO_MODIFICATION_FRAGMENT){
-                    if (aInfo5ViewModel.getModifiedPhotoUploadedFlag() == false){
+                    if (!aInfo5ViewModel.getModifiedPhotoUploadedFlag()){
                         showDialogForImageSaveBP()
                     } else {
                         if (aInfo5ViewModel.getThePreviousScreenVariable() == MainActivity.INTROS_FRAGMENT) {
@@ -331,7 +334,7 @@ class PhotoModificationFragment : Fragment() {
 
                     }
                 }
-                if (binding.drawingView.getFlagIfTextDrawn() == true){
+                if (binding.drawingView.getFlagIfTextDrawn()){
                     binding.drawingView.textRotate()
                 }
             }
@@ -405,6 +408,17 @@ class PhotoModificationFragment : Fragment() {
 
     //Functions below
 
+    private fun observeStatusMessage() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                aInfo5ViewModel.statusMessageSF.collect { message ->
+                    // Show Toast, Snackbar, or dialog - executes exactly once
+                    Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
+    }
+
     private fun brushSelected(view: View){
         if (view != mImageButtonCurrentBrush){
             val imageButton = view as ImageButton
@@ -431,68 +445,107 @@ class PhotoModificationFragment : Fragment() {
 
     }
 
-    val arrayOfBrushSizesList = arrayOf<CharSequence>("Brush Size 4", "Brush Size 6", "Brush Size 8", "Brush Size 10", "Brush Size 12", "Brush Size 14", "Brush Size 16", "Brush Size 18", "Brush Size 20", "Brush Size 22")
+    private val arrayOfBrushSizesList = arrayOf<CharSequence>("Brush Size 4", "Brush Size 6", "Brush Size 8", "Brush Size 10", "Brush Size 12", "Brush Size 14", "Brush Size 16", "Brush Size 18", "Brush Size 20", "Brush Size 22")
 
-    var checkedBrushItemNumber = 0
-    fun setBrushCheckedItem(input: Int){
+    private var checkedBrushItemNumber = 0
+    private fun setBrushCheckedItem(input: Int){
         checkedBrushItemNumber = input
     }
-    fun getBrushCheckedItem(): Int{
+    private fun getBrushCheckedItem(): Int{
         return checkedBrushItemNumber
     }
 
     private fun chooseBrushSizeListDialog(){
         val builder : AlertDialog.Builder = AlertDialog.Builder(this.requireContext())
         builder.setTitle("Set the Brush Size")
-        builder.setSingleChoiceItems(arrayOfBrushSizesList, getBrushCheckedItem(), DialogInterface.OnClickListener{ dialog, which ->
-            //Toast.makeText(context, "Gloop: $which", Toast.LENGTH_SHORT).show()
+        builder.setSingleChoiceItems(arrayOfBrushSizesList, getBrushCheckedItem()) { dialog, which ->
             setBrushCheckedItem(which)
-            when(which){
-                0-> {binding.drawingView.setSizeForBrush(4.toFloat())}
-                1-> {binding.drawingView.setSizeForBrush(6.toFloat())}
-                2-> {binding.drawingView.setSizeForBrush(8.toFloat())}
-                3-> {binding.drawingView.setSizeForBrush(10.toFloat())}
-                4-> {binding.drawingView.setSizeForBrush(12.toFloat())}
-                5-> {binding.drawingView.setSizeForBrush(14.toFloat())}
-                6-> {binding.drawingView.setSizeForBrush(16.toFloat())}
-                7-> {binding.drawingView.setSizeForBrush(18.toFloat())}
-                8-> {binding.drawingView.setSizeForBrush(20.toFloat())}
-                9-> {binding.drawingView.setSizeForBrush(22.toFloat())}
+            when (which) {
+                0 -> {
+                    binding.drawingView.setSizeForBrush(4.toFloat())
+                }
+                1 -> {
+                    binding.drawingView.setSizeForBrush(6.toFloat())
+                }
+                2 -> {
+                    binding.drawingView.setSizeForBrush(8.toFloat())
+                }
+                3 -> {
+                    binding.drawingView.setSizeForBrush(10.toFloat())
+                }
+                4 -> {
+                    binding.drawingView.setSizeForBrush(12.toFloat())
+                }
+                5 -> {
+                    binding.drawingView.setSizeForBrush(14.toFloat())
+                }
+                6 -> {
+                    binding.drawingView.setSizeForBrush(16.toFloat())
+                }
+                7 -> {
+                    binding.drawingView.setSizeForBrush(18.toFloat())
+                }
+                8 -> {
+                    binding.drawingView.setSizeForBrush(20.toFloat())
+                }
+                9 -> {
+                    binding.drawingView.setSizeForBrush(22.toFloat())
+                }
             }
             dialog.dismiss()
-        })
+        }
         builder.create().show()
     }
 
-    val arrayOfTextSizesList = arrayOf<CharSequence>("Text Size 20", "Text Size 25", "Text Size 30", "Text Size 35", "Text Size 40", "Text Size 45", "Text Size 50", "Text Size 55", "Text Size 60", "Text Size 70")
+    private val arrayOfTextSizesList = arrayOf<CharSequence>("Text Size 20", "Text Size 25", "Text Size 30", "Text Size 35", "Text Size 40", "Text Size 45", "Text Size 50", "Text Size 55", "Text Size 60", "Text Size 70")
 
-    var checkedTextItemNumber = 4
-    fun setTextCheckedItem(input: Int){
+    private var checkedTextItemNumber = 4
+    private fun setTextCheckedItem(input: Int){
         checkedTextItemNumber = input
     }
-    fun getTextCheckedItem(): Int{
+    private fun getTextCheckedItem(): Int{
         return checkedTextItemNumber
     }
 
     private fun chooseTextSizeListDialog(){
         val builder : AlertDialog.Builder = AlertDialog.Builder(this.requireContext())
         builder.setTitle("Set the Text Size")
-        builder.setSingleChoiceItems(arrayOfTextSizesList, getTextCheckedItem(), DialogInterface.OnClickListener{ dialog, which ->
+        builder.setSingleChoiceItems(arrayOfTextSizesList, getTextCheckedItem()) { dialog, which ->
             setTextCheckedItem(which)
-            when(which){
-                0-> {binding.drawingView.setSizeForText(20.toFloat())}
-                1-> {binding.drawingView.setSizeForText(25.toFloat())}
-                2-> {binding.drawingView.setSizeForText(30.toFloat())}
-                3-> {binding.drawingView.setSizeForText(35.toFloat())}
-                4-> {binding.drawingView.setSizeForText(40.toFloat())}
-                5-> {binding.drawingView.setSizeForText(45.toFloat())}
-                6-> {binding.drawingView.setSizeForText(50.toFloat())}
-                7-> {binding.drawingView.setSizeForText(55.toFloat())}
-                8-> {binding.drawingView.setSizeForText(60.toFloat())}
-                9-> {binding.drawingView.setSizeForText(70.toFloat())}
+            when (which) {
+                0 -> {
+                    binding.drawingView.setSizeForText(20.toFloat())
+                }
+                1 -> {
+                    binding.drawingView.setSizeForText(25.toFloat())
+                }
+                2 -> {
+                    binding.drawingView.setSizeForText(30.toFloat())
+                }
+                3 -> {
+                    binding.drawingView.setSizeForText(35.toFloat())
+                }
+                4 -> {
+                    binding.drawingView.setSizeForText(40.toFloat())
+                }
+                5 -> {
+                    binding.drawingView.setSizeForText(45.toFloat())
+                }
+                6 -> {
+                    binding.drawingView.setSizeForText(50.toFloat())
+                }
+                7 -> {
+                    binding.drawingView.setSizeForText(55.toFloat())
+                }
+                8 -> {
+                    binding.drawingView.setSizeForText(60.toFloat())
+                }
+                9 -> {
+                    binding.drawingView.setSizeForText(70.toFloat())
+                }
             }
             dialog.dismiss()
-        })
+        }
         builder.create().show()
     }
 

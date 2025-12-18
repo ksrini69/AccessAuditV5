@@ -4,13 +4,13 @@ import android.app.AlertDialog
 import android.os.Bundle
 import android.text.method.ScrollingMovementMethod
 import android.util.Log
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.animation.AnimationUtils
 import androidx.activity.OnBackPressedCallback
 import androidx.databinding.DataBindingUtil
+import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.auditapplication5.data.model.*
@@ -30,18 +30,14 @@ class ObservationsFragment : Fragment() {
     private lateinit var presentSectionAllData: SectionAllDataDC
     private lateinit var pageTemplateList: MutableList<PageTemplateDC>
     private lateinit var uniqueListOfSectionPageCodes: MutableList<String>
+    private lateinit var sectionChildPageCodesList: MutableList<String>
 
     val TAG = MainActivity.TESTING_TAG
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         // Inflate the layout for this fragment
         binding = DataBindingUtil.inflate(
             layoutInflater,
@@ -62,13 +58,14 @@ class ObservationsFragment : Fragment() {
 
         val TAG = MainActivity.TESTING_TAG
 
-
         presentSectionAllPagesFrameworkIndex =
             aInfo5ViewModel.getThePresentSectionAllPagesFrameworkIndex()
         presentSectionAllPagesFramework = aInfo5ViewModel.getThePresentSectionAllPagesFramework()
         presentSectionAllData = aInfo5ViewModel.getThePresentSectionAllData()
         pageTemplateList = aInfo5ViewModel.getThePageTemplateList()
         uniqueListOfSectionPageCodes = aInfo5ViewModel.getTheUniqueListOfSectionPageCodes()
+
+
 
         activity?.onBackPressedDispatcher?.addCallback(
             viewLifecycleOwner,
@@ -82,44 +79,40 @@ class ObservationsFragment : Fragment() {
                     }
                     else if (aInfo5ViewModel.getTheScreenVariable() == MainActivity.OBSERVATIONS_FRAGMENT_OBSERVATIONS) {
                         var currentPageIndex = 0
-                        if (aInfo5ViewModel.getThePreviousScreenVariable() == MainActivity.SECTION_FRAGMENT_SECTION_CHOICE) {
-                            currentPageIndex =
-                                presentSectionAllPagesFramework.sectionPageFrameworkList.size - 1
-                        }
-                        else {
-                            currentPageIndex = presentSectionAllPagesFrameworkIndex
+                        currentPageIndex = if (aInfo5ViewModel.getThePreviousScreenVariable() == MainActivity.SECTION_FRAGMENT_SECTION_CHOICE) {
+                            presentSectionAllPagesFramework.sectionPageFrameworkList.size - 1
+                        } else {
+                            presentSectionAllPagesFrameworkIndex
                         }
                         binding.rvQuestionsFramework.visibility = View.VISIBLE
                         binding.rvCheckboxesFramework.visibility = View.GONE
-                        binding.tvQuestionsEtcLabel.setText(getString(R.string.string_Questions_Below))
+                        binding.tvQuestionsEtcLabel.text = getString(R.string.string_Questions_Below)
                         aInfo5ViewModel.setTheScreenVariable(MainActivity.OBSERVATIONS_FRAGMENT)
                         loadQuestionsRecyclerView(currentPageIndex)
                     }
                     else if (aInfo5ViewModel.getTheScreenVariable() == MainActivity.OBSERVATIONS_FRAGMENT_RECOMMENDATIONS) {
                         var currentPageIndex = 0
-                        if (aInfo5ViewModel.getThePreviousScreenVariable() == MainActivity.SECTION_FRAGMENT_SECTION_CHOICE) {
-                            currentPageIndex =
-                                presentSectionAllPagesFramework.sectionPageFrameworkList.size - 1
+                        currentPageIndex = if (aInfo5ViewModel.getThePreviousScreenVariable() == MainActivity.SECTION_FRAGMENT_SECTION_CHOICE) {
+                            presentSectionAllPagesFramework.sectionPageFrameworkList.size - 1
                         } else {
-                            currentPageIndex = presentSectionAllPagesFrameworkIndex
+                            presentSectionAllPagesFrameworkIndex
                         }
                         binding.rvQuestionsFramework.visibility = View.VISIBLE
                         binding.rvCheckboxesFramework.visibility = View.GONE
-                        binding.tvQuestionsEtcLabel.setText(getString(R.string.string_Questions_Below))
+                        binding.tvQuestionsEtcLabel.text = getString(R.string.string_Questions_Below)
                         aInfo5ViewModel.setTheScreenVariable(MainActivity.OBSERVATIONS_FRAGMENT)
                         loadQuestionsRecyclerView(currentPageIndex)
                     }
                     else if (aInfo5ViewModel.getTheScreenVariable() == MainActivity.OBSERVATIONS_FRAGMENT_STANDARDS) {
                         var currentPageIndex = 0
-                        if (aInfo5ViewModel.getThePreviousScreenVariable() == MainActivity.SECTION_FRAGMENT_SECTION_CHOICE) {
-                            currentPageIndex =
-                                presentSectionAllPagesFramework.sectionPageFrameworkList.size - 1
+                        currentPageIndex = if (aInfo5ViewModel.getThePreviousScreenVariable() == MainActivity.SECTION_FRAGMENT_SECTION_CHOICE) {
+                            presentSectionAllPagesFramework.sectionPageFrameworkList.size - 1
                         } else {
-                            currentPageIndex = presentSectionAllPagesFrameworkIndex
+                            presentSectionAllPagesFrameworkIndex
                         }
                         binding.rvQuestionsFramework.visibility = View.VISIBLE
                         binding.rvCheckboxesFramework.visibility = View.GONE
-                        binding.tvQuestionsEtcLabel.setText(getString(R.string.string_Questions_Below))
+                        binding.tvQuestionsEtcLabel.text = getString(R.string.string_Questions_Below)
                         aInfo5ViewModel.setTheScreenVariable(MainActivity.OBSERVATIONS_FRAGMENT)
                         loadQuestionsRecyclerView(currentPageIndex)
                     }
@@ -130,7 +123,12 @@ class ObservationsFragment : Fragment() {
         val actionBar = (activity as MainActivity).supportActionBar
         actionBar?.hide()
 
+        //Initialise Some LD Flags for CameraX etc
+        initialiseSomeFlagsLD()
+
         //Check things here
+
+
 
         //Set the pages present in the Section Code and Display to be True
         aInfo5ViewModel.changePagesPresentToTrueInCompanySectionCodeAndDisplayNameList(
@@ -156,7 +154,7 @@ class ObservationsFragment : Fragment() {
             }
         }
         else if (aInfo5ViewModel.getThePreviousScreenVariable() == MainActivity.RV_PARENT_CHILD_FRAGMENT){
-            if (aInfo5ViewModel.getTheFrameworkUpdatedInParentChildRVFragmentFlag() == true){
+            if (aInfo5ViewModel.getTheFrameworkUpdatedInParentChildRVFragmentFlag()){
                 aInfo5ViewModel.setTheFrameworkUpdatedInParentChildRVFragmentFlag(false)
                 aInfo5ViewModel.setTheAllTemplatesUploadedFlagMLD(false)
                 aInfo5ViewModel.setTheSectionAllDataLoadedFlagMLD(false)
@@ -170,15 +168,45 @@ class ObservationsFragment : Fragment() {
                 else {
                     aInfo5ViewModel.setTheAllTemplatesUploadedFlagMLD(true)
                 }
-            } else {
+            }
+            else {
                 aInfo5ViewModel.setTheAllTemplatesUploadedFlagMLD(true)
                 aInfo5ViewModel.setTheSectionAllDataLoadedFlagMLD(true)
             }
         }
 
+        //Get All the SectionCode Related Templates for Checklist Report
+        val currentSectionCode = aInfo5ViewModel.getThePresentSectionCodeAndDisplayName().uniqueCodeName
+        val currentPageGroupCode = processSectionCode(currentSectionCode)
+        val parentChildParentItemML = aInfo5ViewModel.getTheParentChildParentItemML()
+        sectionChildPageCodesList = parentChildParentItemML.find { it.pageGroupCode == currentPageGroupCode }?.childItemList!!
+        val presentInTemplateList = mutableListOf<Int>()
+        if (sectionChildPageCodesList.isNotEmpty()){
+            for (item in sectionChildPageCodesList){
+                if (aInfo5ViewModel.isItemPresentInPageTemplateList(item)){
+                    presentInTemplateList.add(1)
+                }
+            }
+            if (presentInTemplateList.size != sectionChildPageCodesList.size){
+                aInfo5ViewModel.allSectionTemplatesUploadedForChecklistFlagLD.observe(viewLifecycleOwner){
+                    if (it == false){
+                        getThePageTemplatesForCheckListReport(sectionChildPageCodesList)
+                    }
+                }
+            }
+            else {
+                aInfo5ViewModel.setTheAllSectionTemplatesUploadedForChecklistFlagMLD(true)
+            }
+        }
+        else {
+            aInfo5ViewModel.setTheAllSectionTemplatesUploadedForChecklistFlagMLD(true)
+        }
+
+
         //Set process of getting the questions view etc
         aInfo5ViewModel.allConditionsMetLD.observe(viewLifecycleOwner) { allMet ->
             if (allMet == true) {
+                binding.tvPbMessagesObservationsFragment.visibility = View.GONE
                 //Set Up the Questions View Now
                 if (aInfo5ViewModel.getThePreviousScreenVariable() == MainActivity.SECTION_FRAGMENT_SECTION_CHOICE) {
                     binding.rvQuestionsFramework.visibility = View.VISIBLE
@@ -282,8 +310,17 @@ class ObservationsFragment : Fragment() {
                 }
             }
             else {
+//                Log.d(TAG, "onViewCreated:Obs fragment \n" +
+//                        "parentChildParentItemMLUploadedMLD: ${aInfo5ViewModel.parentChildParentItemMLUploadedMLD.value.toString()} \n" +
+//                        "sectionAllPagesFrameworkLoadedFlagLD: ${aInfo5ViewModel.sectionAllPagesFrameworkLoadedFlagLD.value.toString()}\n" +
+//                        "sectionAllDataLoadedFlagLD: ${aInfo5ViewModel.sectionAllDataLoadedFlagLD.value.toString()}\n" +
+//                        "allTemplatesUploadedFlagMLD: ${aInfo5ViewModel.allTemplatesUploadedFlagMLD.value.toString()}\n" +
+//                        "editCompletedFlagLD: ${aInfo5ViewModel.editCompletedFlagLD.value.toString()}\n" +
+//                        "deleteCompletedFlagLD: ${aInfo5ViewModel.deleteCompletedFlagLD.value.toString()}")
                 //Ensure that the Progress bar is visible
                 binding.pbUploadingFromDatabase.visibility = View.VISIBLE
+                binding.tvPbMessagesObservationsFragment.visibility = View.VISIBLE
+                binding.tvPbMessagesObservationsFragment.text = getString(R.string.string_message_loading_from_db)
                 binding.llObservationsActionbuttonsAndViews.isEnabled = false
                 binding.fabAddANewBlock.isEnabled = false
             }
@@ -306,24 +343,23 @@ class ObservationsFragment : Fragment() {
             binding.buttonQuestionsView.startAnimation(animation)
             aInfo5ViewModel.setTheScreenVariable(MainActivity.OBSERVATIONS_FRAGMENT)
             var currentPageIndex = 0
-            if (aInfo5ViewModel.getThePreviousScreenVariable() == MainActivity.SECTION_FRAGMENT_SECTION_CHOICE) {
+            currentPageIndex = if (aInfo5ViewModel.getThePreviousScreenVariable() == MainActivity.SECTION_FRAGMENT_SECTION_CHOICE) {
                 if (presentSectionAllPagesFramework.sectionPageFrameworkList.size > 0) {
-                    currentPageIndex =
-                        presentSectionAllPagesFramework.sectionPageFrameworkList.size - 1
+                    presentSectionAllPagesFramework.sectionPageFrameworkList.size - 1
                 } else {
-                    currentPageIndex = 0
+                    0
                 }
             } else {
                 if (presentSectionAllPagesFramework.sectionPageFrameworkList.size > 0) {
-                    currentPageIndex = presentSectionAllPagesFrameworkIndex
+                    presentSectionAllPagesFrameworkIndex
                 } else {
-                    currentPageIndex = 0
+                    0
                 }
             }
             //aInfo5ViewModel.setThePreviousScreenVariable(MainActivity.NOT_RELEVANT)
             binding.rvQuestionsFramework.visibility = View.VISIBLE
             binding.rvCheckboxesFramework.visibility = View.GONE
-            binding.tvQuestionsEtcLabel.setText(getString(R.string.string_Questions_Below))
+            binding.tvQuestionsEtcLabel.text = getString(R.string.string_Questions_Below)
             binding.tvQuestionsEtcLabel.startAnimation(animation)
             loadQuestionsRecyclerView(currentPageIndex)
         }
@@ -333,22 +369,21 @@ class ObservationsFragment : Fragment() {
             binding.buttonObservationsView.startAnimation(animation)
             aInfo5ViewModel.setTheScreenVariable(MainActivity.OBSERVATIONS_FRAGMENT_OBSERVATIONS)
             var currentPageIndex = 0
-            if (aInfo5ViewModel.getThePreviousScreenVariable() == MainActivity.SECTION_FRAGMENT_SECTION_CHOICE) {
+            currentPageIndex = if (aInfo5ViewModel.getThePreviousScreenVariable() == MainActivity.SECTION_FRAGMENT_SECTION_CHOICE) {
                 if (presentSectionAllPagesFramework.sectionPageFrameworkList.size > 0) {
-                    currentPageIndex =
-                        presentSectionAllPagesFramework.sectionPageFrameworkList.size - 1
+                    presentSectionAllPagesFramework.sectionPageFrameworkList.size - 1
                 } else {
-                    currentPageIndex = 0
+                    0
                 }
             } else {
                 if (presentSectionAllPagesFramework.sectionPageFrameworkList.size > 0) {
-                    currentPageIndex = presentSectionAllPagesFrameworkIndex
+                    presentSectionAllPagesFrameworkIndex
                 } else {
-                    currentPageIndex = 0
+                    0
                 }
             }
             //aInfo5ViewModel.setThePreviousScreenVariable(MainActivity.NOT_RELEVANT)
-            binding.tvQuestionsEtcLabel.setText(getString(R.string.string_Observations_Below))
+            binding.tvQuestionsEtcLabel.text = getString(R.string.string_Observations_Below)
             binding.tvQuestionsEtcLabel.startAnimation(animation)
             binding.rvQuestionsFramework.visibility = View.GONE
             binding.rvCheckboxesFramework.visibility = View.VISIBLE
@@ -360,21 +395,20 @@ class ObservationsFragment : Fragment() {
             binding.buttonRecommendationsView.startAnimation(animation)
             aInfo5ViewModel.setTheScreenVariable(MainActivity.OBSERVATIONS_FRAGMENT_RECOMMENDATIONS)
             var currentPageIndex = 0
-            if (aInfo5ViewModel.getThePreviousScreenVariable() == MainActivity.SECTION_FRAGMENT_SECTION_CHOICE) {
+            currentPageIndex = if (aInfo5ViewModel.getThePreviousScreenVariable() == MainActivity.SECTION_FRAGMENT_SECTION_CHOICE) {
                 if (presentSectionAllPagesFramework.sectionPageFrameworkList.size > 0) {
-                    currentPageIndex =
-                        presentSectionAllPagesFramework.sectionPageFrameworkList.size - 1
+                    presentSectionAllPagesFramework.sectionPageFrameworkList.size - 1
                 } else {
-                    currentPageIndex = 0
+                    0
                 }
             } else {
                 if (presentSectionAllPagesFramework.sectionPageFrameworkList.size > 0) {
-                    currentPageIndex = presentSectionAllPagesFrameworkIndex
+                    presentSectionAllPagesFrameworkIndex
                 } else {
-                    currentPageIndex = 0
+                    0
                 }
             }
-            binding.tvQuestionsEtcLabel.setText(getString(R.string.string_Recommendations_Below))
+            binding.tvQuestionsEtcLabel.text = getString(R.string.string_Recommendations_Below)
             binding.tvQuestionsEtcLabel.startAnimation(animation)
             binding.rvQuestionsFramework.visibility = View.GONE
             binding.rvCheckboxesFramework.visibility = View.VISIBLE
@@ -386,21 +420,20 @@ class ObservationsFragment : Fragment() {
             binding.buttonStandardsView.startAnimation(animation)
             aInfo5ViewModel.setTheScreenVariable(MainActivity.OBSERVATIONS_FRAGMENT_STANDARDS)
             var currentPageIndex = 0
-            if (aInfo5ViewModel.getThePreviousScreenVariable() == MainActivity.SECTION_FRAGMENT_SECTION_CHOICE) {
+            currentPageIndex = if (aInfo5ViewModel.getThePreviousScreenVariable() == MainActivity.SECTION_FRAGMENT_SECTION_CHOICE) {
                 if (presentSectionAllPagesFramework.sectionPageFrameworkList.size > 0) {
-                    currentPageIndex =
-                        presentSectionAllPagesFramework.sectionPageFrameworkList.size - 1
+                    presentSectionAllPagesFramework.sectionPageFrameworkList.size - 1
                 } else {
-                    currentPageIndex = 0
+                    0
                 }
             } else {
                 if (presentSectionAllPagesFramework.sectionPageFrameworkList.size > 0) {
-                    currentPageIndex = presentSectionAllPagesFrameworkIndex
+                    presentSectionAllPagesFrameworkIndex
                 } else {
-                    currentPageIndex = 0
+                    0
                 }
             }
-            binding.tvQuestionsEtcLabel.setText(getString(R.string.string_Standards_Below))
+            binding.tvQuestionsEtcLabel.text = getString(R.string.string_Standards_Below)
             binding.tvQuestionsEtcLabel.startAnimation(animation)
             binding.rvQuestionsFramework.visibility = View.GONE
             binding.rvCheckboxesFramework.visibility = View.VISIBLE
@@ -700,6 +733,29 @@ class ObservationsFragment : Fragment() {
 
     //Functions below
 
+
+    private fun processSectionCode(input: String): String {
+        var resultString = ""
+        resultString = if (input == "Section_DropoffandBuildingEntry_0004_Section"){
+            "PG_Drop_Off_And_Building_Entry_PG"
+        }
+        else {
+            val parts = input.split("_")
+            if (parts.size < 2) return ""
+            val secondTerm = parts[1]  // "Gates" or "MiscellaneousRooms"
+            // Proper camelCase split using regex - keeps capitalization
+            val words = secondTerm.split(Regex("(?<=\\p{Ll})(?=\\p{Lu})")).filter { it.isNotEmpty() }
+            "PG_${words.joinToString("_")}_PG"
+        }
+
+        return resultString
+    }
+
+    private fun initialiseSomeFlagsLD(){
+        aInfo5ViewModel.setThePictureUploadedCXFFlagMLD(true)
+        aInfo5ViewModel.setTheVideoUploadedCXFFlagMLD(true)
+    }
+
     fun createUniqueListOfPageCodesForCurrentPageFromFramework(currentPageIndex: Int){
         uniqueListOfSectionPageCodes = mutableListOf()
         if (presentSectionAllPagesFramework.sectionPageFrameworkList.isNotEmpty()){
@@ -742,7 +798,7 @@ class ObservationsFragment : Fragment() {
         }
     }
 
-    fun saveIntoDB(){
+    private fun saveIntoDB(){
         //Save the page title into the page framework and data
         val currentPageIndex = presentSectionAllPagesFrameworkIndex
         aInfo5ViewModel.updatePageFrameworkTitleInPresentSectionAllPagesFramework(
@@ -769,11 +825,13 @@ class ObservationsFragment : Fragment() {
 
         //Update and save the Company Report into db
         aInfo5ViewModel.setTheSectionPagesUpdatedInReportSIFFlagMLD(false)
-        aInfo5ViewModel.updateSectionDetailsInCompanyReportAndSave(
-            aInfo5ViewModel.getPresentSectionCode(),
-            aInfo5ViewModel.getPresentSectionName(),
-            aInfo5ViewModel.getThePresentSectionAllData()
-        )
+
+            aInfo5ViewModel.updateSectionDetailsInCompanyReportAndSave(
+                aInfo5ViewModel.getPresentSectionCode(),
+                aInfo5ViewModel.getPresentSectionName(),
+                aInfo5ViewModel.getThePresentSectionAllData(),
+                sectionChildPageCodesList
+            )
 
         presentSectionAllPagesFramework = aInfo5ViewModel.getThePresentSectionAllPagesFramework()
         presentSectionAllData = aInfo5ViewModel.getThePresentSectionAllData()
@@ -819,7 +877,8 @@ class ObservationsFragment : Fragment() {
                             aInfo5ViewModel.setThePageCountMLD(currentPageIndex )
                             presentSectionAllPagesFrameworkIndex = currentPageIndex
                             aInfo5ViewModel.setThePresentSectionAllPagesFrameworkIndex(currentPageIndex )
-                        } else {
+                        }
+                        else {
                             aInfo5ViewModel.setThePageCountMLD(0)
                             presentSectionAllPagesFrameworkIndex = 0
                             aInfo5ViewModel.setThePresentSectionAllPagesFrameworkIndex(0)
@@ -918,7 +977,7 @@ class ObservationsFragment : Fragment() {
         var ampValueListString = ""
         if (ampCode != "") {
             if (ampCode.contains("_APM") && ampCode.contains("APM_")) {
-                val ampIDML = mutableListOf<String>(ampCode)
+                val ampIDML = mutableListOf(ampCode)
                 val ampListStringValue = aInfo5ViewModel.getAInfo5TemplatesByIds(ampIDML)
                 ampListStringValue.observe(viewLifecycleOwner) { list ->
                     if (list.isEmpty()) {
@@ -953,7 +1012,7 @@ class ObservationsFragment : Fragment() {
             multiChoiceList.keys.toTypedArray(),
             multiChoiceList.values.toBooleanArray()
         ) { dialogInterface, which, isChecked ->
-            multiChoiceList.set(multiChoiceList.keys.toTypedArray().get(which), isChecked)
+            multiChoiceList[multiChoiceList.keys.toTypedArray().get(which)] = isChecked
         }
 
         builder.setPositiveButton("ok") { dialog, id ->
@@ -969,7 +1028,7 @@ class ObservationsFragment : Fragment() {
                 val recommendationsFrameworkDataItem = CheckboxesFrameworkDataItemDC()
                 val standardsFrameworkDataItem = CheckboxesFrameworkDataItemDC()
                 
-                if (selection.value == true) {
+                if (selection.value) {
                     for (item in inputList) {
                         if (!uniqueListOfSectionPageCodes.contains(item)){
                             aInfo5ViewModel.uniqueListOfSectionPageCodes.add(item)
@@ -1217,7 +1276,7 @@ class ObservationsFragment : Fragment() {
 
     }
 
-    fun uniqueCodeFromQuestionsParentTemplateItemList(
+    private fun uniqueCodeFromQuestionsParentTemplateItemList(
         questionsFrameworkItemML: MutableList<QuestionsFrameworkItemDC>,
         blockTitle: String
     ): Int {
@@ -1234,15 +1293,15 @@ class ObservationsFragment : Fragment() {
             }
         }
 
-        if (numberList.isNotEmpty()) {
-            result = numberList.max() + 1
+        result = if (numberList.isNotEmpty()) {
+            numberList.max() + 1
         } else {
-            result = 1
+            1
         }
         return result
     }
 
-    fun uniqueCodeFromCheckboxParentTemplateItemList(
+    private fun uniqueCodeFromCheckboxParentTemplateItemList(
         inputMutableList: MutableList<CheckboxesFrameworkItemDC>,
         blockTitle: String
     ): Int {
@@ -1258,10 +1317,10 @@ class ObservationsFragment : Fragment() {
                 }
             }
         }
-        if (numberList.isNotEmpty()) {
-            result = numberList.max() + 1
+        result = if (numberList.isNotEmpty()) {
+            numberList.max() + 1
         } else {
-            result = 1
+            1
         }
 
         return result
@@ -1294,21 +1353,25 @@ class ObservationsFragment : Fragment() {
     }
 
     private fun generateQuestionsTemplateList(pageCode: String) {
-        if (aInfo5ViewModel.isItemPresentInPageTemplateList(pageCode) == false) {
+        if (!aInfo5ViewModel.isItemPresentInPageTemplateMLMLD(pageCode)) {
             aInfo5ViewModel.presentTemplateUploadedFlagMLD.value = false
             getThePageTemplateAndUploadIntoViewModel(mutableListOf(pageCode) )
-            aInfo5ViewModel.setTheQuestionsListMLD(
-                getItemFromPageTemplateList(
-                    pageCode
-                ).questionsList
-            )
+            aInfo5ViewModel.getItemFromPageTemplateMLMLD(
+                pageCode
+            )?.let {
+                aInfo5ViewModel.setTheQuestionsListMLD(
+                    it.questionsList
+                )
+            }
         }
         else {
-            aInfo5ViewModel.setTheQuestionsListMLD(
-                getItemFromPageTemplateList(
-                    pageCode
-                ).questionsList
-            )
+            aInfo5ViewModel.getItemFromPageTemplateMLMLD(
+                pageCode
+            )?.let {
+                aInfo5ViewModel.setTheQuestionsListMLD(
+                    it.questionsList
+                )
+            }
         }
     }
 
@@ -1376,16 +1439,18 @@ class ObservationsFragment : Fragment() {
                 { selectedPageCode -> generateObservationsTemplateList(selectedPageCode) })
     }
 
-    fun generateObservationsTemplateList(pageCode: String) {
-        if (aInfo5ViewModel.isItemPresentInPageTemplateList(pageCode) == false) {
+    private fun generateObservationsTemplateList(pageCode: String) {
+        if (!aInfo5ViewModel.isItemPresentInPageTemplateMLMLD(pageCode)) {
             aInfo5ViewModel.presentTemplateUploadedFlagMLD.value = false
             getThePageTemplateAndUploadIntoViewModel(mutableListOf(pageCode) )
         } else {
-            aInfo5ViewModel.setTheObservationsListMLD(
-                getItemFromPageTemplateList(
-                    pageCode
-                ).observationsList
-            )
+            aInfo5ViewModel.getItemFromPageTemplateMLMLD(
+                pageCode
+            )?.let {
+                aInfo5ViewModel.setTheObservationsListMLD(
+                    it.observationsList
+                )
+            }
         }
 
     }
@@ -1456,16 +1521,18 @@ class ObservationsFragment : Fragment() {
                 { selectedPageCode -> generateRecommendationsTemplateList(selectedPageCode) })
     }
 
-    fun generateRecommendationsTemplateList(pageCode: String) {
-        if (aInfo5ViewModel.isItemPresentInPageTemplateList(pageCode) == false) {
+    private fun generateRecommendationsTemplateList(pageCode: String) {
+        if (!aInfo5ViewModel.isItemPresentInPageTemplateMLMLD(pageCode)) {
             aInfo5ViewModel.presentTemplateUploadedFlagMLD.value = false
             getThePageTemplateAndUploadIntoViewModel(mutableListOf(pageCode))
         } else {
-            aInfo5ViewModel.setTheRecommendationsListMLD(
-                getItemFromPageTemplateList(
-                    pageCode
-                ).recommendationsList
-            )
+            aInfo5ViewModel.getItemFromPageTemplateMLMLD(
+                pageCode
+            )?.let {
+                aInfo5ViewModel.setTheRecommendationsListMLD(
+                    it.recommendationsList
+                )
+            }
         }
     }
 
@@ -1536,15 +1603,17 @@ class ObservationsFragment : Fragment() {
     }
 
     fun generateStandardsTemplateList(pageCode: String) {
-        if (aInfo5ViewModel.isItemPresentInPageTemplateList(pageCode) == false) {
+        if (!aInfo5ViewModel.isItemPresentInPageTemplateMLMLD(pageCode)) {
             aInfo5ViewModel.presentTemplateUploadedFlagMLD.value = false
             getThePageTemplateAndUploadIntoViewModel(mutableListOf(pageCode))
         } else {
-            aInfo5ViewModel.setTheStandardsListMLD(
-                getItemFromPageTemplateList(
-                    pageCode
-                ).standardsList
-            )
+            aInfo5ViewModel.getItemFromPageTemplateMLMLD(
+                pageCode
+            )?.let {
+                aInfo5ViewModel.setTheStandardsListMLD(
+                    it.standardsList
+                )
+            }
         }
     }
 
@@ -1612,26 +1681,26 @@ class ObservationsFragment : Fragment() {
 
             if (aInfo5ViewModel.getTheScreenVariable() == MainActivity.OBSERVATIONS_FRAGMENT) {
                 loadQuestionsRecyclerView(currentPageIndex)
-                binding.tvQuestionsEtcLabel.setText(getString(R.string.string_Questions_Below))
+                binding.tvQuestionsEtcLabel.text = getString(R.string.string_Questions_Below)
             }
             else if (aInfo5ViewModel.getTheScreenVariable() == MainActivity.OBSERVATIONS_FRAGMENT_OBSERVATIONS) {
                 loadObservationsRecyclerView(currentPageIndex)
-                binding.tvQuestionsEtcLabel.setText(getString(R.string.string_Observations_Below))
+                binding.tvQuestionsEtcLabel.text = getString(R.string.string_Observations_Below)
             }
             else if (aInfo5ViewModel.getTheScreenVariable() == MainActivity.OBSERVATIONS_FRAGMENT_RECOMMENDATIONS) {
                 loadRecommendationsRecyclerView(currentPageIndex)
-                binding.tvQuestionsEtcLabel.setText(getString(R.string.string_Recommendations_Below))
+                binding.tvQuestionsEtcLabel.text = getString(R.string.string_Recommendations_Below)
             }
             else if (aInfo5ViewModel.getTheScreenVariable() == MainActivity.OBSERVATIONS_FRAGMENT_STANDARDS) {
                 loadStandardsRecyclerView(currentPageIndex)
-                binding.tvQuestionsEtcLabel.setText(getString(R.string.string_Standards_Below))
+                binding.tvQuestionsEtcLabel.text = getString(R.string.string_Standards_Below)
             }
             loadPageData(currentPageIndex)
 
         }
     }
 
-    fun loadPageData(currentPageIndex: Int) {
+    private fun loadPageData(currentPageIndex: Int) {
         aInfo5ViewModel.etObservationsMLD.value =
             presentSectionAllData.sectionAllPagesData.sectionPageDataList[currentPageIndex].observations
         aInfo5ViewModel.etRecommendationsMLD.value =
@@ -1652,6 +1721,13 @@ class ObservationsFragment : Fragment() {
     fun getThePageTemplateAndUploadIntoViewModel(pageCodeML: MutableList<String>, presentSectionAllPagesFramework: SectionAllPagesFrameworkDC = SectionAllPagesFrameworkDC(), presentSectionAllData: SectionAllDataDC = SectionAllDataDC()) {
         aInfo5ViewModel.getAInfo5TemplatesByIds(pageCodeML).observe(viewLifecycleOwner) { list ->
             aInfo5ViewModel.templateStringsToPageTemplatesAndAddingToTemplatesListMLD(list, presentSectionAllPagesFramework, presentSectionAllData)
+        }
+    }
+
+    //Get PageTemplates For Checklist Report and Upload into TemplateList
+    fun getThePageTemplatesForCheckListReport(pageCodeML: MutableList<String>){
+        aInfo5ViewModel.getAInfo5TemplatesByIds(pageCodeML).observe(viewLifecycleOwner){list ->
+            aInfo5ViewModel.templateStringsToPageTemplatesForCheckListReportAndAddingToTemplatesListMLD(list)
         }
     }
 
@@ -1679,7 +1755,7 @@ class ObservationsFragment : Fragment() {
         builder.create().show()
     }
 
-    fun expandAndCollapseViews() {
+    private fun expandAndCollapseViews() {
         var isActionButtonsExpanded = true
 
         fun setActionButtonsExpandedValue(input: Boolean) {
