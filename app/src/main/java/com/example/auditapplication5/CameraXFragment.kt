@@ -5,6 +5,7 @@ import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.provider.DocumentsContract
 import android.provider.MediaStore
 import android.util.Log
 import android.view.LayoutInflater
@@ -12,6 +13,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
+import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.camera.core.CameraSelector
@@ -22,6 +24,7 @@ import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.video.*
 import androidx.core.content.ContextCompat
 import androidx.core.content.PermissionChecker
+import androidx.core.net.toUri
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
@@ -41,7 +44,11 @@ class CameraXFragment : Fragment() {
     private lateinit var binding: FragmentCameraXBinding
     private lateinit var aInfo5ViewModel: AInfo5ViewModel
 
+    private lateinit var folderPicker: ActivityResultLauncher<Uri?>
+
     var savedImageUri: Uri? = null
+
+    var savedVideoUriString = ""
 
     private var imageCapture: ImageCapture? = null
     private var videoCapture: VideoCapture<Recorder>? = null
@@ -107,9 +114,16 @@ class CameraXFragment : Fragment() {
                 binding.buttonVideoCapture.isEnabled = true
             }
             else {
-                binding.pbSavingPictureAndVideo.visibility = View.VISIBLE
-                binding.tvPbMessagesCameraXFragment.visibility = View.VISIBLE
-                binding.tvPbMessagesCameraXFragment.text = getString(R.string.string_mesage_photo_video_saved)
+                if (aInfo5ViewModel.videoUploadedCXFFlagLD.value == false){
+                    binding.pbSavingPictureAndVideo.visibility = View.GONE
+                } else {
+                    binding.pbSavingPictureAndVideo.visibility = View.VISIBLE
+                }
+
+                if (aInfo5ViewModel.pictureUploadedCXFFlagLD.value == false){
+                    binding.tvPbMessagesCameraXFragment.visibility = View.VISIBLE
+                    binding.tvPbMessagesCameraXFragment.text = getString(R.string.string_mesage_photo_saved)
+                }
                 binding.buttonImageCapture.isEnabled = false
                 binding.buttonVideoCapture.isEnabled = false
             }
@@ -151,13 +165,15 @@ class CameraXFragment : Fragment() {
 //            }, 600)
         }
         binding.buttonVideoCapture.setOnClickListener {
+            aInfo5ViewModel.setTheVideoUploadedCXFFlagMLD(false)
             captureVideo()
         }
 
         cameraExecutor = Executors.newSingleThreadExecutor()
 
-
     }
+
+
 
     override fun onStop() {
         super.onStop()
@@ -257,7 +273,7 @@ class CameraXFragment : Fragment() {
         val contentValues = ContentValues().apply {
             put(MediaStore.MediaColumns.DISPLAY_NAME, photoName)
             put(MediaStore.MediaColumns.MIME_TYPE, "image/jpeg")
-            put(MediaStore.Images.Media.RELATIVE_PATH, "Pictures/${aInfo5ViewModel.getPresentCompanyCode()}")
+            put(MediaStore.Images.Media.RELATIVE_PATH, "Pictures/Temp_Storage")
         }
 
 
@@ -295,8 +311,6 @@ class CameraXFragment : Fragment() {
     private fun captureVideo() {
         val videoCapture = this.videoCapture ?: return
 
-        binding.buttonVideoCapture.isEnabled = false
-
         val curRecording = recording
         if (curRecording != null) {
             // Stop the current recording session.
@@ -305,14 +319,25 @@ class CameraXFragment : Fragment() {
             return
         }
 
+        binding.buttonVideoCapture.isEnabled = false
+
         // create and start a new recording session
-        val name = SimpleDateFormat(MainActivity.FILENAME_DEFAULT_FORMAT, Locale.US)
+
+        var presentSectionName = ""
+        if (aInfo5ViewModel.getLocationForPhotos().contains(aInfo5ViewModel.getPresentSectionCode())){
+            presentSectionName = aInfo5ViewModel.getPresentSectionName()
+        }
+
+        var videoName = aInfo5ViewModel.makeVideoName(aInfo5ViewModel.getLocationForPhotos(),presentSectionName)
+
+        videoName += "_" + SimpleDateFormat(MainActivity.FILENAME_DEFAULT_FORMAT, Locale.US)
             .format(System.currentTimeMillis())
+
         val contentValues = ContentValues().apply {
-            put(MediaStore.MediaColumns.DISPLAY_NAME, name)
+            put(MediaStore.MediaColumns.DISPLAY_NAME, videoName)
             put(MediaStore.MediaColumns.MIME_TYPE, "video/mp4")
             if (Build.VERSION.SDK_INT > Build.VERSION_CODES.P) {
-                put(MediaStore.Video.Media.RELATIVE_PATH, "Movies/${aInfo5ViewModel.getPresentCompanyCode()}")
+                put(MediaStore.Video.Media.RELATIVE_PATH, "Movies/Temp_Storage")
             }
         }
 
@@ -342,12 +367,13 @@ class CameraXFragment : Fragment() {
                         }
                         is VideoRecordEvent.Finalize -> {
                             if (!recordEvent.hasError()) {
-                                val msg = "Video capture succeeded: " +
-                                        "${recordEvent.outputResults.outputUri}"
-                                aInfo5ViewModel.setStatusMessageSF(msg)
-//                                Toast.makeText(activity?.baseContext, msg, Toast.LENGTH_SHORT)
-//                                    .show()
+                                val videoUri = recordEvent.outputResults.outputUri
+                                val msg = "Video capture succeeded: "
+                                //aInfo5ViewModel.setStatusMessageSF(msg)
+                                Toast.makeText(activity?.baseContext, msg, Toast.LENGTH_SHORT)
+                                    .show()
                                 Log.d(MainActivity.TAG, msg)
+                                aInfo5ViewModel.writeToVideoFile(videoUri, videoName)
                                 aInfo5ViewModel.setTheVideoUploadedCXFFlagMLD(true)
                             }
                             else {
@@ -374,6 +400,11 @@ class CameraXFragment : Fragment() {
             ContextCompat.checkSelfPermission(
                 it1.baseContext, it)
         } == PackageManager.PERMISSION_GRANTED
+    }
+
+    private fun getRelativePathFromTreeUri(treeUri: Uri): String {
+        val docId = DocumentsContract.getTreeDocumentId(treeUri)
+        return docId?.substringAfter("primary:") ?: "Movies"
     }
 
 

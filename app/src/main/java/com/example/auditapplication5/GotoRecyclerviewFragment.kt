@@ -36,7 +36,7 @@ class GotoRecyclerviewFragment : Fragment() {
 
         activity?.onBackPressedDispatcher?.addCallback(viewLifecycleOwner, object : OnBackPressedCallback(true){
             override fun handleOnBackPressed() {
-                aInfo5ViewModel.setTheScreenVariable(aInfo5ViewModel.getThePreviousScreenVariable())
+                aInfo5ViewModel.setTheScreenVariable(aInfo5ViewModel.getThePreviousScreen2Variable())
                 findNavController().navigate(R.id.action_gotoRecyclerviewFragment_to_observationsFragment)
             }
 

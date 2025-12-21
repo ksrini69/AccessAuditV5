@@ -12,6 +12,7 @@ import android.widget.Toast
 import androidx.core.net.toUri
 import androidx.documentfile.provider.DocumentFile
 import androidx.lifecycle.*
+import androidx.lifecycle.Observer
 import com.example.auditapplication5.Event
 import com.example.auditapplication5.MainActivity
 import com.example.auditapplication5.data.model.*
@@ -21,6 +22,8 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import java.io.*
+import java.util.*
+import kotlin.collections.LinkedHashMap
 
 class AInfo5ViewModel(
     private val app: Application,
@@ -4921,37 +4924,12 @@ class AInfo5ViewModel(
                 if (matchingReport != null){
                     reorderedSectionReportList.add(matchingReport)
                 } else {
-                    break
+                    continue
                 }
             }
         }
         if (reorderedSectionReportList.isNotEmpty()){
             setTheSectionReportListInCompanyReport(reorderedSectionReportList)
-        }
-    }
-
-    fun updateSectionReportInCompanyReportAndSave(sectionReport: SectionReportDC) {
-        viewModelScope.launch(Dispatchers.Default) {
-            var sectionReportPresentFlag = false
-            var sectionReportIndex = 0
-            if (companyReport.sectionReportList.isNotEmpty()) {
-                for (index in 0 until companyReport.sectionReportList.size) {
-                    if (companyReport.sectionReportList[index].sectionCode == sectionReport.sectionCode) {
-                        sectionReportPresentFlag = true
-                        sectionReportIndex = index
-                        break
-                    }
-                }
-            } else {
-                companyReport.sectionReportList.add(sectionReport)
-            }
-            withContext(Dispatchers.Main) {
-                if (sectionReportPresentFlag) {
-                    companyReport.sectionReportList[sectionReportIndex] = sectionReport
-                }
-                reorderSectionReportsInCompanyReport()
-            }
-
         }
     }
 
@@ -6202,6 +6180,36 @@ class AInfo5ViewModel(
         }
         return presentPhotoName
     }
+
+    fun makeVideoName(location: String, sectionName1: String = ""): String {
+        var videoName = ""
+        if (location.contains(getPresentCompanyCode())) {
+            videoName = MainActivity.COMPANY_INTRODUCTION
+        } else if (location.contains(getPresentSectionCode())) {
+
+            var sectionName = sectionName1
+            if (sectionName == "") {
+                val list = location.split("_")
+                sectionName = if (list.size > 1) {
+                    list[1]
+                } else {
+                    location
+                }
+            }
+
+            if (location.contains(MainActivity.INTRODUCTIONS_PAGE)) {
+                videoName =
+                    sectionName + "_" + MainActivity.INTRODUCTIONS_PAGE
+            } else if (location.contains(MainActivity.OBSERVATIONS_PAGE)) {
+                videoName =
+                    sectionName + "_" + MainActivity.OBSERVATIONS_PAGE
+            }
+        }
+        return videoName
+    }
+
+
+
 
     //The below function changes the photo name to photoName_M. M stands for Modified
     private fun modifyPhotoName(selectedPhotoName: String): String {
@@ -7464,7 +7472,8 @@ class AInfo5ViewModel(
                                     setThePictureUploadedCXFFlagMLD(true)
                                 }
                             }
-                        } else {
+                        }
+                        else {
                             //Error Message
                             withContext(Dispatchers.Main) {
                                 //statusMessage.value = Event("Error: File Write Failed!")
@@ -7477,6 +7486,87 @@ class AInfo5ViewModel(
         }
 
     }
+
+    fun writeToVideoFile(videoUri: Uri?, videoName: String = "") {
+        viewModelScope.launch {
+            withContext(Dispatchers.IO) {
+                val context = getApplication<Application>().applicationContext
+                val contentResolver = context.contentResolver
+                val dirUriString = getTheCompanyDirectoryURIString()
+
+                if (dirUriString.isEmpty() || videoUri == null) {
+                    withContext(Dispatchers.Main) {
+                        setTheVideoUploadedCXFFlagMLD(true)
+                    }
+                    return@withContext
+                }
+
+                val dirUri = dirUriString.toUri()
+                val dir = DocumentFile.fromTreeUri(context, dirUri)
+
+                if (dir != null) {
+                    var videoFullName = ""
+                    if (videoName != ""){
+                        videoFullName = videoName + ".mp4"
+                    } else {
+                        videoFullName = "Video_${
+                            android.icu.text.SimpleDateFormat(
+                                MainActivity.FILENAME_DEFAULT_FORMAT,
+                                Locale.US
+                            )
+                                .format(System.currentTimeMillis())}.mp4"
+                    }
+
+                    val videoFile = dir.createFile("video/mp4", videoFullName)
+
+                    if (videoFile != null && videoFile.canWrite()) {
+                        // Copy video data from MediaStore to custom folder
+                        contentResolver.openInputStream(videoUri)?.use { input ->
+                            contentResolver.openOutputStream(videoFile.uri)?.use { output ->
+                                input.copyTo(output)
+                            }
+                        }
+
+                        // Delete original from Movies folder
+                        try {
+                            val rowsDeleted = contentResolver.delete(videoUri, null, null)
+                            if (rowsDeleted == 0) {
+                                Log.w("VideoDelete", "No rows deleted from Movies")
+                            } else {
+                                Log.i("VideoDelete", "Original video deleted from Movies")
+                            }
+                        } catch (e: SecurityException) {
+                            Log.e("VideoDelete", "Permission denied: ${e.message}")
+                        } catch (e: Exception) {
+                            Log.e("VideoDelete", "Delete failed: ${e.message}")
+                        }
+
+                        // Update database and UI on main thread
+                        withContext(Dispatchers.Main) {
+                            // Add video path to your lists (adapt to your structure)
+                            val videoComputerPath = ";;\\Video\\$videoFullName"
+
+                            // Update your ViewModel lists (similar to photo logic)
+                            // addVideoToCompanyVideosList(videoComputerPath)
+                            // saveCompanyVideoDetailsListToDB()
+
+                            setTheVideoUploadedCXFFlagMLD(true)
+                            Log.i("VideoSave", "Video moved to $dirUriString/$videoFullName")
+                        }
+                    }
+                    else {
+                        Log.e("VideoSave", "Cannot create/write video file")
+                        withContext(Dispatchers.Main) {
+                            setTheVideoUploadedCXFFlagMLD(true)
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+
+
 
     private fun uriToBitmap(selectedFileUri: Uri): Bitmap? {
         try {
