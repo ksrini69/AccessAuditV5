@@ -2,6 +2,9 @@ package com.example.auditapplication5
 
 import android.content.ContentValues
 import android.content.pm.PackageManager
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.graphics.Matrix
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
@@ -36,6 +39,8 @@ import java.text.SimpleDateFormat
 import java.util.*
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
+import androidx.camera.camera2.interop.Camera2CameraInfo
+import android.hardware.camera2.CameraCharacteristics
 
 
 class CameraXFragment : Fragment() {
@@ -53,6 +58,8 @@ class CameraXFragment : Fragment() {
     private var videoCapture: VideoCapture<Recorder>? = null
     private var recording: Recording? = null
     private lateinit var cameraExecutor: ExecutorService
+
+    private var sensorOrientation = 0
 
     var defaultImageName = "Default_Photo"
     var defaultVideoName = "Default_Video"
@@ -130,15 +137,39 @@ class CameraXFragment : Fragment() {
 
         orientationEventListener = object : OrientationEventListener(requireContext()) {
             override fun onOrientationChanged(orientation: Int) {
+
                 if (orientation == ORIENTATION_UNKNOWN) return
-                // 2. Map the sensor degrees to Surface constants
-                val rotation = when (orientation) {
-                    in 45 until 135 -> Surface.ROTATION_270
-                    in 135 until 225 -> Surface.ROTATION_180
-                    in 225 until 315 -> Surface.ROTATION_90
+
+                // 1. Get how the user is holding the phone
+                val deviceRotationDegrees = when (orientation) {
+                    in 45 until 135 -> 270
+                    in 135 until 225 -> 180
+                    in 225 until 315 -> 90
+                    else -> 0
+                }
+
+                // 2. Calculate final rotation based on hardware sensor orientation
+                // This ensures the photo is upright regardless of how the sensor is mounted
+                var finalRotationDegrees = 0
+                if (sensorOrientation == 90){
+                    finalRotationDegrees = (deviceRotationDegrees - (sensorOrientation - 90) + 360) % 360
+                } else if (sensorOrientation == 0) {
+                    finalRotationDegrees = (deviceRotationDegrees - (sensorOrientation) + 360) % 360
+                } else if (sensorOrientation == 270){
+                    finalRotationDegrees = (deviceRotationDegrees - (sensorOrientation - 270) + 360) % 360
+                } else if (sensorOrientation == 180){
+                    finalRotationDegrees = (deviceRotationDegrees - (sensorOrientation - 180) + 360) % 360
+                }
+
+                // 3. Map degrees to Surface constants
+                val rotation = when (finalRotationDegrees) {
+                    90 -> Surface.ROTATION_90
+                    180 -> Surface.ROTATION_180
+                    270 -> Surface.ROTATION_270
                     else -> Surface.ROTATION_0
                 }
-                // 3. Dynamically update the target rotation
+
+                // 4. Dynamically update the target rotation
                 imageCapture?.targetRotation = rotation
             }
         }
@@ -189,12 +220,11 @@ class CameraXFragment : Fragment() {
 
     override fun onStart() {
         super.onStart()
-        orientationEventListener?.enable() // Start listening
+        //orientationEventListener?.enable() // Start listening
     }
 
     override fun onStop() {
         super.onStop()
-
         orientationEventListener?.disable() // Stop listening to save battery
 
         //Update and save the Company Report into db
@@ -229,6 +259,7 @@ class CameraXFragment : Fragment() {
         }
     }
 
+    @androidx.annotation.OptIn(androidx.camera.camera2.interop.ExperimentalCamera2Interop::class)
     private fun startCamera() {
         val cameraProviderFuture = ProcessCameraProvider.getInstance(this.requireContext())
 
@@ -260,6 +291,18 @@ class CameraXFragment : Fragment() {
             try {
                 // Unbind use cases before rebinding
                 cameraProvider.unbindAll()
+
+                val camera = cameraProvider.bindToLifecycle(
+                    this, cameraSelector, preview, imageCapture, videoCapture)
+
+                val cameraInfo = camera.cameraInfo
+                sensorOrientation = Camera2CameraInfo.from(cameraInfo)
+                    .getCameraCharacteristic(CameraCharacteristics.SENSOR_ORIENTATION) ?: 0
+
+                Toast.makeText(requireContext(), "Sensor Orientation is $sensorOrientation", Toast.LENGTH_SHORT).show()
+
+                // Now that we have sensor info, enable the listener
+                orientationEventListener?.enable()
 
                 // Bind use cases to camera
                 cameraProvider.bindToLifecycle(
@@ -310,16 +353,75 @@ class CameraXFragment : Fragment() {
         if (outputOptions != null) {
             imageCapture.takePicture(
                 outputOptions,
-                ContextCompat.getMainExecutor(this.requireContext()),
+                cameraExecutor,
+                //ContextCompat.getMainExecutor(this.requireContext()),
                 object : ImageCapture.OnImageSavedCallback {
                     override fun onError(exc: ImageCaptureException) {
                         Log.e(MainActivity.TAG, "Photo capture failed: ${exc.message}", exc)
-                        aInfo5ViewModel.setThePictureUploadedCXFFlagMLD(true)
+                        activity?.runOnUiThread {
+                            aInfo5ViewModel.setThePictureUploadedCXFFlagMLD(true)
+                        }
+
+                        //aInfo5ViewModel.setThePictureUploadedCXFFlagMLD(true)
                     }
 
                     override fun onImageSaved(output: ImageCapture.OutputFileResults){
                         savedImageUri = output.savedUri
-                        aInfo5ViewModel.writeToImageFile(savedImageUri)
+                        val uri = output.savedUri ?: return
+
+                        // <<< START OF ROTATION CORRECTION LOGIC >>>
+                        try {
+                            val context = requireContext()
+
+                            // 1. Check the EXIF Orientation
+                            val inputStream = context.contentResolver.openInputStream(uri)
+                            val exif = androidx.exifinterface.media.ExifInterface(inputStream!!)
+                            val orientation = exif.getAttributeInt(
+                                androidx.exifinterface.media.ExifInterface.TAG_ORIENTATION,
+                                androidx.exifinterface.media.ExifInterface.ORIENTATION_NORMAL
+                            )
+                            inputStream.close()
+
+                            // 2. Only rotate if the phone saved it sideways (Phone 2 scenario)
+                            if (orientation != androidx.exifinterface.media.ExifInterface.ORIENTATION_NORMAL) {
+                                val bitmap = BitmapFactory.decodeStream(context.contentResolver.openInputStream(uri))
+
+                                val matrix = Matrix()
+                                when (orientation) {
+                                    androidx.exifinterface.media.ExifInterface.ORIENTATION_ROTATE_90 -> matrix.postRotate(90f)
+                                    androidx.exifinterface.media.ExifInterface.ORIENTATION_ROTATE_180 -> matrix.postRotate(180f)
+                                    androidx.exifinterface.media.ExifInterface.ORIENTATION_ROTATE_270 -> matrix.postRotate(270f)
+                                }
+
+                                val rotatedBitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.width, bitmap.height, matrix, true)
+
+                                // 3. Save the corrected pixels back to the file
+                                context.contentResolver.openOutputStream(uri)?.use { out ->
+                                    rotatedBitmap.compress(Bitmap.CompressFormat.JPEG, 100, out)
+                                }
+
+                                // 4. Reset the EXIF tag to 'Normal' so it doesn't get rotated twice later
+                                val outStream = context.contentResolver.openFileDescriptor(uri, "rw")
+                                val finalExif = androidx.exifinterface.media.ExifInterface(outStream?.fileDescriptor!!)
+                                finalExif.setAttribute(androidx.exifinterface.media.ExifInterface.TAG_ORIENTATION, "1")
+                                finalExif.saveAttributes()
+                                outStream.close()
+
+                                bitmap.recycle()
+                                rotatedBitmap.recycle()
+                            }
+                        } catch (e: Exception) {
+                            Log.e(MainActivity.TAG, "Rotation Fix Failed: ${e.message}")
+                        }
+                        // <<< END OF ROTATION CORRECTION LOGIC >>>
+
+                        savedImageUri = uri
+                        activity?.runOnUiThread {
+                            aInfo5ViewModel.writeToImageFile(savedImageUri)
+                            // This likely triggers the flag to enable buttons again
+                        }
+
+                        //aInfo5ViewModel.writeToImageFile(savedImageUri)
                     }
                 }
             )

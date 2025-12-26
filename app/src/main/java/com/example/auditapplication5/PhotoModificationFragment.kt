@@ -161,7 +161,8 @@ class PhotoModificationFragment : Fragment() {
         imageView = binding.ivBackground
         if (aInfo5ViewModel.getSelectedPhotoItemDC().photoUriString != ""){
             uploadImageFile(aInfo5ViewModel.getSelectedPhotoItemDC().photoUriString.toUri(), imageView)
-        } else {
+        }
+        else {
             context?.let { ContextCompat.getColor(it, R.color.white) }
                 ?.let { imageView.setBackgroundColor(it) }
         }
