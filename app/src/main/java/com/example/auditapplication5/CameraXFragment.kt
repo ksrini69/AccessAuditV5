@@ -8,9 +8,7 @@ import android.os.Bundle
 import android.provider.DocumentsContract
 import android.provider.MediaStore
 import android.util.Log
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.ActivityResultLauncher
@@ -50,6 +48,7 @@ class CameraXFragment : Fragment() {
 
     var savedVideoUriString = ""
 
+    private var orientationEventListener: OrientationEventListener? = null
     private var imageCapture: ImageCapture? = null
     private var videoCapture: VideoCapture<Recorder>? = null
     private var recording: Recording? = null
@@ -129,6 +128,21 @@ class CameraXFragment : Fragment() {
             }
         }
 
+        orientationEventListener = object : OrientationEventListener(requireContext()) {
+            override fun onOrientationChanged(orientation: Int) {
+                if (orientation == ORIENTATION_UNKNOWN) return
+                // 2. Map the sensor degrees to Surface constants
+                val rotation = when (orientation) {
+                    in 45 until 135 -> Surface.ROTATION_270
+                    in 135 until 225 -> Surface.ROTATION_180
+                    in 225 until 315 -> Surface.ROTATION_90
+                    else -> Surface.ROTATION_0
+                }
+                // 3. Dynamically update the target rotation
+                imageCapture?.targetRotation = rotation
+            }
+        }
+
         // Request camera permissions
         if (allPermissionsGranted()) {
             startCamera()
@@ -173,10 +187,15 @@ class CameraXFragment : Fragment() {
 
     }
 
-
+    override fun onStart() {
+        super.onStart()
+        orientationEventListener?.enable() // Start listening
+    }
 
     override fun onStop() {
         super.onStop()
+
+        orientationEventListener?.disable() // Stop listening to save battery
 
         //Update and save the Company Report into db
         aInfo5ViewModel.updateSectionDetailsInCompanyReportAndSave(
