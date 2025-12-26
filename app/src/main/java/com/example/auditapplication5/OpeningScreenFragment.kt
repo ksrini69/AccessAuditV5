@@ -146,7 +146,7 @@ class OpeningScreenFragment : Fragment() {
                     } else {
                         binding.llPasswordDatabaseDeletion.visibility = View.GONE
                         binding.llOpeningScreen.visibility = View.VISIBLE
-                        aInfo5ViewModel.setStatusMessageSF("The password entered is incorrect")
+                        aInfo5ViewModel.setStatusMessageFlow("The password entered is incorrect")
                         //Toast.makeText(requireContext(),"The password entered is incorrect", Toast.LENGTH_SHORT).show()
                         aInfo5ViewModel.setTheScreenVariable(MainActivity.OPENING_SCREEN_FRAGMENT)
                     }
@@ -166,7 +166,7 @@ class OpeningScreenFragment : Fragment() {
     private fun observeStatusMessage() {
         viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
-                aInfo5ViewModel.statusMessageSF.collect { message ->
+                aInfo5ViewModel.statusMessageFlow.collect { message ->
                     // Show Toast, Snackbar, or dialog - executes exactly once
                     Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
                 }
@@ -239,7 +239,7 @@ class OpeningScreenFragment : Fragment() {
                     .setPositiveButton("Yes") { dialog, _ ->
                         aInfo5ViewModel.deleteAllAInfo5()
                         aInfo5ViewModel.areAllAuditsDeletedMLD.value = true
-                        aInfo5ViewModel.setStatusMessageSF("Deletion of Audit Records is Complete")
+                        aInfo5ViewModel.setStatusMessageFlow("Deletion of Audit Records is Complete")
                         //Toast.makeText(this.requireContext(), "Deletion of Audit Records is Complete", Toast.LENGTH_LONG).show()
                         aInfo5ViewModel.setTheFileFlag(MainActivity.TEMPLATE_DATABASE_DELETE)
                         dialog.dismiss()
@@ -262,7 +262,7 @@ class OpeningScreenFragment : Fragment() {
                         aInfo5ViewModel.clearThePageGroupIDsList()
                         aInfo5ViewModel.clearTheParentChildParentItemML()
 
-                        aInfo5ViewModel.setStatusMessageSF("Deletion of Templates is Complete")
+                        aInfo5ViewModel.setStatusMessageFlow("Deletion of Templates is Complete")
                         //Toast.makeText(this.requireContext(), "Deletion of Templates is Complete", Toast.LENGTH_LONG).show()
                         dialog.dismiss()
                         //Load the templateLoadedIntoDBFlag into Template DB

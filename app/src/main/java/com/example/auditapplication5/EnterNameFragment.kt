@@ -263,7 +263,7 @@ class EnterNameFragment : Fragment() {
                                     aInfo5ViewModel.getTheParentFolderURIString().toUri()
                                 )
                             } catch (e: FileSystemException) {
-                                aInfo5ViewModel.setStatusMessageSF("Directory Creation Failed. Please note $e")
+                                aInfo5ViewModel.setStatusMessageFlow("Directory Creation Failed. Please note $e")
 //                                Toast.makeText(
 //                                    this.requireContext(),
 //                                    "Directory Creation Failed. Please note $e",
@@ -275,7 +275,7 @@ class EnterNameFragment : Fragment() {
                             try {
                                 aInfo5ViewModel.gettingCompanyDirectoryUriAndSavingIntoDB(companyName,aInfo5ViewModel.getTheParentFolderURIString().toUri() )
                             } catch (e: FileSystemException){
-                                aInfo5ViewModel.setStatusMessageSF("Getting this $companyName directory Uri has failed. Please note $e")
+                                aInfo5ViewModel.setStatusMessageFlow("Getting this $companyName directory Uri has failed. Please note $e")
                                 //Toast.makeText(context, "Getting this $companyName directory Uri has failed. Please note $e", Toast.LENGTH_SHORT).show()
                             }
 
@@ -340,7 +340,7 @@ class EnterNameFragment : Fragment() {
                                         aInfo5ViewModel.getTheParentFolderURIString().toUri()
                                     )
                                 } catch (e: FileSystemException) {
-                                    aInfo5ViewModel.setStatusMessageSF("Directory Creation Has Failed. Please note $e")
+                                    aInfo5ViewModel.setStatusMessageFlow("Directory Creation Has Failed. Please note $e")
 //                                    Toast.makeText(
 //                                        this.requireContext(),
 //                                        "Directory Creation Has Failed. Please note $e",
@@ -351,7 +351,7 @@ class EnterNameFragment : Fragment() {
                                 try {
                                     aInfo5ViewModel.gettingCompanyDirectoryUriAndSavingIntoDB(companyName,aInfo5ViewModel.getTheParentFolderURIString().toUri() )
                                 } catch (e: FileSystemException){
-                                    aInfo5ViewModel.setStatusMessageSF("Getting this $companyName directory Uri has failed. Please note $e")
+                                    aInfo5ViewModel.setStatusMessageFlow("Getting this $companyName directory Uri has failed. Please note $e")
                                     //Toast.makeText(context, "Getting this $companyName directory Uri has failed. Please note $e", Toast.LENGTH_SHORT).show()
                                 }
                             }
@@ -361,7 +361,7 @@ class EnterNameFragment : Fragment() {
                             it.findNavController()
                                 .navigate(R.id.action_enterNameFragment_to_sectionAndIntrosFragment)
                         } else {
-                            aInfo5ViewModel.setStatusMessageSF("This company name exists. Please enter a unique name.")
+                            aInfo5ViewModel.setStatusMessageFlow("This company name exists. Please enter a unique name.")
 //                            Toast.makeText(
 //                                this.requireContext(),
 //                                "This company name exists. Please enter a unique name.",
@@ -429,7 +429,7 @@ class EnterNameFragment : Fragment() {
                                 .navigate(R.id.action_enterNameFragment_to_sectionAndIntrosFragment)
                         }
                         else {
-                            aInfo5ViewModel.setStatusMessageSF("This section exists")
+                            aInfo5ViewModel.setStatusMessageFlow("This section exists")
                             Toast.makeText(
                                 this.requireContext(),
                                 "This section exists",
@@ -462,7 +462,7 @@ class EnterNameFragment : Fragment() {
                             findNavController().navigate(R.id.action_enterNameFragment_to_sectionAndIntrosFragment)
                         }
                         else {
-                            aInfo5ViewModel.setStatusMessageSF("This company name exists. Please enter a unique name.")
+                            aInfo5ViewModel.setStatusMessageFlow("This company name exists. Please enter a unique name.")
 //                            Toast.makeText(
 //                                this.requireContext(),
 //                                "This company name exists. Please enter a unique name.",
@@ -486,7 +486,7 @@ class EnterNameFragment : Fragment() {
                             aInfo5ViewModel.setThePreviousScreen2Variable(MainActivity.NOT_RELEVANT)
                             findNavController().navigate(R.id.action_enterNameFragment_to_sectionAndIntrosFragment)
                         } else {
-                            aInfo5ViewModel.setStatusMessageSF("This section exists. Please enter a unique name.")
+                            aInfo5ViewModel.setStatusMessageFlow("This section exists. Please enter a unique name.")
 //                            Toast.makeText(
 //                                this.requireContext(),
 //                                "This section exists. Please enter a unique name.",
@@ -508,7 +508,7 @@ class EnterNameFragment : Fragment() {
     private fun observeStatusMessage() {
         viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
-                aInfo5ViewModel.statusMessageSF.collect { message ->
+                aInfo5ViewModel.statusMessageFlow.collect { message ->
                     // Show Toast, Snackbar, or dialog - executes exactly once
                     Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
                 }

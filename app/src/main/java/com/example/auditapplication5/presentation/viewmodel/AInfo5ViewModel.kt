@@ -24,6 +24,8 @@ import kotlinx.coroutines.flow.asSharedFlow
 import java.io.*
 import java.util.*
 import kotlin.collections.LinkedHashMap
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.receiveAsFlow
 
 class AInfo5ViewModel(
     private val app: Application,
@@ -81,28 +83,20 @@ class AInfo5ViewModel(
         }
     }
 
-//Status Message using Event
+//Status Message using Flow
 
-    val statusMessage = MutableLiveData<Event<String>>()
-    val message: LiveData<Event<String>>
-        get() = statusMessage
+    // A private mutable channel
+    private val _statusMessageChannel = Channel<String>(Channel.BUFFERED)
 
-    fun setStatusMessage(input: String) {
-        statusMessage.value = Event(input)
-    }
+    // An immutable flow exposed to the UI, safely converting the channel to a flow
+    val statusMessageFlow = _statusMessageChannel.receiveAsFlow()
 
-    private val _statusMessageSF = MutableSharedFlow<String>(
-        replay = 1,
-        extraBufferCapacity = 1
-    )
-
-    val statusMessageSF: SharedFlow<String> = _statusMessageSF.asSharedFlow()
-
-    fun setStatusMessageSF(input: String) {
+    fun setStatusMessageFlow(input: String) {
         viewModelScope.launch {
-            _statusMessageSF.tryEmit(input) // Non-blocking emit
+            _statusMessageChannel.send(input) // Use send() instead of tryEmit() for a channel
         }
     }
+
 
 
 //Company, Audit Date, Intro and Section related Variables and Functions
@@ -5878,7 +5872,7 @@ class AInfo5ViewModel(
         var threeColumnReport = ""
         val companyReport = getTheCompanyReport()
         threeColumnReport =
-            "[H1] Acess Audit Report for ${companyReport.companyName} ;Date of Audit: " +
+            "[H1] Access Audit Report for ${companyReport.companyName} ;Date of Audit: " +
                     "${companyReport.companyAuditDate};; ^12;[H2] Table of Contents;^12;[H2] Introduction;;${
                         companyReport.companyIntroduction.replace(
                             "\n",
@@ -5920,7 +5914,7 @@ class AInfo5ViewModel(
         var threeColumnReport = ""
         val companyReport = getTheCompanyReport()
         threeColumnReport =
-            "[H1] Acess Audit Report for ${companyReport.companyName} ;Date of Audit: " +
+            "[H1] Access Audit Report for ${companyReport.companyName} ;Date of Audit: " +
                     "${companyReport.companyAuditDate};; ^12;[H2] Table of Contents;^12;[H2] Introduction;;${
                         companyReport.companyIntroduction.replace(
                             "\n",
@@ -5960,7 +5954,7 @@ class AInfo5ViewModel(
         var sixColumnReport = ""
         val companyReport = getTheCompanyReport()
         sixColumnReport =
-            "[H1] Acess Audit Report for ${companyReport.companyName} ;Date of Audit: " +
+            "[H1] Access Audit Report for ${companyReport.companyName} ;Date of Audit: " +
                     "${companyReport.companyAuditDate};; ^12;[H2] Table of Contents;^12;[H2] Introduction;;${
                         companyReport.companyIntroduction.replace(
                             "\n",
@@ -6000,7 +5994,7 @@ class AInfo5ViewModel(
         var sixColumnReport = ""
         val companyReport = getTheCompanyReport()
         sixColumnReport =
-            "[H1] Acess Audit Report for ${companyReport.companyName} ;Date of Audit: " +
+            "[H1] Access Audit Report for ${companyReport.companyName} ;Date of Audit: " +
                     "${companyReport.companyAuditDate};; ^12;[H2] Table of Contents;^12;[H2] Introduction;;${
                         companyReport.companyIntroduction.replace(
                             "\n",
@@ -6039,7 +6033,7 @@ class AInfo5ViewModel(
         var checkListWordReport = ""
         val companyReport = getTheCompanyReport()
         checkListWordReport =
-            "[H1] Acess Audit Report for ${companyReport.companyName} ;Date of Audit: " +
+            "[H1] Access Audit Report for ${companyReport.companyName} ;Date of Audit: " +
                     "${companyReport.companyAuditDate};; ^12;[H2] Table of Contents;^12;[H2] Introduction;;${
                         companyReport.companyIntroduction.replace(
                             "\n",
@@ -6078,7 +6072,7 @@ class AInfo5ViewModel(
         var checkListExcelReport = ""
         val companyReport = getTheCompanyReport()
         checkListExcelReport =
-            "[H1] Acess Audit Report for ${companyReport.companyName} ;Date of Audit: " +
+            "[H1] Access Audit Report for ${companyReport.companyName} ;Date of Audit: " +
                     "${companyReport.companyAuditDate};; ^12;[H2] Table of Contents;^12;[H2] Introduction;;${
                         companyReport.companyIntroduction.replace(
                             "\n",
@@ -7293,7 +7287,7 @@ class AInfo5ViewModel(
 
                                 } catch (e: Exception) {
                                     withContext(Dispatchers.Main) {
-                                        statusMessage.value = Event("Error: File Write Error")
+                                        setStatusMessageFlow("Error: File Write Error")
                                     }
                                     e.printStackTrace()
                                 }
@@ -7320,7 +7314,7 @@ class AInfo5ViewModel(
                                     saveCompanyPhotoDetailsListToDB()
                                 } catch (e: Exception) {
                                     withContext(Dispatchers.Main) {
-                                        statusMessage.value = Event("Error: Update failed")
+                                        setStatusMessageFlow("Error: Update failed")
                                     }
                                     e.printStackTrace()
                                 } catch (e: SQLException) {
@@ -8575,11 +8569,11 @@ class AInfo5ViewModel(
             val file3Column = DocumentFile.fromTreeUri(context, dirUri!!)
                 ?.createFile("*/txt", fullFileName)
             if ((file3Column != null) && file3Column.canWrite()) {
-                statusMessage.value = Event("The file was created successfully")
+                setStatusMessageFlow("The file was created successfully")
                 val aInfo5 = AInfo5(fullFileName, file3Column.uri.toString())
                 insertAInfo5(aInfo5)
             } else {
-                statusMessage.value = Event("Write error! Please check your permissions")
+                setStatusMessageFlow("Write error! Please check your permissions")
             }
         }
 

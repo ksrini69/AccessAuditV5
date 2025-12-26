@@ -64,14 +64,14 @@ class PhotoModificationFragment : Fragment() {
                 val isGranted = it.value
 
                 if (isGranted) {
-                    aInfo5ViewModel.setStatusMessageSF("Permission Granted. Now you can read the storage files")
+                    aInfo5ViewModel.setStatusMessageFlow("Permission Granted. Now you can read the storage files")
 //                    Toast.makeText(this.requireContext(), "Permission Granted. Now you can read the storage files",
 //                        Toast.LENGTH_SHORT).show()
                     val pickIntent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
                     openGalleryLauncher.launch(pickIntent)
                 } else {
                     if (permissionName == Manifest.permission.READ_EXTERNAL_STORAGE ){
-                        aInfo5ViewModel.setStatusMessageSF("You have not granted permission")
+                        aInfo5ViewModel.setStatusMessageFlow("You have not granted permission")
 //                        Toast.makeText(this.requireContext(), "You have not granted permission",
 //                            Toast.LENGTH_SHORT).show()
                     }
@@ -411,7 +411,7 @@ class PhotoModificationFragment : Fragment() {
     private fun observeStatusMessage() {
         viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
-                aInfo5ViewModel.statusMessageSF.collect { message ->
+                aInfo5ViewModel.statusMessageFlow.collect { message ->
                     // Show Toast, Snackbar, or dialog - executes exactly once
                     Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
                 }

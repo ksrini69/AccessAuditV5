@@ -328,7 +328,7 @@ class SimpleListRecyclerViewFragment : Fragment() {
             binding.rvSimpleList.layoutManager = LinearLayoutManager(this.requireContext())
             binding.rvSimpleList.adapter = SimpleListRVAdapter(
                 namesList,
-                codesAndNamesML,
+                codesAndNamesML.reversed().toMutableList(),
                 true
             ) { selectedItemName: String, selectedItemCode: String ->
                 companyListItemClicked(
@@ -409,8 +409,7 @@ class SimpleListRecyclerViewFragment : Fragment() {
                         aInfo5ViewModel.getTheParentFolderURIString().toUri()
                     )
                 } catch (e: FileSystemException) {
-                    aInfo5ViewModel.statusMessage.value =
-                        Event("Directory Creation Failed. Please note $e")
+                    aInfo5ViewModel.setStatusMessageFlow("Directory Creation Failed. Please note $e")
                 }
             }
         }

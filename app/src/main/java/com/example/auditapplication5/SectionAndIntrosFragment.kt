@@ -565,7 +565,7 @@ class SectionAndIntrosFragment : Fragment() {
     private fun observeStatusMessage() {
         viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
-                aInfo5ViewModel.statusMessageSF.collect { message ->
+                aInfo5ViewModel.statusMessageFlow.collect { message ->
                     // Show Toast, Snackbar, or dialog - executes exactly once
                     Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
                 }

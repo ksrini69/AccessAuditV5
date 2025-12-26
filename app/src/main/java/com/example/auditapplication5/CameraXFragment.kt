@@ -143,7 +143,7 @@ class CameraXFragment : Fragment() {
                                 startCamera()
                             } else {
                                 Log.i("DEBUG", "permission denied")
-                                aInfo5ViewModel.setStatusMessageSF("Permissions not granted by the user.")
+                                aInfo5ViewModel.setStatusMessageFlow("Permissions not granted by the user.")
 //                                Toast.makeText(this.requireContext(),
 //                                    "Permissions not granted by the user.",
 //                                    Toast.LENGTH_SHORT).show()
@@ -202,8 +202,7 @@ class CameraXFragment : Fragment() {
     private fun observeStatusMessage() {
         viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
-                aInfo5ViewModel.statusMessageSF.collect { message ->
-                    binding.tvPbMessagesCameraXFragment.visibility = View.GONE
+                aInfo5ViewModel.statusMessageFlow.collect { message ->
                     // Show Toast, Snackbar, or dialog - executes exactly once
                     Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
                 }
@@ -369,10 +368,10 @@ class CameraXFragment : Fragment() {
                             if (!recordEvent.hasError()) {
                                 val videoUri = recordEvent.outputResults.outputUri
                                 val msg = "Video capture succeeded: "
-                                //aInfo5ViewModel.setStatusMessageSF(msg)
-                                Toast.makeText(activity?.baseContext, msg, Toast.LENGTH_SHORT)
-                                    .show()
-                                Log.d(MainActivity.TAG, msg)
+                                aInfo5ViewModel.setStatusMessageFlow(msg)
+//                                Toast.makeText(activity?.baseContext, msg, Toast.LENGTH_SHORT)
+//                                    .show()
+//                                Log.d(MainActivity.TAG, msg)
                                 aInfo5ViewModel.writeToVideoFile(videoUri, videoName)
                                 aInfo5ViewModel.setTheVideoUploadedCXFFlagMLD(true)
                             }
