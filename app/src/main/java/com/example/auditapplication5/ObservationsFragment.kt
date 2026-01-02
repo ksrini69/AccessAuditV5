@@ -179,7 +179,10 @@ class ObservationsFragment : Fragment() {
         val currentSectionCode = aInfo5ViewModel.getThePresentSectionCodeAndDisplayName().uniqueCodeName
         val currentPageGroupCode = processSectionCode(currentSectionCode)
         val parentChildParentItemML = aInfo5ViewModel.getTheParentChildParentItemML()
-        sectionChildPageCodesList = parentChildParentItemML.find { it.pageGroupCode == currentPageGroupCode }?.childItemList!!
+        sectionChildPageCodesList = parentChildParentItemML
+            .find { it.pageGroupCode == currentPageGroupCode }
+            ?.childItemList ?: mutableListOf()
+
         val presentInTemplateList = mutableListOf<Int>()
         if (sectionChildPageCodesList.isNotEmpty()){
             for (item in sectionChildPageCodesList){
@@ -194,7 +197,7 @@ class ObservationsFragment : Fragment() {
                     }
                 }
             }
-            else {
+            else  {
                 aInfo5ViewModel.setTheAllSectionTemplatesUploadedForChecklistFlagMLD(true)
             }
         }

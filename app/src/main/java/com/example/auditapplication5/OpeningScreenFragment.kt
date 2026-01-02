@@ -116,7 +116,8 @@ class OpeningScreenFragment : Fragment() {
             val templatesLoadedFlag = aInfo5ViewModel.getTheTemplatesHaveBeenLoadedIntoDBFlag()
             if (templatesLoadedFlag) {
                 showDialogForNewTemplateUpload()
-            } else {
+            }
+            else {
                 aInfo5ViewModel.setTheFileFlag(MainActivity.TEMPLATE_DOCUMENT_LOAD)
                 val intent = Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
                     addCategory(Intent.CATEGORY_OPENABLE)
@@ -143,14 +144,16 @@ class OpeningScreenFragment : Fragment() {
                                 resources.getString(R.string.string_message_for_deleting_audit_records_db)
                             showDialog(auditDeleteTitle, auditDeleteMessage)
                         }
-                    } else {
+                    }
+                    else {
                         binding.llPasswordDatabaseDeletion.visibility = View.GONE
                         binding.llOpeningScreen.visibility = View.VISIBLE
                         aInfo5ViewModel.setStatusMessageFlow("The password entered is incorrect")
                         //Toast.makeText(requireContext(),"The password entered is incorrect", Toast.LENGTH_SHORT).show()
                         aInfo5ViewModel.setTheScreenVariable(MainActivity.OPENING_SCREEN_FRAGMENT)
                     }
-                } else {
+                }
+                else {
                     binding.llPasswordDatabaseDeletion.visibility = View.GONE
                     binding.llOpeningScreen.visibility = View.VISIBLE
                     aInfo5ViewModel.setTheScreenVariable(MainActivity.OPENING_SCREEN_FRAGMENT)
@@ -261,6 +264,16 @@ class OpeningScreenFragment : Fragment() {
                         aInfo5ViewModel.clearTheTemplateIDList()
                         aInfo5ViewModel.clearThePageGroupIDsList()
                         aInfo5ViewModel.clearTheParentChildParentItemML()
+
+                        val templateDetails = CodeNameAndDisplayNameDC()
+                        templateDetails.uniqueCodeName = MainActivity.TEMPLATES_NOT_PRESENT_IN_DB
+                        templateDetails.displayName = ""
+                        templateDetails.pagesPresent = false
+                        aInfo5ViewModel.setTheTemplateDetails(templateDetails)
+                        val templateDetailsString = aInfo5ViewModel.codeAndDisplayNameToString(templateDetails)
+                        val templatesDetailsInDBID = MainActivity.TEMPLATE_DETAILS_DB_ID
+                        val aInfo5TemplateDetails = AInfo5Templates(templatesDetailsInDBID, templateDetailsString)
+                        aInfo5ViewModel.insertAInfo5Templates(aInfo5TemplateDetails)
 
                         aInfo5ViewModel.setStatusMessageFlow("Deletion of Templates is Complete")
                         //Toast.makeText(this.requireContext(), "Deletion of Templates is Complete", Toast.LENGTH_LONG).show()

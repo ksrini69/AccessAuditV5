@@ -447,7 +447,8 @@ class SectionAndIntrosFragment : Fragment() {
         binding.buttonChooseSection.setOnClickListener {
             if (aInfo5ViewModel.getTheScreenVariable() == MainActivity.SECTION_FRAGMENT_SECTION_CHOICE) {
                 aInfo5ViewModel.setThePreviousScreenVariable(MainActivity.SECTION_FRAGMENT_SECTION_CHOICE)
-            } else if (aInfo5ViewModel.getTheScreenVariable() == MainActivity.SECTION_FRAGMENT) {
+            }
+            else if (aInfo5ViewModel.getTheScreenVariable() == MainActivity.SECTION_FRAGMENT) {
                 aInfo5ViewModel.setThePreviousScreenVariable(MainActivity.SECTION_FRAGMENT)
             }
             it.findNavController()
@@ -531,7 +532,6 @@ class SectionAndIntrosFragment : Fragment() {
             aInfo5ViewModel.setTheScreenVariable(MainActivity.OBSERVATIONS_FRAGMENT)
             aInfo5ViewModel.setThePreviousScreenVariable(MainActivity.SECTION_FRAGMENT_SECTION_CHOICE)
             aInfo5ViewModel.setTheWhichIntroductionsOrObservationsToBeUploadedVariable(MainActivity.SECTION_OBSERVATIONS)
-            //Ensure that the Observations Fragment textwatchers are off
 
             findNavController().navigate(R.id.action_sectionAndIntrosFragment_to_observationsFragment)
         }

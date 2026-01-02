@@ -299,7 +299,7 @@ class CameraXFragment : Fragment() {
                 sensorOrientation = Camera2CameraInfo.from(cameraInfo)
                     .getCameraCharacteristic(CameraCharacteristics.SENSOR_ORIENTATION) ?: 0
 
-                Toast.makeText(requireContext(), "Sensor Orientation is $sensorOrientation", Toast.LENGTH_SHORT).show()
+                //Toast.makeText(requireContext(), "Sensor Orientation is $sensorOrientation", Toast.LENGTH_SHORT).show()
 
                 // Now that we have sensor info, enable the listener
                 orientationEventListener?.enable()

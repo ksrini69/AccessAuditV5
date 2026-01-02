@@ -14,6 +14,7 @@ import androidx.databinding.DataBindingUtil
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.auditapplication5.data.model.AInfo5
+import com.example.auditapplication5.data.model.AInfo5Templates
 import com.example.auditapplication5.data.model.CodeNameAndDisplayNameDC
 import com.example.auditapplication5.databinding.FragmentSimpleListRecyclerViewBinding
 import com.example.auditapplication5.presentation.adapter.SimpleListRVAdapter
@@ -107,7 +108,8 @@ class SimpleListRecyclerViewFragment : Fragment() {
             if (it == true){
                 binding.pbSimpleListRecyclerView.visibility = View.GONE
                 binding.clSimpleListRecyclerviewHolder.isEnabled = true
-            } else {
+            }
+            else {
                 binding.pbSimpleListRecyclerView.visibility = View.VISIBLE
                 binding.clSimpleListRecyclerviewHolder.isEnabled = false
             }

@@ -67,30 +67,55 @@ class ParentChildRecyclerviewFragment : Fragment() {
         val actionBar = (activity as MainActivity).supportActionBar
         actionBar?.hide()
 
-        if (aInfo5ViewModel.getTheParentChildParentItemML().isEmpty()) {
-            aInfo5ViewModel.setTheParentChildParentItemML(mutableListOf(aInfo5ViewModel.defaultRVParentChildParentItem))
-        }
+        //Looking at the Template Details Uploaded Information
+
+        if (aInfo5ViewModel.getTheTemplateDetails().uniqueCodeName == "" && aInfo5ViewModel.getTheTemplateDetails().displayName == ""){
+            aInfo5ViewModel.getAInfo5TemplatesByIds(mutableListOf(MainActivity.TEMPLATE_DETAILS_DB_ID)).observe(viewLifecycleOwner){
+                if (it.isNotEmpty()){
+                    val templateDetailsString = it[0].template_string
+                    aInfo5ViewModel.setTheTemplateDetails(aInfo5ViewModel.stringToCodeAndDisplayName(templateDetailsString!!))
+                    aInfo5ViewModel.setTheTemplateDetailsUploadedFlagMLD(true)
+                } else {
+                    val templateDetails = CodeNameAndDisplayNameDC()
+                    templateDetails.uniqueCodeName = MainActivity.TEMPLATES_NOT_PRESENT_IN_DB
+                    templateDetails.displayName = ""
+                    templateDetails.pagesPresent = false
+                    aInfo5ViewModel.setTheTemplateDetails(templateDetails)
+                    val templateDetailsString = aInfo5ViewModel.codeAndDisplayNameToString(templateDetails)
+                    val templatesDetailsInDBID = MainActivity.TEMPLATE_DETAILS_DB_ID
+                    val aInfo5TemplateDetails = AInfo5Templates(templatesDetailsInDBID, templateDetailsString)
+                    aInfo5ViewModel.insertAInfo5Templates(aInfo5TemplateDetails)
+                    aInfo5ViewModel.setTheTemplateDetailsUploadedFlagMLD(true)
+                }
+            }
+    }
+
 
         val currentSectionCode = aInfo5ViewModel.getThePresentSectionCodeAndDisplayName().uniqueCodeName
-
-        val currentPageGroupCode = processSectionCode(currentSectionCode)
-        val priorityPgGroupCodes = listOf(currentPageGroupCode)
+        var currentPageGroupCode = ""
         val originalList = aInfo5ViewModel.getTheParentChildParentItemML()
-        val sortedMutableList: MutableList<RVParentChildParentItemDC> = originalList
-            .sortedWith(compareBy<RVParentChildParentItemDC> { item ->
-                when (item.pageGroupCode.trim()) {
-                    in priorityPgGroupCodes -> 0  // Priority group first
-                    else -> 1               // Rest second
-                }
-            }.thenBy { it.pageGroupCode.trim() })  // Sort within each group by title
-            .toMutableList()
+        var sortedMutableList: MutableList<RVParentChildParentItemDC> = mutableListOf()
+
+        if (aInfo5ViewModel.getTheParentChildParentItemML().isEmpty()) {
+            aInfo5ViewModel.setTheParentChildParentItemML(mutableListOf(aInfo5ViewModel.defaultRVParentChildParentItem))
+            sortedMutableList = aInfo5ViewModel.getTheParentChildParentItemML()
+        } else {
+            currentPageGroupCode = processSectionCode(currentSectionCode)
+            val priorityPgGroupCodes = listOf(currentPageGroupCode)
+            sortedMutableList = originalList
+                .sortedWith(compareBy<RVParentChildParentItemDC> { item ->
+                    when (item.pageGroupCode.trim()) {
+                        in priorityPgGroupCodes -> 0  // Priority group first
+                        else -> 1               // Rest second
+                    }
+                }.thenBy { it.pageGroupCode.trim() })  // Sort within each group by title
+                .toMutableList()
+        }
 
         for (index in 0 until sortedMutableList.size){
             sortedMutableList[index].isExpandable = index == 0
         }
 
-
-//aInfo5ViewModel.getTheParentChildParentItemML().sortedBy { it.title.trim() }.toMutableList()
         loadRecyclerView(sortedMutableList)
     }
 

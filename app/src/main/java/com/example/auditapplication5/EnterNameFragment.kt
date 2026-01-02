@@ -152,26 +152,6 @@ class EnterNameFragment : Fragment() {
         }
 
 
-        //Getting the company directory uri string
-//        var companyDirectoryUriString = ""
-//        companyDirectoryUriString = aInfo5ViewModel.getTheCompanyDirectoryURIString()
-//        if (companyDirectoryUriString == ""){
-//            val companyDirectoryUriId =
-//                aInfo5ViewModel.getPresentCompanyCode() + MainActivity.COMPANY_DIRECTORY_URI_ID
-//            aInfo5ViewModel.getAInfo5ByIds(mutableListOf(companyDirectoryUriId))
-//                .observe(viewLifecycleOwner) { list ->
-//                    if (list.isEmpty()) {
-//                        companyDirectoryUriString = ""
-//                    } else {
-//                        companyDirectoryUriString = ""
-//                        for (item in list) {
-//                            companyDirectoryUriString += item.framework.toString()
-//                        }
-//                        aInfo5ViewModel.setTheCompanyDirectoryURIString(companyDirectoryUriString)
-//                    }
-//                }
-//        }
-
         //Putting the name of Company or Section in the Edit Text
         if (aInfo5ViewModel.getThePreviousScreenVariable() == MainActivity.SIMPLE_LIST_RV_FRAGMENT) {
             if (aInfo5ViewModel.retrieveTheCompanyNameToBeUpdatedFlag()) {

@@ -13,19 +13,16 @@ import androidx.core.net.toUri
 import androidx.documentfile.provider.DocumentFile
 import androidx.lifecycle.*
 import androidx.lifecycle.Observer
-import com.example.auditapplication5.Event
 import com.example.auditapplication5.MainActivity
 import com.example.auditapplication5.data.model.*
 import com.example.auditapplication5.domain.usecase.*
 import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.SharedFlow
-import kotlinx.coroutines.flow.asSharedFlow
 import java.io.*
 import java.util.*
 import kotlin.collections.LinkedHashMap
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.receiveAsFlow
+import java.text.SimpleDateFormat
 
 class AInfo5ViewModel(
     private val app: Application,
@@ -1345,6 +1342,14 @@ class AInfo5ViewModel(
         return templateString
     }
 
+    private var templateDetails: CodeNameAndDisplayNameDC = CodeNameAndDisplayNameDC()
+    fun setTheTemplateDetails(input: CodeNameAndDisplayNameDC){
+        templateDetails = input
+    }
+    fun getTheTemplateDetails(): CodeNameAndDisplayNameDC{
+        return  templateDetails
+    }
+
     //This flag is meant to check if the templates have been loaded into the DB or not
     //If templates have been loaded, it is true else false
     private var templatesHaveBeenLoadedIntoDatabaseFlag = false
@@ -1386,7 +1391,7 @@ class AInfo5ViewModel(
     }
 
 
-    fun loadDefaultTemplatesIntoTemplateDatabase(templateString: String) {
+    fun loadDefaultTemplatesIntoTemplateDatabase(templateString: String, uriString: String = "") {
         viewModelScope.launch(Dispatchers.Default) {
             val fileString = templateString
             val fileStringList: List<String>
@@ -1501,10 +1506,23 @@ class AInfo5ViewModel(
             val templateLoadedIntoDBFlagID = MainActivity.TEMPLATES_LOADED_INTO_DB_ID
             val aInfo5Template = AInfo5Templates(templateLoadedIntoDBFlagID, true.toString())
             insertAInfo5Templates(aInfo5Template)
+
+            //Load the date and details of when the template has been loaded in db
+            val templateDetails = CodeNameAndDisplayNameDC()
+            templateDetails.uniqueCodeName = SimpleDateFormat(MainActivity.FILENAME_DEFAULT_FORMAT, Locale.US)
+                .format(System.currentTimeMillis())
+            templateDetails.displayName = uriString
+            templateDetails.pagesPresent = true
+            val templateDetailsString = codeAndDisplayNameToString(templateDetails)
+            val templatesDetailsInDBID = MainActivity.TEMPLATE_DETAILS_DB_ID
+            val aInfo5TemplateDetails = AInfo5Templates(templatesDetailsInDBID, templateDetailsString)
+            insertAInfo5Templates(aInfo5TemplateDetails)
+
             withContext(Dispatchers.Main) {
                 setTheTemplatesHaveBeenLoadedIntoDBFlag(true)
                 //Load the ParentChildParentItemML Variable
                 setTheParentChildParentItemML(rvParentChildParentItemML)
+                setTheTemplateDetails(templateDetails)
             }
         }
     }
@@ -4430,6 +4448,16 @@ class AInfo5ViewModel(
         return companyIntroData
     }
 
+    //MLD for templates uploaded being true with date.
+
+    private var templateDetailsUploadedFlagMLD = MutableLiveData(true)
+    val templateDetailsUploadedFlagLD: LiveData<Boolean?>
+        get() = templateDetailsUploadedFlagMLD
+    fun setTheTemplateDetailsUploadedFlagMLD(input: Boolean) {
+        templateDetailsUploadedFlagMLD.value = input
+    }
+
+
     //MLD Flag to ensure that the edit has been completed. True stands for completion
     //False means that it is not yet complete
     private var editCompletedFlagMLD = MutableLiveData(true)
@@ -4642,6 +4670,7 @@ class AInfo5ViewModel(
     }
 
 
+
     //MLD Flag to ensure parent folder has been uploaded. True stands for completion
     //False means that it is not yet complete
     private var parentFolderUploadedMAFlagMLD = MutableLiveData(false)
@@ -4684,16 +4713,18 @@ class AInfo5ViewModel(
             val templatesUploadedFlag = templatesUploadedMAFlagLD.value?: false
             val templateStringUploadedFlag = templateStringUploadedMAFlagLD.value?: false
             val parentChildParentListUploadedFlag = parentChildParentListUploadedMAFlagLD.value?: false
-
+            val templateDetailsUploadedFlag = templateDetailsUploadedFlagLD.value?: false
             // Set true only if all are true
             this.value = parentFolderUploadedMAFlag && templatesUploadedFlag
                     && templateStringUploadedFlag && parentChildParentListUploadedFlag
+                    && templateDetailsUploadedFlag
 
         }
         addSource(parentFolderUploadedMAFlagLD, observer)
         addSource(templatesUploadedMAFlagLD, observer)
         addSource(templateStringUploadedMAFlagLD, observer)
         addSource(parentChildParentListUploadedMAFlagLD, observer)
+        addSource(templateDetailsUploadedFlagLD, observer)
 
     }
 
@@ -4799,13 +4830,16 @@ class AInfo5ViewModel(
         val observer = Observer<Boolean?> {
             val parentFolderUploadedFlag = parentFolderUploadedSLRVFlagLD.value?: false
             val companySectionCDListUPloadedFlag = companySectionCDListUploadedSLRVFlagLD.value?: false
+            val templateDetailsUploadedFlag = templateDetailsUploadedFlagLD.value?: false
 
             // Set true only if all are true
             this.value = parentFolderUploadedFlag && companySectionCDListUPloadedFlag
 
+
         }
         addSource(parentFolderUploadedSLRVFlagLD, observer)
         addSource(companySectionCDListUploadedSLRVFlagLD, observer)
+
     }
 
     //MLD Flag to ensure picture has been uploaded. True stands for completion
@@ -7903,7 +7937,7 @@ class AInfo5ViewModel(
         return result
     }
 
-    private fun codeAndDisplayNameToString(codeAndDisplayName: CodeNameAndDisplayNameDC): String {
+    fun codeAndDisplayNameToString(codeAndDisplayName: CodeNameAndDisplayNameDC): String {
         var result = ""
         val resultML = codeAndDisplayNameToML(codeAndDisplayName)
         result = mlToStringUsingDelimiter1(resultML)

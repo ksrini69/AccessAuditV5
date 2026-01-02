@@ -18,6 +18,7 @@ import androidx.core.net.toUri
 import androidx.lifecycle.ViewModelProvider
 import com.example.auditapplication5.data.model.AInfo5
 import com.example.auditapplication5.data.model.AInfo5Templates
+import com.example.auditapplication5.data.model.CodeNameAndDisplayNameDC
 import com.example.auditapplication5.databinding.ActivityMainBinding
 import com.example.auditapplication5.presentation.viewmodel.AInfo5ViewModel
 import com.example.auditapplication5.presentation.viewmodel.AInfo5ViewModelFactory
@@ -64,7 +65,7 @@ class MainActivity : AppCompatActivity() {
                         //Save the template file contents to the View Model when read
                         aInfo5ViewModel.setTheTemplateString(readTextFromUri(treeURI))
                         //Load the separate templates into the database
-                        aInfo5ViewModel.loadDefaultTemplatesIntoTemplateDatabase(aInfo5ViewModel.getTheTemplateString()!!)
+                        aInfo5ViewModel.loadDefaultTemplatesIntoTemplateDatabase(aInfo5ViewModel.getTheTemplateString()!!, treeURI.toString())
 
                     }
                 }
@@ -209,6 +210,33 @@ class MainActivity : AppCompatActivity() {
         if (!aInfo5ViewModel.isItemPresentInPageTemplateList(aInfo5ViewModel.getTheDefaultPageTemplate().pageCode)){
             aInfo5ViewModel.addUniquePageToPageTemplateList(aInfo5ViewModel.getTheDefaultPageTemplate())
         }
+
+        //Getting the Template uploaded details from db
+        if (aInfo5ViewModel.templateDetailsUploadedFlagLD.value == false){
+            if (aInfo5ViewModel.getTheTemplateDetails().uniqueCodeName == "" && aInfo5ViewModel.getTheTemplateDetails().displayName == ""){
+                aInfo5ViewModel.getAInfo5TemplatesByIds(mutableListOf(TEMPLATE_DETAILS_DB_ID)).observe(this){
+                    if (it.isNotEmpty()){
+                        val templateDetailsString = it[0].template_string
+                        aInfo5ViewModel.setTheTemplateDetails(aInfo5ViewModel.stringToCodeAndDisplayName(templateDetailsString!!))
+                        aInfo5ViewModel.setTheTemplateDetailsUploadedFlagMLD(true)
+                    } else {
+                        val templateDetails = CodeNameAndDisplayNameDC()
+                        templateDetails.uniqueCodeName = TEMPLATES_NOT_PRESENT_IN_DB
+                        templateDetails.displayName = ""
+                        templateDetails.pagesPresent = false
+                        aInfo5ViewModel.setTheTemplateDetails(templateDetails)
+                        val templateDetailsString = aInfo5ViewModel.codeAndDisplayNameToString(templateDetails)
+                        val templatesDetailsInDBID = MainActivity.TEMPLATE_DETAILS_DB_ID
+                        val aInfo5TemplateDetails = AInfo5Templates(templatesDetailsInDBID, templateDetailsString)
+                        aInfo5ViewModel.insertAInfo5Templates(aInfo5TemplateDetails)
+                        aInfo5ViewModel.setTheTemplateDetailsUploadedFlagMLD(true)
+                    }
+                }
+            } else {
+                aInfo5ViewModel.setTheTemplateDetailsUploadedFlagMLD(true)
+            }
+        }
+
     }
 
     //Functions Below
@@ -368,6 +396,8 @@ class MainActivity : AppCompatActivity() {
         const val TEMPLATE_DOCUMENT_ID = "Template_Document_ID"
         const val TEMPLATE_IDs_LIST_ID = "Template_IDs_List_ID"
         const val TEMPLATES_LOADED_INTO_DB_ID = "Templates_Loaded_Flag"
+        const val TEMPLATE_DETAILS_DB_ID = "Templates_Details_In_DB_ID"
+        const val TEMPLATE_NOT_IN_DB = "Templates "
 
         const val COMPANY_INTRO_ID = "_Company_Intros_ID"
         const val SECTION_INTRO_ID = "_Intros_ID"
@@ -377,7 +407,7 @@ class MainActivity : AppCompatActivity() {
         const val AUDIT_DATABASE_DELETE = "Audit Database Delete"
         const val TEMPLATE_DATABASE_DELETE = "Template Database Delete"
         const val TEMPLATE_SECTION_LIST = "Default_Section_List"
-        const val TEMPLATE_NOT_IN_DB = "Template_Not_In_DB"
+        const val TEMPLATES_NOT_PRESENT_IN_DB = "Templates_Not_Present_In_DB"
 
         const val FILE_CONTENT_LIST_ID = "File Content List ID"
         const val FILE_REPORT_ID = "_Report"
@@ -427,6 +457,7 @@ class MainActivity : AppCompatActivity() {
         aInfo5ViewModel.setTheParentFolderUploadedMAFlagMLD(false)
         aInfo5ViewModel.setTheTemplateStringUploadedMAFlagMLD(false)
         aInfo5ViewModel.setTheParentChildParentListUploadedMAFlagMLD(false)
+        aInfo5ViewModel.setTheTemplateDetailsUploadedFlagMLD(false)
         aInfo5ViewModel.areAllAuditsDeletedMLD.value = false
 
     }
