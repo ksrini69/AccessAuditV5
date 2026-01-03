@@ -760,48 +760,6 @@ class ObservationsFragment : Fragment() {
         aInfo5ViewModel.setTheVideoUploadedCXFFlagMLD(true)
     }
 
-    fun createUniqueListOfPageCodesForCurrentPageFromFramework(currentPageIndex: Int){
-        uniqueListOfSectionPageCodes = mutableListOf()
-        if (presentSectionAllPagesFramework.sectionPageFrameworkList.isNotEmpty()){
-            val currentPageSet = presentSectionAllPagesFramework.sectionPageFrameworkList[currentPageIndex]
-            if (!uniqueListOfSectionPageCodes.contains(currentPageSet.pageCode)){
-                uniqueListOfSectionPageCodes.add(currentPageSet.pageCode)
-            }
-            val questionList = currentPageSet.questionsFrameworkList
-            if (questionList.isNotEmpty()){
-                for (qIndex in 0 until questionList.size){
-                    if (!uniqueListOfSectionPageCodes.contains(questionList[qIndex].pageCode)){
-                        uniqueListOfSectionPageCodes.add(questionList[qIndex].pageCode)
-                    }
-                }
-            }
-            val obsList = currentPageSet.observationsFrameworkList
-            if (obsList.isNotEmpty()){
-                for (oIndex in 0 until obsList.size){
-                    if (!uniqueListOfSectionPageCodes.contains(obsList[oIndex].pageCode)){
-                        uniqueListOfSectionPageCodes.add(obsList[oIndex].pageCode)
-                    }
-                }
-            }
-            val recoList = currentPageSet.recommendationsFrameworkList
-            if (recoList.isNotEmpty()){
-                for (rIndex in 0 until recoList.size){
-                    if (!uniqueListOfSectionPageCodes.contains(recoList[rIndex].pageCode)){
-                        uniqueListOfSectionPageCodes.add(recoList[rIndex].pageCode)
-                    }
-                }
-            }
-            val stdsList = currentPageSet.standardsFrameworkList
-            if (stdsList.isNotEmpty()){
-                for (sIndex in 0 until stdsList.size){
-                    if (!uniqueListOfSectionPageCodes.contains(stdsList[sIndex].pageCode)){
-                        uniqueListOfSectionPageCodes.add(stdsList[sIndex].pageCode)
-                    }
-                }
-            }
-        }
-    }
-
     private fun saveIntoDB(){
         //Save the page title into the page framework and data
         val currentPageIndex = presentSectionAllPagesFrameworkIndex

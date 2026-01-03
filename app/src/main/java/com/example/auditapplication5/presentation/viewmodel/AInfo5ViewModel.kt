@@ -5265,7 +5265,10 @@ class AInfo5ViewModel(
                                         for (questionsListIndex in 0 until itemQuestionsList.size) {
                                             checklistWordTable = checklistWordTable + itemQuestionsList[questionsListIndex].question + "$"
                                             checklistWordTable = if (questionsListIndex < itemDataList.size) {
-                                                checklistWordTable + itemDataList[questionsListIndex].data1Value + "$" + itemDataList[questionsListIndex].data2Value + "$" + itemDataList[questionsListIndex].data3Value + "$" + itemDataList[questionsListIndex].buttonOptionChosen + "\n"
+                                                checklistWordTable + itemDataList[questionsListIndex].data1Value + itemQuestionsList[questionsListIndex].data1Sentence2.replace(".", "").replace("<>", "") + "$" +
+                                                        itemDataList[questionsListIndex].data2Value + itemQuestionsList[questionsListIndex].data2Sentence2.replace(".", "").replace("<>", "") + "$" +
+                                                        itemDataList[questionsListIndex].data3Value + itemQuestionsList[questionsListIndex].data3Sentence2.replace(".", "").replace("<>", "") + "$" +
+                                                        itemDataList[questionsListIndex].buttonOptionChosen + "\n"
                                             } else {
                                                 checklistWordTable + "$" + "$" + "$" + "\n"
                                             }
@@ -5334,7 +5337,10 @@ class AInfo5ViewModel(
                                         for (questionsListIndex in 0 until itemQuestionsList.size) {
                                             checklistExcelTable = checklistExcelTable + itemQuestionsList[questionsListIndex].question + "$"
                                             checklistExcelTable = if (questionsListIndex < itemDataList.size) {
-                                                checklistExcelTable + itemDataList[questionsListIndex].data1Value + "$" + itemDataList[questionsListIndex].data2Value + "$" + itemDataList[questionsListIndex].data3Value + "$" + itemDataList[questionsListIndex].buttonOptionChosen + "\n"
+                                                checklistExcelTable + itemDataList[questionsListIndex].data1Value + itemQuestionsList[questionsListIndex].data1Sentence2.replace(".", "").replace("<>", "") + "$" +
+                                                        itemDataList[questionsListIndex].data2Value + itemQuestionsList[questionsListIndex].data2Sentence2.replace(".", "").replace("<>", "") + "$" +
+                                                        itemDataList[questionsListIndex].data3Value + itemQuestionsList[questionsListIndex].data3Sentence2.replace(".", "").replace("<>", "") + "$" +
+                                                        itemDataList[questionsListIndex].buttonOptionChosen + "\n"
                                             } else {
                                                 checklistExcelTable + "$" + "$" + "$" + "\n"
                                             }
