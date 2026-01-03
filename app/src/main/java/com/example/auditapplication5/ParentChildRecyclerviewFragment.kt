@@ -99,17 +99,23 @@ class ParentChildRecyclerviewFragment : Fragment() {
         if (aInfo5ViewModel.getTheParentChildParentItemML().isEmpty()) {
             aInfo5ViewModel.setTheParentChildParentItemML(mutableListOf(aInfo5ViewModel.defaultRVParentChildParentItem))
             sortedMutableList = aInfo5ViewModel.getTheParentChildParentItemML()
-        } else {
-            currentPageGroupCode = processSectionCode(currentSectionCode)
-            val priorityPgGroupCodes = listOf(currentPageGroupCode)
-            sortedMutableList = originalList
-                .sortedWith(compareBy<RVParentChildParentItemDC> { item ->
-                    when (item.pageGroupCode.trim()) {
-                        in priorityPgGroupCodes -> 0  // Priority group first
-                        else -> 1               // Rest second
-                    }
-                }.thenBy { it.pageGroupCode.trim() })  // Sort within each group by title
-                .toMutableList()
+        }
+        else {
+            if (aInfo5ViewModel.getTheTemplateDetails().pagesPresent == true){
+                currentPageGroupCode = processSectionCode(currentSectionCode)
+                val priorityPgGroupCodes = listOf(currentPageGroupCode)
+                sortedMutableList = originalList
+                    .sortedWith(compareBy<RVParentChildParentItemDC> { item ->
+                        when (item.pageGroupCode.trim()) {
+                            in priorityPgGroupCodes -> 0  // Priority group first
+                            else -> 1               // Rest second
+                        }
+                    }.thenBy { it.pageGroupCode.trim() })  // Sort within each group by title
+                    .toMutableList()
+            } else {
+                aInfo5ViewModel.setTheParentChildParentItemML(mutableListOf(aInfo5ViewModel.defaultRVParentChildParentItem))
+                sortedMutableList = aInfo5ViewModel.getTheParentChildParentItemML()
+            }
         }
 
         for (index in 0 until sortedMutableList.size){

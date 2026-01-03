@@ -352,7 +352,8 @@ class ObservationsFragment : Fragment() {
                 } else {
                     0
                 }
-            } else {
+            }
+            else {
                 if (presentSectionAllPagesFramework.sectionPageFrameworkList.size > 0) {
                     presentSectionAllPagesFrameworkIndex
                 } else {
@@ -1860,11 +1861,14 @@ class ObservationsFragment : Fragment() {
             if (getQsObsRecoStdsLabelExpandedValue()) {
                 if (aInfo5ViewModel.getTheScreenVariable() == MainActivity.OBSERVATIONS_FRAGMENT) {
                     binding.rvQuestionsFramework.visibility = View.VISIBLE
-                } else if (aInfo5ViewModel.getTheScreenVariable() == MainActivity.OBSERVATIONS_FRAGMENT_OBSERVATIONS) {
+                }
+                else if (aInfo5ViewModel.getTheScreenVariable() == MainActivity.OBSERVATIONS_FRAGMENT_OBSERVATIONS) {
                     binding.rvCheckboxesFramework.visibility = View.VISIBLE
-                } else if (aInfo5ViewModel.getTheScreenVariable() == MainActivity.OBSERVATIONS_FRAGMENT_RECOMMENDATIONS) {
+                }
+                else if (aInfo5ViewModel.getTheScreenVariable() == MainActivity.OBSERVATIONS_FRAGMENT_RECOMMENDATIONS) {
                     binding.rvCheckboxesFramework.visibility = View.VISIBLE
-                } else if (aInfo5ViewModel.getTheScreenVariable() == MainActivity.OBSERVATIONS_FRAGMENT_STANDARDS) {
+                }
+                else if (aInfo5ViewModel.getTheScreenVariable() == MainActivity.OBSERVATIONS_FRAGMENT_STANDARDS) {
                     binding.rvCheckboxesFramework.visibility = View.VISIBLE
                 }
                 binding.tvQuestionsEtcLabel.setBackgroundResource(R.drawable.border1dp_color_purple700_with_up_arrow)

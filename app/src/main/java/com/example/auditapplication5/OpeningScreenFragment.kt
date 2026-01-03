@@ -264,6 +264,7 @@ class OpeningScreenFragment : Fragment() {
                         aInfo5ViewModel.clearTheTemplateIDList()
                         aInfo5ViewModel.clearThePageGroupIDsList()
                         aInfo5ViewModel.clearTheParentChildParentItemML()
+                        aInfo5ViewModel.clearThePageTemplateMLMLD()
 
                         val templateDetails = CodeNameAndDisplayNameDC()
                         templateDetails.uniqueCodeName = MainActivity.TEMPLATES_NOT_PRESENT_IN_DB
