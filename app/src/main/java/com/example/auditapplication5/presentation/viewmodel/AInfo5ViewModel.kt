@@ -1722,10 +1722,12 @@ class AInfo5ViewModel(
                                         if (takeFirst13Characters.contains("Obs Remarks")) {
                                             pageTemplate.observationsList =
                                                 dbStringtoCheckboxTemplateItemList(itemLevel2)
-                                        } else if (takeFirst13Characters.contains("Reco Remarks")) {
+                                        }
+                                        else if (takeFirst13Characters.contains("Reco Remarks")) {
                                             pageTemplate.recommendationsList =
                                                 dbStringtoCheckboxTemplateItemList(itemLevel2)
-                                        } else if (takeFirst13Characters.contains("Standards")) {
+                                        }
+                                        else if (takeFirst13Characters.contains("Standards")) {
                                             pageTemplate.standardsList =
                                                 dbStringtoCheckboxTemplateItemList(itemLevel2)
                                         }

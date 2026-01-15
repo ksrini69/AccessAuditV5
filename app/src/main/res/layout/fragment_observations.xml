@@ -26,11 +26,12 @@
             <TextView
                 android:id="@+id/tv_page_name_and_number"
                 android:layout_width="match_parent"
-                android:layout_height="40dp"
+                android:layout_height="wrap_content"
                 android:background="@drawable/border1dp_with_up_arrow"
                 android:contentDescription="@string/string_textview_that_displays_the_page_name_and_number"
                 android:gravity="center_vertical"
                 android:textStyle="bold"
+                android:textSize="20sp"
                 android:textColor="@color/black"
                 android:text="@{String.valueOf(aInfo5ViewModel.sectionNameFormatForDisplay(aInfo5ViewModel.sectionNameMLD)) + String.valueOf(aInfo5ViewModel.pageCountFormatForDisplay(aInfo5ViewModel.pageCountMLD))+ String.valueOf(aInfo5ViewModel.etPageNameMLD)}"
                 android:tooltipText="@string/string_textview_that_displays_the_page_name_and_number"/>
@@ -325,7 +326,7 @@
             <!--Label for the Observations and Recommendations Block -->
             <TextView
                 android:layout_width="match_parent"
-                android:layout_height="40dp"
+                android:layout_height="wrap_content"
                 android:id="@+id/tv_observations_recommendations_label"
                 android:textSize="20sp"
                 android:textStyle="bold"
@@ -351,7 +352,7 @@
 
                     <TextView
                         android:layout_width="match_parent"
-                        android:layout_height="36dp"
+                        android:layout_height="wrap_content"
                         android:id="@+id/tv_observations_pictures_label"
                         android:textSize="16sp"
                         android:textStyle="bold"
@@ -396,7 +397,7 @@
 
                     <TextView
                         android:layout_width="match_parent"
-                        android:layout_height="36dp"
+                        android:layout_height="wrap_content"
                         android:id="@+id/tv_recommendations_standards_label"
                         android:textSize="16sp"
                         android:textStyle="bold"
@@ -446,7 +447,7 @@
             <!--Label for the Questions, Obs, Reco, Stds Views -->
             <TextView
                 android:layout_width="match_parent"
-                android:layout_height="40dp"
+                android:layout_height="wrap_content"
                 android:id="@+id/tv_questions_etc_label"
                 android:textSize="22sp"
                 android:textStyle="bold"

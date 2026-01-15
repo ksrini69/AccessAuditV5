@@ -3,6 +3,7 @@ package com.example.auditapplication5.presentation.adapter
 import android.text.Editable
 import android.text.InputType
 import android.text.TextWatcher
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -158,6 +159,7 @@ class QuestionTemplateRVAdapter(
             if (questionTemplateItem.data2Hint != "<>" && questionTemplateItem.data2Hint != "") {
                 binding.etDataField2.hint = questionTemplateItem.data2Hint
             }
+
             if (questionTemplateItem.data2Type == "N") {
                 binding.etDataField2.inputType = InputType.TYPE_CLASS_NUMBER
             }

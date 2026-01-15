@@ -90,8 +90,6 @@ class SectionAndIntrosFragment : Fragment() {
         val actionBar = (activity as MainActivity).supportActionBar
         actionBar?.show()
 
-
-
         //Checking stuff here
 
         //Check to see if the edit and delete MLDs are both true

@@ -128,8 +128,6 @@ class ObservationsFragment : Fragment() {
 
         //Check things here
 
-
-
         //Set the pages present in the Section Code and Display to be True
         aInfo5ViewModel.changePagesPresentToTrueInCompanySectionCodeAndDisplayNameList(
             aInfo5ViewModel.getPresentSectionCode()
@@ -761,32 +759,32 @@ class ObservationsFragment : Fragment() {
     }
 
     private fun saveIntoDB(){
-        //Save the page title into the page framework and data
-        val currentPageIndex = presentSectionAllPagesFrameworkIndex
-        aInfo5ViewModel.updatePageFrameworkTitleInPresentSectionAllPagesFramework(
-            aInfo5ViewModel.etPageNameMLD.value.toString(),
-            currentPageIndex
-        )
-        //Save the observations etc info into Section Page Data
-        aInfo5ViewModel.updateObservationsInObsForThePresentSectionAllData(
-            aInfo5ViewModel.etObservationsMLD.value.toString(),
-            currentPageIndex
-        )
-        aInfo5ViewModel.updatePicturePathsInObsForThePresentSectionAllData(
-            aInfo5ViewModel.tvPhotoPathsInObservationsFragmentMLD.value.toString(),
-            currentPageIndex
-        )
-        aInfo5ViewModel.updateRecommendationsInObsForThePresentSectionAllData(
-            aInfo5ViewModel.etRecommendationsMLD.value.toString(),
-            currentPageIndex
-        )
-        aInfo5ViewModel.updateStandardsInObsForThePresentSectionAllData(
-            aInfo5ViewModel.tvStandardsMLD.value.toString(),
-            currentPageIndex
-        )
-
-        //Update and save the Company Report into db
-        aInfo5ViewModel.setTheSectionPagesUpdatedInReportSIFFlagMLD(false)
+        if (presentSectionAllPagesFramework.sectionPageFrameworkList.size > 0){
+            //Save the page title into the page framework and data
+            val currentPageIndex = presentSectionAllPagesFrameworkIndex
+            aInfo5ViewModel.updatePageFrameworkTitleInPresentSectionAllPagesFramework(
+                aInfo5ViewModel.etPageNameMLD.value.toString(),
+                currentPageIndex
+            )
+            //Save the observations etc info into Section Page Data
+            aInfo5ViewModel.updateObservationsInObsForThePresentSectionAllData(
+                aInfo5ViewModel.etObservationsMLD.value.toString(),
+                currentPageIndex
+            )
+            aInfo5ViewModel.updatePicturePathsInObsForThePresentSectionAllData(
+                aInfo5ViewModel.tvPhotoPathsInObservationsFragmentMLD.value.toString(),
+                currentPageIndex
+            )
+            aInfo5ViewModel.updateRecommendationsInObsForThePresentSectionAllData(
+                aInfo5ViewModel.etRecommendationsMLD.value.toString(),
+                currentPageIndex
+            )
+            aInfo5ViewModel.updateStandardsInObsForThePresentSectionAllData(
+                aInfo5ViewModel.tvStandardsMLD.value.toString(),
+                currentPageIndex
+            )
+            //Update and save the Company Report into db
+            aInfo5ViewModel.setTheSectionPagesUpdatedInReportSIFFlagMLD(false)
 
             aInfo5ViewModel.updateSectionDetailsInCompanyReportAndSave(
                 aInfo5ViewModel.getPresentSectionCode(),
@@ -795,17 +793,18 @@ class ObservationsFragment : Fragment() {
                 sectionChildPageCodesList
             )
 
-        presentSectionAllPagesFramework = aInfo5ViewModel.getThePresentSectionAllPagesFramework()
-        presentSectionAllData = aInfo5ViewModel.getThePresentSectionAllData()
+            presentSectionAllPagesFramework = aInfo5ViewModel.getThePresentSectionAllPagesFramework()
+            presentSectionAllData = aInfo5ViewModel.getThePresentSectionAllData()
 
-        //Save the SectionPagesFramework and Data into db before stopping
-        val sectionPagesFrameworkAndDataID =
-            aInfo5ViewModel.getPresentCompanyCode() + aInfo5ViewModel.getPresentSectionCode() + MainActivity.SECTION_PAGES_FRAMEWORK_AND_DATA_ID
-        aInfo5ViewModel.saveThePresentSectionAllPagesFrameworkAndAllDataToDB(
-            aInfo5ViewModel.getThePresentSectionAllPagesFramework(),
-            aInfo5ViewModel.getThePresentSectionAllData(),
-            sectionPagesFrameworkAndDataID
-        )
+            //Save the SectionPagesFramework and Data into db before stopping
+            val sectionPagesFrameworkAndDataID =
+                aInfo5ViewModel.getPresentCompanyCode() + aInfo5ViewModel.getPresentSectionCode() + MainActivity.SECTION_PAGES_FRAMEWORK_AND_DATA_ID
+            aInfo5ViewModel.saveThePresentSectionAllPagesFrameworkAndAllDataToDB(
+                aInfo5ViewModel.getThePresentSectionAllPagesFramework(),
+                aInfo5ViewModel.getThePresentSectionAllData(),
+                sectionPagesFrameworkAndDataID
+            )
+        }
     }
 
     private fun showDialogToDeleteAPage() {
@@ -870,6 +869,7 @@ class ObservationsFragment : Fragment() {
                     reloadingPage(newListIndex)
                 }
                 else {
+
                     //Save the Section Page Framework and the page data before exiting
                     val sectionPagesFrameworkAndDataID =
                         aInfo5ViewModel.getPresentCompanyCode() + aInfo5ViewModel.getPresentSectionCode() + MainActivity.SECTION_PAGES_FRAMEWORK_AND_DATA_ID
@@ -886,7 +886,7 @@ class ObservationsFragment : Fragment() {
                         aInfo5ViewModel.getPresentCompanyCode() + MainActivity.COMPANY_SECTION_LIST_ID
                     aInfo5ViewModel.saveTheCompanySectionCodeAndDisplayMLIntoDB(companySectionsCDListID)
                     //Navigate to the SectionAndIntrosFragment suitably
-                    aInfo5ViewModel.setTheScreenVariable(MainActivity.SECTION_FRAGMENT_SECTION_CHOICE)
+                    aInfo5ViewModel.setTheScreenVariable(MainActivity.SECTION_FRAGMENT)
                     aInfo5ViewModel.setThePreviousScreenVariable(MainActivity.NOT_RELEVANT)
                     findNavController().navigate(R.id.action_observationsFragment_to_sectionAndIntrosFragment)
                 }

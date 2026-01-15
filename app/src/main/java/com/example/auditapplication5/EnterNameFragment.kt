@@ -55,23 +55,40 @@ class EnterNameFragment : Fragment() {
                 override fun handleOnBackPressed() {
                     if (aInfo5ViewModel.getThePreviousScreenVariable() == MainActivity.OPENING_SCREEN_FRAGMENT) {
                         findNavController().navigate(R.id.action_enterNameFragment_to_openingScreenFragment)
-                    } else if (aInfo5ViewModel.getThePreviousScreenVariable() == MainActivity.SECTION_FRAGMENT) {
+                    }
+                    else if (aInfo5ViewModel.getThePreviousScreenVariable() == MainActivity.SECTION_FRAGMENT) {
                         aInfo5ViewModel.setThePreviousScreenVariable(MainActivity.NOT_RELEVANT)
                         findNavController().navigate(R.id.action_enterNameFragment_to_sectionAndIntrosFragment)
-                    } else if (aInfo5ViewModel.getThePreviousScreenVariable() == MainActivity.SIMPLE_LIST_RV_FRAGMENT) {
+                    }
+                    else if (aInfo5ViewModel.getThePreviousScreenVariable() == MainActivity.SIMPLE_LIST_RV_FRAGMENT) {
                         if (aInfo5ViewModel.getThePreviousScreen2Variable() == MainActivity.SECTION_FRAGMENT_EDIT_1) {
+                            if (aInfo5ViewModel.editCompletedFlagLD.value == false){
+                                aInfo5ViewModel.setTheEditCompletedFlagMLD(true)
+                            }
                             aInfo5ViewModel.setTheScreenVariable(MainActivity.SECTION_FRAGMENT)
                             aInfo5ViewModel.setThePreviousScreenVariable(MainActivity.NOT_RELEVANT)
                             aInfo5ViewModel.setThePreviousScreen2Variable(MainActivity.NOT_RELEVANT)
-                        } else if (aInfo5ViewModel.getThePreviousScreen2Variable() == MainActivity.SECTION_FRAGMENT_EDIT_2) {
+                        }
+                        else if (aInfo5ViewModel.getThePreviousScreen2Variable() == MainActivity.SECTION_FRAGMENT_EDIT_2) {
+                            if (aInfo5ViewModel.editCompletedFlagLD.value == false){
+                                aInfo5ViewModel.setTheEditCompletedFlagMLD(true)
+                            }
                             aInfo5ViewModel.setTheScreenVariable(MainActivity.SECTION_FRAGMENT_SECTION_CHOICE)
                             aInfo5ViewModel.setThePreviousScreenVariable(MainActivity.NOT_RELEVANT)
                             aInfo5ViewModel.setThePreviousScreen2Variable(MainActivity.NOT_RELEVANT)
-                        } else if (aInfo5ViewModel.getThePreviousScreen2Variable() == MainActivity.SECTION_FRAGMENT_DELETE_1) {
+                        }
+                        else if (aInfo5ViewModel.getThePreviousScreen2Variable() == MainActivity.SECTION_FRAGMENT_DELETE_1) {
+                            if (aInfo5ViewModel.deleteCompletedFlagLD.value == false){
+                                aInfo5ViewModel.setTheDeleteCompletedFlagMLD(true)
+                            }
                             aInfo5ViewModel.setTheScreenVariable(MainActivity.SECTION_FRAGMENT)
                             aInfo5ViewModel.setThePreviousScreenVariable(MainActivity.NOT_RELEVANT)
                             aInfo5ViewModel.setThePreviousScreen2Variable(MainActivity.NOT_RELEVANT)
-                        } else if (aInfo5ViewModel.getThePreviousScreen2Variable() == MainActivity.SECTION_FRAGMENT_DELETE_2) {
+                        }
+                        else if (aInfo5ViewModel.getThePreviousScreen2Variable() == MainActivity.SECTION_FRAGMENT_DELETE_2) {
+                            if (aInfo5ViewModel.deleteCompletedFlagLD.value == false){
+                                aInfo5ViewModel.setTheDeleteCompletedFlagMLD(true)
+                            }
                             aInfo5ViewModel.setTheScreenVariable(MainActivity.SECTION_FRAGMENT_SECTION_CHOICE)
                             aInfo5ViewModel.setThePreviousScreenVariable(MainActivity.NOT_RELEVANT)
                             aInfo5ViewModel.setThePreviousScreen2Variable(MainActivity.NOT_RELEVANT)
